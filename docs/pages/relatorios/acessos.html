@@ -1,0 +1,1778 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Acess Control - Relatório de Acessos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+        .content-box {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.2);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-info {
+            background: #38bdf8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #0284c7;
+        }
+
+        /* Grid de filtros */
+        .filtros-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .filtro-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filtro-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .filtro-group input,
+        .filtro-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #ffffff;
+        }
+
+        .filtro-group input:focus,
+        .filtro-group select:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .date-range {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .date-range input {
+            flex: 1;
+        }
+
+        /* Seção de colunas */
+        .colunas-container {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 24px;
+        }
+
+        .colunas-container h3 {
+            margin-bottom: 16px;
+            color: #1e293b;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .colunas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .coluna-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .coluna-item:hover {
+            border-color: #4a90d9;
+            background: #ebf5ff;
+        }
+
+        .coluna-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #4a90d9;
+        }
+
+        .coluna-item span {
+            font-size: 0.9rem;
+            color: #1e293b;
+        }
+
+        /* Tabela de preview */
+        .preview-container {
+            margin-top: 24px;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            color: #1e293b;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* Cards de estatísticas resumidas */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 20px 0 24px;
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-card h4 {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        /* Formatos */
+        .formatos {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .formato-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .formato-option:hover {
+            border-color: #4a90d9;
+            background: #ebf5ff;
+        }
+
+        .formato-option input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #4a90d9;
+        }
+
+        .formato-option i {
+            color: #4a90d9;
+            font-size: 1.1rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Filtros Retráteis */
+        .filters-wrapper {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            background: #fff;
+            position: relative;
+            z-index: 10;
+        }
+
+        .filters-header {
+            padding: 16px 24px;
+            background: #f8fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+            user-select: none;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .filters-header:hover {
+            background: #f1f5f9;
+        }
+
+        .filters-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filters-header .toggle-icon {
+            transition: transform 0.3s;
+            color: #64748b;
+        }
+
+        .filters-header.active .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .filters-content {
+            padding: 24px;
+            display: none;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .filters-content.active {
+            display: block;
+        }
+
+        /* Estilos Choices.js custom */
+        .choices {
+            margin-bottom: 0;
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .choices.is-open {
+            z-index: 100;
+        }
+
+        .choices__inner {
+            background-color: #fff !important;
+            border: 1.5px solid #e2e8f0 !important;
+            border-radius: 8px !important;
+            min-height: 42px !important;
+            padding: 5px 10px !important;
+        }
+
+        .choices.is-focused .choices__inner {
+            border-color: #4a90d9 !important;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1) !important;
+        }
+
+        .choices__list--dropdown {
+            border-radius: 8px !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        @media (max-width: 768px) {
+            .filtros-container {
+                grid-template-columns: 1fr;
+            }
+
+            .colunas-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .formatos {
+                flex-direction: column;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .date-range {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="relatorio-acessos" class="content-section active">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1>Relatório de Acessos - Pessoas</h1>
+                            <p>Visualize e exporte dados de acesso de pessoas</p>
+                        </div>
+                    </div>
+
+                    <div class="content-box">
+                        <!-- Tipo de Relatório - SELECT -->
+                        <div class="filtros-container" style="grid-template-columns: repeat(2, 1fr);">
+                            <div class="filtro-group">
+                                <label>Tipo de Relatório</label>
+                                <select id="tipoRelatorio" onchange="mudarTipoRelatorio()">
+                                    <option value="totais">Totais de Acessos</option>
+                                    <option value="presentes">Pessoas Presentes</option>
+                                    <option value="por-empresa">Quantidade de Presentes por Empresa</option>
+                                </select>
+                            </div>
+
+                            <!-- Período -->
+                            <div class="filtro-group">
+                                <label>Período</label>
+                                <div class="date-range">
+                                    <input type="datetime-local" id="dataHoraInicio" value="2026-03-01T00:00">
+                                    <span>até</span>
+                                    <input type="datetime-local" id="dataHoraFim" value="2026-03-09T23:59">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filtros Retráteis -->
+                        <div class="filters-wrapper">
+                            <div class="filters-header" id="header-filtros" onclick="toggleFilters()">
+                                <h3><i class="fas fa-filter"></i> Filtros</h3>
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </div>
+                            <div id="content-filtros" class="filters-content">
+                                <div class="filtros-container">
+                                    <!-- Direção -->
+                                    <div class="filtro-group">
+                                        <label>Direção</label>
+                                        <select id="filtroDirecao">
+                                            <option value="">Todas</option>
+                                            <option value="entry">Entrada</option>
+                                            <option value="exit">Saída</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Status -->
+                                    <div class="filtro-group">
+                                        <label>Status</label>
+                                        <select id="filtroStatus">
+                                            <option value="">Todos</option>
+                                            <option value="ativo">Ativo</option>
+                                            <option value="inativo">Inativo</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Grupos -->
+                                    <div class="filtro-group">
+                                        <label>Grupos</label>
+                                        <select id="filtroGrupo">
+                                            <option value="">Todos</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Empresas -->
+                                    <div class="filtro-group">
+                                        <label>Empresas</label>
+                                        <select id="filtroEmpresa">
+                                            <option value="">Todas</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Equipamento -->
+                                    <div class="filtro-group">
+                                        <label>Equipamento</label>
+                                        <select id="filtroEquipamento">
+                                            <option value="">Todos</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Autorização -->
+                                    <div class="filtro-group">
+                                        <label>Autorização</label>
+                                        <select id="filtroAutorizacao">
+                                            <option value="">Todas</option>
+                                            <option value="success">Autorizada</option>
+                                            <option value="denied">Negada</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Tipo de Pessoa (Pessoa ou Visitante) -->
+                                    <div class="filtro-group">
+                                        <label>Tipo de Pessoa</label>
+                                        <select id="filtroTipoPessoa">
+                                            <option value="">Todos</option>
+                                            <option value="person">Pessoa Cadastrada</option>
+                                            <option value="visitor">Visitante</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Pessoas Cadastradas / Visitantes -->
+                                    <div class="filtro-group">
+                                        <label>Pessoa/Visitante</label>
+                                        <select id="filtroPessoas">
+                                            <option value="">Todas</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seleção de Colunas -->
+                        <div class="colunas-container">
+                            <h3><i class="fas fa-columns"></i> Selecione as colunas para exibir</h3>
+                            <div class="colunas-grid" id="colunasGrid">
+                                <label class="coluna-item">
+                                    <input type="checkbox" value="nome" checked>
+                                    <span>Nome</span>
+                                </label>
+                                <label class="coluna-item">
+                                    <input type="checkbox" value="dataHora" checked>
+                                    <span>Data/Hora</span>
+                                </label>
+                                <label class="coluna-item">
+                                    <input type="checkbox" value="direcao" checked>
+                                    <span>Direção</span>
+                                </label>
+                                <label class="coluna-item">
+                                    <input type="checkbox" value="equipamento" checked>
+                                    <span>Equipamento</span>
+                                </label>
+                                <label class="coluna-item">
+                                    <input type="checkbox" value="empresa" checked>
+                                    <span>Empresa</span>
+                                </label>
+                                <label class="coluna-item">
+                                    <input type="checkbox" value="grupo" checked>
+                                    <span>Grupo</span>
+                                </label>
+                                <label class="coluna-item">
+                                    <input type="checkbox" value="autorizacao" checked>
+                                    <span>Autorização</span>
+                                </label>
+                                <label class="coluna-item">
+                                    <input type="checkbox" value="matricula" checked>
+                                    <span>Matrícula</span>
+                                </label>
+                                <label class="coluna-item">
+                                    <input type="checkbox" value="documento">
+                                    <span>Documento</span>
+                                </label>
+                                <label class="coluna-item">
+                                    <input type="checkbox" value="foto">
+                                    <span>Foto</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Estatísticas Resumidas -->
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h4>Total de Acessos</h4>
+                                <div class="value" id="total-acessos">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <h4>Pessoas Presentes</h4>
+                                <div class="value" id="total-presentes">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <h4>Empresas com Pessoas</h4>
+                                <div class="value" id="total-empresas">0</div>
+                            </div>
+                        </div>
+
+                        <!-- Formato de Exportação -->
+                        <div class="formatos">
+                            <label class="formato-option">
+                                <input type="radio" name="formato" value="pdf" checked>
+                                <i class="fas fa-file-pdf"></i>
+                                <span>PDF</span>
+                            </label>
+                            <label class="formato-option">
+                                <input type="radio" name="formato" value="xlsx">
+                                <i class="fas fa-file-excel"></i>
+                                <span>Excel (XLSX)</span>
+                            </label>
+                            <label class="formato-option">
+                                <input type="radio" name="formato" value="csv">
+                                <i class="fas fa-file-csv"></i>
+                                <span>CSV</span>
+                            </label>
+                        </div>
+
+                        <!-- Botões -->
+                        <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+                            <button class="btn btn-primary" id="btn-gerar-relatorio" onclick="gerarRelatorio()">
+                                <i class="fas fa-file-export"></i> Gerar Relatório
+                            </button>
+                            <button class="btn btn-secondary" onclick="visualizarPreview()">
+                                <i class="fas fa-eye"></i> Visualizar Preview
+                            </button>
+                            <a href="historico.html" class="btn btn-secondary">
+                                <i class="fas fa-history"></i> Histórico de Relatórios
+                            </a>
+                        </div>
+
+                        <!-- Card de status do job (aparece quando relatório está gerando) -->
+                        <div id="job-status-card" style="display:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:16px; margin-bottom:24px;">
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <i id="job-status-icon" class="fas fa-cog fa-spin" style="font-size:24px; color:#3b82f6;"></i>
+                                <div style="flex:1;">
+                                    <div id="job-status-title" style="font-weight:600; color:#1e293b;">Gerando relatório...</div>
+                                    <div id="job-status-msg" style="color:#64748b; font-size:0.9rem; margin-top:2px;">Sua solicitação está na fila de processamento.</div>
+                                </div>
+                                <button id="job-download-btn" class="btn btn-success" style="display:none;" onclick="baixarJobAtual()">
+                                    <i class="fas fa-download"></i> Baixar
+                                </button>
+                                <button id="job-close-btn" class="btn btn-secondary btn-sm" style="display:none;" onclick="fecharJobCard()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Preview da Tabela -->
+                        <div id="previewContainer" class="preview-container hidden">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                                <h3 style="margin-bottom: 0; color: #1e293b;">Preview do Relatório</h3>
+                                <div style="position: relative; width: 300px; min-width: 250px;">
+                                    <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
+                                    <input type="text" id="inputBuscaPreview" onkeyup="filtrarPreview()" placeholder="Buscar no preview..." style="width: 100%; padding: 10px 12px 10px 38px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; outline: none; transition: border-color 0.2s;">
+                                </div>
+                            </div>
+                            <table class="data-table" id="previewTable">
+                                <thead id="previewThead">
+                                    <tr></tr>
+                                </thead>
+                                <tbody id="previewTbody"></tbody>
+                            </table>
+                            <div id="previewPagination" class="pagination" style="display: flex; justify-content: center; gap: 8px; margin-top: 15px; align-items: center;"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+    <script src="../../auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+    <script>
+        // Dados da empresa — carregados dinamicamente do banco
+        let empresaInfo = { razao: 'Acess Control', cnpj: '', endereco: '', telefone: '' };
+
+        async function carregarEmpresaInfo() {
+            try {
+                if (typeof api === 'undefined') return;
+                const data = await api.getReportCompany();
+                if (data && (data.razao || data.cnpj)) {
+                    empresaInfo = {
+                        razao:    data.razao    || 'Acess Control',
+                        cnpj:     data.cnpj     || '',
+                        endereco: data.endereco || '',
+                        telefone: data.telefone || ''
+                    };
+                }
+            } catch(e) { console.warn('Erro ao carregar dados empresa:', e); }
+        }
+
+        async function carregarLogo() {
+            try {
+                const resp = await fetch('../../logo.jpg');
+                if (!resp.ok) return;
+                const blob = await resp.blob();
+                const reader = new FileReader();
+                reader.onloadend = () => { window._reportLogoBase64 = reader.result; };
+                reader.readAsDataURL(blob);
+            } catch(e) { console.warn('Logo não encontrada:', e); }
+        }
+
+        // Variáveis globais para armazenar dados da API
+        let acessosData = [];
+        let filtrosData = null;
+        let choicesInstances = {};
+
+        // Inicializar Choices.js
+        function initChoices() {
+            const selects = [
+                'tipoRelatorio', 'filtroDirecao', 'filtroStatus', 'filtroGrupo', 
+                'filtroEmpresa', 'filtroEquipamento', 'filtroAutorizacao', 
+                'filtroTipoPessoa', 'filtroPessoas'
+            ];
+
+            selects.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (choicesInstances[id]) {
+                        choicesInstances[id].destroy();
+                    }
+                    choicesInstances[id] = new Choices(el, {
+                        searchEnabled: true,
+                        itemSelectText: '',
+                        noResultsText: 'Nenhum resultado encontrado',
+                        noChoicesText: 'Sem opções disponíveis',
+                        placeholder: true,
+                        placeholderValue: 'Selecione uma opção',
+                        shouldSort: false
+                    });
+                }
+            });
+        }
+
+        // Função para toggle dos filtros
+        function toggleFilters() {
+            const header = document.getElementById('header-filtros');
+            const content = document.getElementById('content-filtros');
+            header.classList.toggle('active');
+            content.classList.toggle('active');
+        }
+
+        // Inicializar dados ao carregar a página
+        async function initData() {
+            // Carregar logo e empresa em paralelo
+            carregarLogo();
+            carregarEmpresaInfo();
+
+            // Inicializar comboboxes vazios primeiro
+            initChoices();
+            
+            try {
+                // Carregar filtros
+                filtrosData = await api.getReportFilters();
+                if (filtrosData) {
+                    populateFilters(filtrosData);
+                }
+                
+                // Carregar dados iniciais
+                await loadAccessData();
+                
+                // Atualizar estatísticas
+                await atualizarEstatisticas();
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+            }
+        }
+
+        // Preencher os selects de filtro
+        function populateFilters(filtros) {
+            // Grupos
+            const grupoSelect = document.getElementById('filtroGrupo');
+            if (filtros.groups && grupoSelect) {
+                const options = [{ value: '', label: 'Todos os Grupos', selected: true }];
+                filtros.groups.forEach(g => options.push({ value: g.id, label: g.name }));
+                choicesInstances['filtroGrupo'].setChoices(options, 'value', 'label', true);
+            }
+
+            // Empresas
+            const empresaSelect = document.getElementById('filtroEmpresa');
+            if (filtros.companies && empresaSelect) {
+                const options = [{ value: '', label: 'Todas as Empresas', selected: true }];
+                filtros.companies.forEach(c => options.push({ 
+                    value: c.id, 
+                    label: c.trading_name || c.corporate_name 
+                }));
+                choicesInstances['filtroEmpresa'].setChoices(options, 'value', 'label', true);
+            }
+
+            // Equipamentos
+            const equipamentoSelect = document.getElementById('filtroEquipamento');
+            if (filtros.equipments && equipamentoSelect) {
+                const options = [{ value: '', label: 'Todos os Equipamentos', selected: true }];
+                filtros.equipments.forEach(e => options.push({ value: e.id, label: e.name }));
+                choicesInstances['filtroEquipamento'].setChoices(options, 'value', 'label', true);
+            }
+
+            // Pessoas e Visitantes
+            const pessoaSelect = document.getElementById('filtroPessoas');
+            if (pessoaSelect) {
+                const choices = [{ value: '', label: 'Todas as Pessoas', selected: true }];
+                
+                if (filtros.persons) {
+                    filtros.persons.forEach(p => choices.push({ 
+                        value: p.id, 
+                        label: `${p.name} (${p.registration_number || '-'})`,
+                        groupId: 1
+                    }));
+                }
+                
+                if (filtros.visitors) {
+                    filtros.visitors.forEach(v => choices.push({ 
+                        value: v.id, 
+                        label: `${v.name} (${v.document || '-'})`,
+                        groupId: 2
+                    }));
+                }
+                
+                choicesInstances['filtroPessoas'].setChoices(choices, 'value', 'label', true);
+            }
+        }
+
+        // Carregar dados de acessos do backend
+        async function loadAccessData() {
+            const dataInicio = document.getElementById('dataHoraInicio').value;
+            const dataFim = document.getElementById('dataHoraFim').value;
+            
+            const filters = {};
+            if (dataInicio) filters.startDate = dataInicio;
+            if (dataFim) filters.endDate = dataFim;
+
+            // Coletar outros filtros
+            const direcao = document.getElementById('filtroDirecao').value;
+            if (direcao) filters.direction = direcao;
+
+            const status = document.getElementById('filtroStatus').value;
+            if (status) filters.status = status;
+
+            const groupId = document.getElementById('filtroGrupo').value;
+            if (groupId) filters.groupId = groupId;
+
+            const companyId = document.getElementById('filtroEmpresa').value;
+            if (companyId) filters.companyId = companyId;
+
+            const equipmentId = document.getElementById('filtroEquipamento').value;
+            if (equipmentId) filters.equipmentId = equipmentId;
+
+            const autorizacao = document.getElementById('filtroAutorizacao').value;
+            if (autorizacao) filters.status = autorizacao; // O backend usa 'status' para autorização
+
+            const personType = document.getElementById('filtroTipoPessoa').value;
+            if (personType) filters.personType = personType;
+
+            const personId = document.getElementById('filtroPessoas').value;
+            if (personId) filters.personId = personId;
+            
+            try {
+                console.log('Carregando dados de acessos com filtros:', filters);
+                acessosData = await api.getAccessReport(filters);
+                console.log('Dados de acessos carregados:', acessosData.length);
+            } catch (error) {
+                console.error('Erro ao carregar acessos:', error);
+                acessosData = [];
+            }
+        }
+
+        // Atualizar estatísticas
+        async function atualizarEstatisticas() {
+            // Usar diretamente os dados da API que já estão filtrados
+            if (acessosData && acessosData.length > 0) {
+                const totalAcessos = acessosData.length;
+                
+                // Ordenar do mais antigo para o mais recente para cálculo correto de presentes
+                const dadosOrdenados = [...acessosData].sort((a, b) => 
+                    new Date(a.dataHora) - new Date(b.dataHora)
+                );
+                
+                // Calcular pessoas presentes (apenas acessos autorizados)
+                const presentes = new Map();
+                dadosOrdenados.forEach(acesso => {
+                    if (acesso.autorizacao !== 'success') return; // Ignorar acessos negados
+                    const key = acesso.nome + acesso.matricula;
+                    if (acesso.direcao === 'entry') {
+                        presentes.set(key, acesso);
+                    } else if (acesso.direcao === 'exit') {
+                        presentes.delete(key);
+                    }
+                });
+
+                // Calcular empresas com pessoas presentes
+                const empresasPresentes = new Set();
+                presentes.forEach(pessoa => {
+                    if (pessoa.empresa) empresasPresentes.add(pessoa.empresa);
+                });
+
+                const el = document.getElementById('total-acessos');
+                const el2 = document.getElementById('total-presentes');
+                const el3 = document.getElementById('total-empresas');
+                if (el) el.textContent = totalAcessos;
+                if (el2) el2.textContent = presentes.size;
+                if (el3) el3.textContent = empresasPresentes.size;
+            } else {
+                // Sem dados
+                const el = document.getElementById('total-acessos');
+                const el2 = document.getElementById('total-presentes');
+                const el3 = document.getElementById('total-empresas');
+                if (el) el.textContent = '0';
+                if (el2) el2.textContent = '0';
+                if (el3) el3.textContent = '0';
+            }
+        }
+
+        // Mudar tipo de relatório
+        function mudarTipoRelatorio() {
+            const tipo = document.getElementById('tipoRelatorio').value;
+            console.log('Tipo de relatório selecionado:', tipo);
+            
+            // Atualizar estatísticas ao mudar o tipo
+            atualizarEstatisticas();
+        }
+
+        // Atualizar dados quando os filtros mudam
+        async function applyFilters() {
+            const filters = getFilterValues();
+            console.log('Aplicando filtros:', filters);
+            
+            try {
+                acessosData = await api.getAccessReport(filters);
+                console.log('Dados filtrados carregados:', acessosData.length);
+                atualizarEstatisticas();
+                
+                // Se o preview está visível, atualizar
+                if (!document.getElementById('previewContainer').classList.contains('hidden')) {
+                    visualizarPreview();
+                }
+            } catch (error) {
+                console.error('Erro ao aplicar filtros:', error);
+            }
+        }
+
+        // Obter valores dos filtros
+        function getFilterValues() {
+            const filters = {};
+            
+            const dataInicio = document.getElementById('dataHoraInicio').value;
+            const dataFim = document.getElementById('dataHoraFim').value;
+            const direcao = document.getElementById('filtroDirecao').value;
+            const status = document.getElementById('filtroStatus').value;
+            const grupo = document.getElementById('filtroGrupo').value;
+            const empresa = document.getElementById('filtroEmpresa').value;
+            const equipamento = document.getElementById('filtroEquipamento').value;
+            const autorizacao = document.getElementById('filtroAutorizacao').value;
+            const pessoa = document.getElementById('filtroPessoas').value;
+            const tipoPessoa = document.getElementById('filtroTipoPessoa').value;
+            
+            if (dataInicio) filters.startDate = dataInicio;
+            if (dataFim) filters.endDate = dataFim;
+            if (direcao) filters.direction = direcao;
+            if (status) filters.status = status;
+            if (grupo) filters.groupId = grupo;
+            if (empresa) filters.companyId = empresa;
+            if (equipamento) filters.equipmentId = equipamento;
+            if (autorizacao) filters.authorization = autorizacao;
+            if (pessoa) filters.personId = pessoa;
+            if (tipoPessoa) filters.personType = tipoPessoa;
+            
+            return filters;
+        }
+
+        // Obter dados filtrados - agora usa dados da API diretamente pois o backend já filtra
+        function getDadosFiltrados() {
+            // Retornar dados da API diretamente (já filtrados pelo backend)
+            return acessosData && acessosData.length > 0 ? [...acessosData] : [];
+        }
+
+        // Obter dados agrupados por empresa
+        function getDadosPorEmpresa() {
+            const dados = getDadosFiltrados();
+            const porEmpresa = {};
+
+            // Ordenar dados do mais antigo para o mais recente
+            const dadosOrdenados = [...dados].sort((a, b) => 
+                new Date(a.dataHora) - new Date(b.dataHora)
+            );
+
+            dadosOrdenados.forEach(item => {
+                let empresaNome = item.empresa;
+                if (!empresaNome || empresaNome === '-' || empresaNome.trim() === '') {
+                    empresaNome = 'Sem empresa';
+                }
+                
+                if (!porEmpresa[empresaNome]) {
+                    porEmpresa[empresaNome] = {
+                        empresa: empresaNome,
+                        total: 0,
+                        entradas: 0,
+                        saidas: 0,
+                        pessoas: new Set()
+                    };
+                }
+                porEmpresa[empresaNome].total++;
+                // O backend retorna 'entry' e 'exit' (minúsculo)
+                if (item.direcao === 'entry') {
+                    porEmpresa[empresaNome].entradas++;
+                    porEmpresa[empresaNome].pessoas.add(item.nome);
+                } else if (item.direcao === 'exit') {
+                    porEmpresa[empresaNome].saidas++;
+                    porEmpresa[empresaNome].pessoas.delete(item.nome);
+                }
+            });
+
+            return Object.values(porEmpresa).map(e => ({
+                empresa: e.empresa,
+                total: e.total,
+                entradas: e.entradas,
+                saidas: e.saidas,
+                pessoasPresentes: e.pessoas.size
+            }));
+        }
+
+        // Obter pessoas presentes
+        function getPessoasPresentes() {
+            const dados = getDadosFiltrados();
+            const presentes = new Map();
+
+            // Ordenar dados do mais antigo para o mais recente (ordem cronológica)
+            const dadosOrdenados = [...dados].sort((a, b) => 
+                new Date(a.dataHora) - new Date(b.dataHora)
+            );
+
+            dadosOrdenados.forEach(item => {
+                if (item.autorizacao !== 'success') return; // Ignorar acessos negados
+                const key = item.nome + item.matricula;
+                if (item.direcao === 'entry') {
+                    presentes.set(key, item);
+                } else if (item.direcao === 'exit') {
+                    presentes.delete(key);
+                }
+            });
+
+            return Array.from(presentes.values());
+        }
+
+        // Obter colunas selecionadas
+        function getColunasSelecionadas() {
+            const checkboxes = document.querySelectorAll('#colunasGrid input[type="checkbox"]:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
+        // Visualizar preview
+        async function visualizarPreview() {
+            // Recarregar dados com filtros atuais antes de mostrar o preview
+            await loadAccessData();
+            await atualizarEstatisticas();
+
+            const tipoRelatorio = document.getElementById('tipoRelatorio').value;
+            
+            // Selecionar colunas automaticamente berdasarkan tipo de relatório
+            let colunasSelecionadas;
+            const checkboxes = document.querySelectorAll('#colunasGrid input[type="checkbox"]');
+            
+            if (tipoRelatorio === 'por-empresa') {
+                // Para relatório por empresa, selecionar colunas relevantes
+                colunasSelecionadas = ['empresa', 'total', 'entradas', 'saidas', 'pessoasPresentes'];
+                checkboxes.forEach(cb => {
+                    if (colunasSelecionadas.includes(cb.value)) {
+                        cb.checked = true;
+                    } else {
+                        cb.checked = false;
+                    }
+                });
+            } else {
+                colunasSelecionadas = getColunasSelecionadas();
+                if (colunasSelecionadas.length === 0) {
+                    // Selecionar colunas padrão para relatórios normais
+                    checkboxes.forEach(cb => cb.checked = true);
+                    colunasSelecionadas = getColunasSelecionadas();
+                }
+            }
+            
+            if (colunasSelecionadas.length === 0) {
+                alert('Selecione pelo menos uma coluna!');
+                return;
+            }
+
+            let dados = [];
+
+            switch(tipoRelatorio) {
+                case 'totais':
+                    dados = getDadosFiltrados();
+                    break;
+                case 'presentes':
+                    dados = getPessoasPresentes();
+                    break;
+                case 'por-empresa':
+                    dados = getDadosPorEmpresa();
+                    break;
+            }
+
+            const thead = document.getElementById('previewThead');
+            const tbody = document.getElementById('previewTbody');
+
+            // Mapeamento de labels
+            const labels = {
+                nome: 'Nome',
+                dataHora: 'Data/Hora',
+                direcao: 'Direção',
+                equipamento: 'Equipamento',
+                empresa: 'Empresa',
+                grupo: 'Grupo',
+                autorizacao: 'Autorização',
+                matricula: 'Matrícula',
+                documento: 'Documento',
+                foto: 'Foto',
+                total: 'Total de Acessos',
+                entradas: 'Entradas',
+                saidas: 'Saídas',
+                pessoasPresentes: 'Pessoas Presentes'
+            };
+
+            // Montar cabeçalho
+            thead.innerHTML = '<tr>' + colunasSelecionadas.map(col => 
+                `<th>${labels[col] || col}</th>`
+            ).join('') + '</tr>';
+
+            // Limpar busca ao gerar novo preview
+            const buscaInput = document.getElementById('inputBuscaPreview');
+            if (buscaInput) buscaInput.value = '';
+
+            window.previewDataGlobal = dados;
+            window.previewColunasGlobais = colunasSelecionadas;
+            window.previewLabels = labels;
+            window.filteredPreviewData = dados;
+            renderPreviewPage(1);
+
+            document.getElementById('previewContainer').classList.remove('hidden');
+        }
+
+        window.previewCurrentPage = 1;
+        window.previewItemsPerPage = 100;
+
+        function renderPreviewPage(page) {
+            window.previewCurrentPage = page;
+            const start = (page - 1) * window.previewItemsPerPage;
+            const end = start + window.previewItemsPerPage;
+            const paginatedItems = window.filteredPreviewData.slice(start, end);
+
+            const tbody = document.getElementById('previewTbody');
+            const colunasSelecionadas = window.previewColunasGlobais;
+
+            if (paginatedItems.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${colunasSelecionadas.length}" style="text-align: center;">Nenhum dado encontrado</td></tr>`;
+            } else {
+                tbody.innerHTML = paginatedItems.map(item => {
+                    return '<tr>' + colunasSelecionadas.map(col => {
+                        let valor = item[col];
+                        // Tratar 0 e 0 como valores válidos (não como falsy)
+                        if (valor === undefined || valor === null || valor === '') {
+                            valor = '-';
+                        }
+                        
+                        // Format data/hora para português brasileiro
+                        if (col === 'dataHora' && valor && valor !== '-') {
+                            try {
+                                const data = new Date(valor);
+                                valor = data.toLocaleString('pt-BR', { 
+                                    day: '2-digit', 
+                                    month: '2-digit', 
+                                    year: 'numeric',
+                                    hour: '2-digit', 
+                                    minute: '2-digit',
+                                    second: '2-digit'
+                                });
+                            } catch(e) { }
+                        }
+                        
+                        // Traduzir direção para português
+                        if (col === 'direcao') {
+                            if (valor === 'entry' || valor === 'ENTRY') valor = 'ENTRADA';
+                            else if (valor === 'exit' || valor === 'EXIT') valor = 'SAÍDA';
+                            valor = `<span class="badge ${valor === 'ENTRADA' ? 'badge-success' : 'badge-danger'}">${valor}</span>`;
+                        }
+                        
+                        // Traduzir autorização para português
+                        if (col === 'autorizacao') {
+                            if (valor === 'success' || valor === 'SUCCESS' || valor === 'authorized' || valor === 'AUTHORIZED') valor = 'LIBERADO';
+                            else if (valor === 'denied' || valor === 'DENIED') valor = 'NEGADO';
+                            else if (valor === 'on_premises' || valor === 'ON_PREMISES') valor = 'ATIVO';
+                            else if (valor === 'exited' || valor === 'EXITED') valor = 'INATIVO';
+                            
+                            let badgeClass = 'badge-secondary';
+                            if (valor === 'LIBERADO' || valor === 'ATIVO') badgeClass = 'badge-success';
+                            else if (valor === 'NEGADO' || valor === 'INATIVO') badgeClass = 'badge-danger';
+                            
+                            valor = `<span class="badge ${badgeClass}">${valor}</span>`;
+                        }
+                        
+                        if (col === 'foto') {
+                            valor = '<i class="fas fa-user-circle" style="font-size: 1.5rem; color: #4a90d9;"></i>';
+                        }
+                        return `<td>${valor}</td>`;
+                    }).join('') + '</tr>';
+                }).join('');
+            }
+
+            renderPaginationControls();
+        }
+
+        function renderPaginationControls() {
+            const totalPages = Math.ceil(window.filteredPreviewData.length / window.previewItemsPerPage);
+            const container = document.getElementById('previewPagination');
+            container.innerHTML = '';
+            
+            if (totalPages <= 1) return;
+            
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'btn btn-secondary btn-sm';
+            prevBtn.innerText = 'Anterior';
+            prevBtn.disabled = window.previewCurrentPage === 1;
+            prevBtn.onclick = () => renderPreviewPage(window.previewCurrentPage - 1);
+            container.appendChild(prevBtn);
+            
+            const info = document.createElement('span');
+            info.style.fontSize = '14px';
+            info.style.fontWeight = '500';
+            info.innerText = `Pág. ${window.previewCurrentPage} de ${totalPages}`;
+            container.appendChild(info);
+            
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'btn btn-secondary btn-sm';
+            nextBtn.innerText = 'Próximo';
+            nextBtn.disabled = window.previewCurrentPage === totalPages;
+            nextBtn.onclick = () => renderPreviewPage(window.previewCurrentPage + 1);
+            container.appendChild(nextBtn);
+        }
+
+        // Função para filtrar a tabela de preview em tempo real
+        function filtrarPreview() {
+            const input = document.getElementById('inputBuscaPreview');
+            const filter = input.value.toUpperCase();
+            
+            if (!filter) {
+                window.filteredPreviewData = window.previewDataGlobal;
+            } else {
+                window.filteredPreviewData = window.previewDataGlobal.filter(item => {
+                    return window.previewColunasGlobais.some(col => {
+                        let txtValue = String(item[col] || '');
+                        if (col === 'direcao') txtValue = (txtValue.toUpperCase() === 'ENTRY') ? 'ENTRADA' : (txtValue.toUpperCase() === 'EXIT') ? 'SAÍDA' : txtValue;
+                        if (col === 'autorizacao') {
+                            if (txtValue.toUpperCase() === 'SUCCESS') txtValue = 'LIBERADO';
+                            if (txtValue.toUpperCase() === 'DENIED') txtValue = 'NEGADO';
+                            if (txtValue.toUpperCase() === 'ON_PREMISES') txtValue = 'ATIVO';
+                            if (txtValue.toUpperCase() === 'EXITED') txtValue = 'INATIVO';
+                        }
+                        return txtValue.toUpperCase().indexOf(filter) > -1;
+                    });
+                });
+            }
+            renderPreviewPage(1);
+        }
+
+        // Gerar relatório
+        // ===== Fluxo de Geração em Background =====
+        // Toda geração de relatório vira um job na fila do backend.
+        // O usuário vê o progresso na própria página e baixa quando pronto.
+        let jobPollInterval = null;
+        let jobAtual = null;
+
+        function mapearTipoRelatorio() {
+            const tipoRel = document.getElementById('tipoRelatorio')?.value || 'totais';
+            // Mapeia o tipo da UI para o report_type aceito pelo backend
+            if (tipoRel === 'por-empresa') return 'access_por_empresa';
+            return 'access';
+        }
+
+        function abrirJobCard(titulo, msg) {
+            const card = document.getElementById('job-status-card');
+            const icon = document.getElementById('job-status-icon');
+            const t = document.getElementById('job-status-title');
+            const m = document.getElementById('job-status-msg');
+            const dl = document.getElementById('job-download-btn');
+            const close = document.getElementById('job-close-btn');
+            card.style.display = 'block';
+            icon.className = 'fas fa-cog fa-spin';
+            icon.style.color = '#3b82f6';
+            t.textContent = titulo;
+            m.textContent = msg;
+            dl.style.display = 'none';
+            close.style.display = 'none';
+        }
+
+        function atualizarJobCard({ titulo, msg, sucesso, erro }) {
+            const icon = document.getElementById('job-status-icon');
+            const t = document.getElementById('job-status-title');
+            const m = document.getElementById('job-status-msg');
+            const dl = document.getElementById('job-download-btn');
+            const close = document.getElementById('job-close-btn');
+            t.textContent = titulo;
+            m.textContent = msg;
+            if (sucesso) {
+                icon.className = 'fas fa-check-circle';
+                icon.style.color = '#22c55e';
+                dl.style.display = 'inline-flex';
+                close.style.display = 'inline-flex';
+            } else if (erro) {
+                icon.className = 'fas fa-times-circle';
+                icon.style.color = '#ef4444';
+                dl.style.display = 'none';
+                close.style.display = 'inline-flex';
+            }
+        }
+
+        function fecharJobCard() {
+            document.getElementById('job-status-card').style.display = 'none';
+            if (jobPollInterval) { clearInterval(jobPollInterval); jobPollInterval = null; }
+            jobAtual = null;
+        }
+
+        async function baixarJobAtual() {
+            if (!jobAtual) return;
+            try {
+                // Usa o helper centralizado que já cuida de auth headers e
+                // criação do <a> temporário para download.
+                await api.downloadReportFile(jobAtual.id, jobAtual.filename);
+            } catch (e) {
+                alert('Erro ao baixar: ' + e.message);
+            }
+        }
+
+        async function gerarRelatorio() {
+            const colunasSelecionadas = getColunasSelecionadas();
+            if (colunasSelecionadas.length === 0) {
+                alert('Selecione pelo menos uma coluna!');
+                return;
+            }
+
+            // Trava o botão durante o envio
+            const btn = document.getElementById('btn-gerar-relatorio');
+            const btnOriginal = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enfileirando...';
+
+            const filters = getFilterValues();
+            // Inclui colunas selecionadas e formato preferido para o backend usar
+            filters.columns = JSON.stringify(colunasSelecionadas);
+            const formato = document.querySelector('input[name="formato"]:checked')?.value || 'pdf';
+            filters.format = formato;
+
+            try {
+                const res = await api.request('/report-jobs', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        report_type: mapearTipoRelatorio(),
+                        filters,
+                        orientation: 'portrait'
+                    })
+                });
+                if (!res || !res.success) throw new Error(res?.message || 'Erro ao criar job');
+
+                jobAtual = res.data;
+                abrirJobCard(
+                    'Relatório na fila',
+                    `Job #${jobAtual.id} criado. Aguarde — o servidor está processando.`
+                );
+
+                // Polling do status
+                if (jobPollInterval) clearInterval(jobPollInterval);
+                jobPollInterval = setInterval(async () => {
+                    try {
+                        const sr = await api.request(`/report-jobs/${jobAtual.id}`);
+                        const job = sr?.data;
+                        if (!job) return;
+                        jobAtual = job;
+                        if (job.status === 'completed') {
+                            clearInterval(jobPollInterval);
+                            jobPollInterval = null;
+                            atualizarJobCard({
+                                titulo: 'Relatório pronto!',
+                                msg: `${job.total_records || 0} registros. Clique em Baixar para salvar.`,
+                                sucesso: true
+                            });
+                        } else if (job.status === 'failed') {
+                            clearInterval(jobPollInterval);
+                            jobPollInterval = null;
+                            atualizarJobCard({
+                                titulo: 'Falha na geração',
+                                msg: job.error_message || 'Erro desconhecido',
+                                erro: true
+                            });
+                        } else if (job.status === 'processing') {
+                            document.getElementById('job-status-msg').textContent =
+                                'Processando dados no servidor...';
+                        }
+                    } catch (e) {
+                        // ignora falhas pontuais de polling
+                    }
+                }, 2500);
+            } catch (e) {
+                alert('Erro ao enfileirar relatório: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = btnOriginal;
+            }
+        }
+
+        // ===== Funções legadas (preview / dados em memória) =====
+        async function gerarRelatorioLegado() {
+            // Recarregar dados com filtros atuais antes de gerar
+            await loadAccessData();
+            await atualizarEstatisticas();
+
+            const formato = document.querySelector('input[name="formato"]:checked').value;
+            const tipoRelatorio = document.getElementById('tipoRelatorio').value;
+            const colunasSelecionadas = getColunasSelecionadas();
+
+            if (colunasSelecionadas.length === 0) {
+                alert('Selecione pelo menos uma coluna!');
+                return;
+            }
+
+            let dados = [];
+            let titulo = '';
+
+            switch(tipoRelatorio) {
+                case 'totais':
+                    dados = getDadosFiltrados();
+                    titulo = 'RELATÓRIO DE TOTAIS DE ACESSOS';
+                    break;
+                case 'presentes':
+                    dados = getPessoasPresentes();
+                    titulo = 'RELATÓRIO DE PESSOAS PRESENTES';
+                    break;
+                case 'por-empresa':
+                    dados = getDadosPorEmpresa();
+                    titulo = 'RELATÓRIO DE ACESSOS POR EMPRESA';
+                    break;
+            }
+
+            if (dados.length >= 2000) {
+                // Warning para relatórios que bateram no limite e podem demorar
+                showWarningToast('Relatórios grandes podem demorar um pouco para ser gerados. Limitado aos últimos 100000 registros. Gerando em 10 segundos...', 10000);
+                await new Promise(resolve => setTimeout(resolve, 10000));
+            }
+
+            switch(tipoRelatorio) {
+                case 'totais':
+                    dados = getDadosFiltrados();
+                    titulo = 'RELATÓRIO DE TOTAIS DE ACESSOS';
+                    break;
+                case 'presentes':
+                    dados = getPessoasPresentes();
+                    titulo = 'RELATÓRIO DE PESSOAS PRESENTES';
+                    break;
+                case 'por-empresa':
+                    dados = getDadosPorEmpresa();
+                    titulo = 'RELATÓRIO DE ACESSOS POR EMPRESA';
+                    break;
+            }
+
+            switch(formato) {
+                case 'pdf':
+                    gerarPDF(dados, colunasSelecionadas, titulo);
+                    break;
+                case 'xlsx':
+                    gerarExcel(dados, colunasSelecionadas, titulo);
+                    break;
+                case 'csv':
+                    gerarCSV(dados, colunasSelecionadas, titulo);
+                    break;
+            }
+        }
+
+        function gerarPDF(dados, colunasSelecionadas, titulo) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('portrait');
+            const pageW = doc.internal.pageSize.getWidth();
+
+            // Logo no canto superior direito
+            if (window._reportLogoBase64) {
+                try { doc.addImage(window._reportLogoBase64, 'JPEG', pageW - 45, 5, 35, 18); } catch(e){}
+            } else {
+                doc.setFontSize(10);
+                doc.setTextColor(74, 144, 217);
+                doc.text('Acess Control', pageW - 15, 15, { align: 'right' });
+            }
+
+            doc.setFontSize(16);
+            doc.setTextColor(44, 62, 80);
+            doc.text(titulo, 15, 20);
+
+            doc.setFontSize(8);
+            doc.setTextColor(100);
+            const linhasEmpresa = [empresaInfo.razao || 'Acess Control'];
+            if (empresaInfo.cnpj)     linhasEmpresa.push(`CNPJ: ${empresaInfo.cnpj}`);
+            if (empresaInfo.endereco) linhasEmpresa.push(empresaInfo.endereco);
+            doc.text(linhasEmpresa, 15, 30);
+
+            const startY = 30 + linhasEmpresa.length * 5;
+
+            // Período e Data de Emissão
+            const dataInicio = document.getElementById('dataHoraInicio').value;
+            const dataFim = document.getElementById('dataHoraFim').value;
+            doc.text(`Período: ${dataInicio.replace('T', ' ')} a ${dataFim.replace('T', ' ')}`, 15, startY + 2);
+            doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 15, startY + 6);
+
+            const tableStartY = startY + 12;
+
+            // Preparar dados
+            const labels = {
+                nome: 'Nome', dataHora: 'Data/Hora', direcao: 'Direção',
+                equipamento: 'Equipamento', empresa: 'Empresa', grupo: 'Grupo',
+                autorizacao: 'Autorização', matricula: 'Matrícula', documento: 'Documento',
+                foto: 'Foto', total: 'Total', entradas: 'Entradas',
+                saidas: 'Saídas', pessoasPresentes: 'Pessoas Presentes'
+            };
+
+            const headers = colunasSelecionadas.map(col => labels[col] || col);
+            const body = dados.map(item =>
+                colunasSelecionadas.map(col => {
+                    let val = item[col] || '-';
+                    if (col === 'dataHora' && val && val !== '-') {
+                        try {
+                            val = new Date(val).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        } catch(e) {}
+                    }
+                    if (col === 'direcao') {
+                        if (val === 'entry' || val === 'ENTRY') val = 'ENTRADA';
+                        else if (val === 'exit' || val === 'EXIT') val = 'SAÍDA';
+                    }
+                    if (col === 'autorizacao') {
+                        if (val === 'success' || val === 'SUCCESS' || val === 'authorized' || val === 'AUTHORIZED') val = 'LIBERADO';
+                        else if (val === 'denied' || val === 'DENIED') val = 'NEGADO';
+                        else if (val === 'on_premises' || val === 'ON_PREMISES') val = 'ATIVO';
+                        else if (val === 'exited' || val === 'EXITED') val = 'INATIVO';
+                    }
+                    return val;
+                })
+            );
+
+            doc.autoTable({
+                startY: tableStartY,
+                head: [headers],
+                body: body,
+                theme: 'striped',
+                headStyles: { fillColor: [74, 144, 217], textColor: 255, fontStyle: 'bold', fontSize: 8 },
+                bodyStyles: { fontSize: 8 },
+                alternateRowStyles: { fillColor: [245, 247, 250] },
+                margin: { left: 15, right: 15 }
+            });
+
+            const finalY = doc.lastAutoTable.finalY || startY + 10;
+            doc.setFontSize(9);
+            doc.text(`Total de registros: ${dados.length}`, 15, finalY + 10);
+
+            doc.save(`relatorio_acessos_${new Date().toISOString().split('T')[0]}.pdf`);
+        }
+
+        function gerarExcel(dados, colunasSelecionadas, titulo) {
+            const labels = {
+                nome: 'Nome', dataHora: 'Data/Hora', direcao: 'Direção',
+                equipamento: 'Equipamento', empresa: 'Empresa', grupo: 'Grupo',
+                autorizacao: 'Autorização', matricula: 'Matrícula', documento: 'Documento',
+                foto: 'Foto', total: 'Total', entradas: 'Entradas',
+                saidas: 'Saídas', pessoasPresentes: 'Pessoas Presentes'
+            };
+
+            const headers = colunasSelecionadas.map(col => labels[col] || col);
+            const data = dados.map(item =>
+                colunasSelecionadas.map(col => {
+                    let val = item[col] || '-';
+                    if (col === 'dataHora' && val && val !== '-') {
+                        try { val = new Date(val).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }); } catch(e) {}
+                    }
+                    if (col === 'direcao') {
+                        if (val === 'entry' || val === 'ENTRY') val = 'ENTRADA';
+                        else if (val === 'exit' || val === 'EXIT') val = 'SAÍDA';
+                    }
+                    if (col === 'autorizacao') {
+                        if (val === 'success' || val === 'SUCCESS' || val === 'authorized' || val === 'AUTHORIZED') val = 'LIBERADO';
+                        else if (val === 'denied' || val === 'DENIED') val = 'NEGADO';
+                        else if (val === 'on_premises' || val === 'ON_PREMISES') val = 'ATIVO';
+                        else if (val === 'exited' || val === 'EXITED') val = 'INATIVO';
+                    }
+                    return val;
+                })
+            );
+
+            const dataInicio = document.getElementById('dataHoraInicio').value;
+            const dataFim = document.getElementById('dataHoraFim').value;
+
+            const wsData = [
+                ['Acess Control - Sistema de Controle de Acesso'],
+                [empresaInfo.razao],
+                [`CNPJ: ${empresaInfo.cnpj}`],
+                [empresaInfo.endereco],
+                [titulo],
+                [`Período: ${dataInicio.replace('T', ' ')} a ${dataFim.replace('T', ' ')}`],
+                [`Gerado em: ${new Date().toLocaleString('pt-BR')}`],
+                [],
+                headers,
+                ...data,
+                [],
+                [`Total de registros: ${dados.length}`]
+            ];
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            ws['!cols'] = headers.map(() => ({ wch: 20 }));
+            XLSX.utils.book_append_sheet(wb, ws, 'Relatório');
+            XLSX.writeFile(wb, `relatorio_acessos_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
+        function gerarCSV(dados, colunasSelecionadas, titulo) {
+            const labels = {
+                nome: 'Nome', dataHora: 'Data/Hora', direcao: 'Direção',
+                equipamento: 'Equipamento', empresa: 'Empresa', grupo: 'Grupo',
+                autorizacao: 'Autorização', matricula: 'Matrícula', documento: 'Documento',
+                foto: 'Foto', total: 'Total', entradas: 'Entradas',
+                saidas: 'Saídas', pessoasPresentes: 'Pessoas Presentes'
+            };
+
+            const headers = colunasSelecionadas.map(col => labels[col] || col);
+            const data = dados.map(item =>
+                colunasSelecionadas.map(col => {
+                    let val = item[col] || '-';
+                    if (col === 'dataHora' && val && val !== '-') {
+                        try { val = new Date(val).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }); } catch(e) {}
+                    }
+                    if (col === 'direcao') {
+                        if (val === 'entry' || val === 'ENTRY') val = 'ENTRADA';
+                        else if (val === 'exit' || val === 'EXIT') val = 'SAÍDA';
+                    }
+                    if (col === 'autorizacao') {
+                        if (val === 'success' || val === 'SUCCESS' || val === 'authorized' || val === 'AUTHORIZED') val = 'LIBERADO';
+                        else if (val === 'denied' || val === 'DENIED') val = 'NEGADO';
+                        else if (val === 'on_premises' || val === 'ON_PREMISES') val = 'ATIVO';
+                        else if (val === 'exited' || val === 'EXITED') val = 'INATIVO';
+                    }
+                    return val;
+                })
+            );
+
+            const dataInicio = document.getElementById('dataHoraInicio').value;
+            const dataFim = document.getElementById('dataHoraFim').value;
+
+            const csvContent = [
+                ['Acess Control - Sistema de Controle de Acesso'],
+                [empresaInfo.razao],
+                [`CNPJ: ${empresaInfo.cnpj}`],
+                [empresaInfo.endereco],
+                [titulo],
+                [`Período: ${dataInicio.replace('T', ' ')} a ${dataFim.replace('T', ' ')}`],
+                [`Gerado em: ${new Date().toLocaleString('pt-BR')}`],
+                [],
+                headers,
+                ...data,
+                [],
+                [`Total de registros: ${dados.length}`]
+            ].map(row => row.join(';')).join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            saveAs(blob, `relatorio_acessos_${new Date().toISOString().split('T')[0]}.csv`);
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Inicializando relatório de acessos...');
+            console.log('API disponível:', typeof api !== 'undefined');
+            
+            // Definir datas padrão para o dia atual
+            const now = new Date();
+            const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+            const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+            
+            const dataHoraInicio = document.getElementById('dataHoraInicio');
+            const dataHoraFim = document.getElementById('dataHoraFim');
+            
+            if (dataHoraInicio && dataHoraFim) {
+                // Função para formatar data para datetime-local
+                const formatDateTimeLocal = (date) => {
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const hours = String(date.getHours()).padStart(2, '0');
+                    const minutes = String(date.getMinutes()).padStart(2, '0');
+                    const seconds = String(date.getSeconds()).padStart(2, '0');
+                    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+                };
+                
+                // Definir valores padrão como o dia atual
+                dataHoraInicio.value = formatDateTimeLocal(todayStart);
+                dataHoraFim.value = formatDateTimeLocal(todayEnd);
+                console.log('Datas inicializadas:', dataHoraInicio.value, 'até', dataHoraFim.value);
+            }
+            
+            // Adicionar event listeners aos filtros
+            const filtros = ['filtroDirecao', 'filtroStatus', 'filtroGrupo', 'filtroEmpresa', 
+                           'filtroEquipamento', 'filtroAutorizacao', 'filtroPessoas',
+                           'filtroTipoPessoa', 'dataHoraInicio', 'dataHoraFim'];
+            
+            filtros.forEach(filtroId => {
+                const elemento = document.getElementById(filtroId);
+                if (elemento) {
+                    elemento.addEventListener('change', applyFilters);
+                    // Para inputs de texto, adicionar também listener de input com debounce
+                    if (elemento.tagName === 'INPUT') {
+                        let debounceTimer;
+                        elemento.addEventListener('input', () => {
+                            clearTimeout(debounceTimer);
+                            debounceTimer = setTimeout(applyFilters, 500);
+                        });
+                    }
+                }
+            });
+            
+            // Carregar apenas filtros (grupos, empresas, equipamentos) — sem buscar logs
+            if (typeof api !== 'undefined') {
+                carregarLogo();
+                carregarEmpresaInfo();
+                initChoices();
+                api.getReportFilters().then(filtrosData => {
+                    if (filtrosData) populateFilters(filtrosData);
+                }).catch(() => {});
+            }
+        });
+    </script>
+</body>
+</html>

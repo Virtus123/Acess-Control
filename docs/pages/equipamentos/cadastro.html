@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Equipamentos - Acess Control</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <script src="../../auth.js"></script>
+    
+    <style>
+        /* Reset e estilos base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+        /* Cards */
+        .content-box {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Grid de formulário */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .grid-col-full {
+            grid-column: 1 / -1;
+        }
+
+        /* Form groups */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #ffffff;
+            font-family: inherit;
+        }
+
+        .form-group input:hover,
+        .form-group select:hover,
+        .form-group textarea:hover {
+            border-color: #94a3b8;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .form-group input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .form-group input[type="number"]::-webkit-inner-spin-button,
+        .form-group input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .required:after {
+            content: " *";
+            color: #e53e3e;
+        }
+
+        /* Form hint */
+        .form-hint {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* Botões */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.2);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .btn-success {
+            background: #24A751;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #1e8f42;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Section header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-header-compact {
+            margin-bottom: 20px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title h2 {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Tabela */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: auto;
+            margin-bottom: 20px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            color: #1e293b;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* Seções extras */
+        .extras-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            margin: 20px 0;
+        }
+
+        .extras-section h3 {
+            margin-bottom: 16px;
+            color: #1e293b;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .extras-section h3 i {
+            color: #4a90d9;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #4a90d9;
+        }
+
+        .checkbox-group label {
+            font-size: 0.9rem;
+            color: #1e293b;
+            cursor: pointer;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin: 10px 0;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #4a90d9;
+        }
+
+        .leitoras-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        /* Ações do formulário */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Texto centralizado */
+        .text-center {
+            text-align: center;
+        }
+
+        /* Mensagem vazia */
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+
+        .empty-message i {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .leitoras-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="equipamentos-cadastro" class="content-section active">
+                    <!-- EQUIPAMENTOS LIST VIEW -->
+                    <div id="equipamentos-list">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <h1>Cadastro de Equipamentos</h1>
+                                <p>Gerenciar equipamentos do sistema</p>
+                            </div>
+                            <div class="section-actions">
+                                <button class="btn btn-primary" onclick="showEquipamentoForm()">
+                                    <i class="fas fa-plus"></i> Novo Equipamento
+                                </button>
+                                <button class="btn btn-success" onclick="sincronizarTodasPessoas()" title="Abrir modal de sincronização">
+                                    <i class="fas fa-sync"></i> Sincronizar
+                                </button>
+                                <button class="btn btn-primary" onclick="sincronizarTodosEquipamentos()" title="Sincronizar todos os equipamentos ativos">
+                                    <i class="fas fa-sync-alt"></i> Sincronizar todos
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="content-box">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Marca</th>
+                                        <th>Modelo</th>
+                                        <th>IP/Serial</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-equipamentos">
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="empty-message">
+                                                <i class="fas fa-microchip"></i>
+                                                <p>Nenhum equipamento cadastrado</p>
+                                                <button class="btn btn-primary btn-sm" onclick="showEquipamentoForm()" style="margin-top: 12px;">
+                                                    <i class="fas fa-plus"></i> Cadastrar primeiro equipamento
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- EQUIPAMENTOS FORM VIEW -->
+                    <div id="equipamentos-form" class="hidden">
+                        <div class="section-header section-header-compact">
+                            <div class="section-title">
+                                <h2 id="equipamento-form-title">Novo Equipamento</h2>
+                                <p>Preencha os dados do equipamento</p>
+                            </div>
+                            <div class="section-actions">
+                                <button class="btn btn-secondary" onclick="showEquipamentoList()">
+                                    <i class="fas fa-times"></i> Fechar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="content-box">
+                            <form id="equipamentoForm" onsubmit="saveEquipamento(event)">
+                                <input type="hidden" id="equipamento-id">
+
+                                <!-- Dados Básicos -->
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="nome" class="required">Nome do Equipamento</label>
+                                        <input type="text" id="nome" placeholder="Ex: Catraca Principal, Câmera Entrada">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="marca" class="required">Marca</label>
+                                        <select id="marca" required onchange="atualizarModelos()">
+                                            <option value="">Selecione...</option>
+                                            <option value="control-id">Control iD</option>
+                                            <option value="henry">Henry</option>
+                                            <option value="outro">Outro</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="modelo" class="required">Modelo</label>
+                                        <select id="modelo" required disabled onchange="mostrarCamposExtras()">
+                                            <option value="">Selecione uma marca...</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group grid-col-full">
+                                        <div class="checkbox-group">
+                                            <input type="checkbox" id="controla-estacionamento" onchange="toggleEstacionamentoVisibility()">
+                                            <label for="controla-estacionamento">Controla Estacionamento</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group grid-col-full" id="equipamento-saida-wrapper" style="display: none;">
+                                        <div class="checkbox-group">
+                                            <input type="checkbox" id="equipamento-saida">
+                                            <label for="equipamento-saida">Equipamento de Saída?</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Código Validador (Comunicador) -->
+                                <div class="extras-section">
+                                    <h3><i class="fas fa-qrcode"></i> Código Validador</h3>
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label for="codigo-validador">Código Validador</label>
+                                            <input type="text" id="codigo-validador" placeholder="Código único do validador">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CAMPOS EXTRAS - CONTROL ID PADRÃO (IDBlock, IDUHF, IDFace, IDFlex) -->
+                                <div id="extras-control-id-padrao" class="extras-section hidden">
+                                    <h3><i class="fas fa-network-wired"></i> Configurações de Rede</h3>
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label for="ip">Endereço IP</label>
+                                            <input type="text" id="ip" placeholder="192.168.1.100">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="porta">Porta de Comunicação</label>
+                                            <input type="number" id="porta" value="5000" placeholder="5000">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="usuario">Usuário</label>
+                                            <input type="text" id="usuario" placeholder="Usuário de acesso">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="senha">Senha</label>
+                                            <input type="password" id="senha" placeholder="Senha de acesso">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="serial">Serial</label>
+                                            <input type="text" id="serial" placeholder="Número de série">
+                                        </div>
+                                    </div>
+                                    
+                                    <h3 style="margin-top: 20px;"><i class="fas fa-clock"></i> Configurações de Acesso</h3>
+                                    <div class="form-grid">
+                                        <div class="form-group grid-col-full">
+                                            <div class="checkbox-group">
+                                                <input type="checkbox" id="inativar-visitante">
+                                                <label for="inativar-visitante">Inativar Visitante ao registrar acesso?</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="tempo-acesso">Tempo entre acessos (segundos)</label>
+                                            <input type="number" id="tempo-acesso" value="5" min="0" placeholder="5">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="tempo-rele">Tempo de ativação do Relé (segundos)</label>
+                                            <input type="number" id="tempo-rele" value="2" min="0" placeholder="2">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CAMPOS EXTRAS - CONTROL ID FACIAL (IDBlock Facial, IDBlock Next Facial) -->
+                                <div id="extras-control-id-facial" class="extras-section hidden">
+                                    <h3><i class="fas fa-face-smile"></i> Configurações de Direções (Entrada/Saída)</h3>
+                                    
+                                    <div class="form-grid">
+                                        <div class="form-group grid-col-full">
+                                            <p class="form-hint">
+                                                Configure a direção (left/right) que o equipamento usa para identificar entrada e saída.
+                                                Esta configuração é usada para equipamentos IDBlock Next e IDBlock Facial que não são marcados como equipamento de saída.
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="direction-entrada">Direção de Entrada</label>
+                                            <select id="direction-entrada">
+                                                <option value="">Selecione...</option>
+                                                <option value="left">Left (Esquerda)</option>
+                                                <option value="right">Right (Direita)</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="direction-saida">Direção de Saída</label>
+                                            <select id="direction-saida">
+                                                <option value="">Selecione...</option>
+                                                <option value="left">Left (Esquerda)</option>
+                                                <option value="right">Right (Direita)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <h3 style="margin-top: 20px;"><i class="fas fa-network-wired"></i> Configurações de Rede</h3>
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label for="ip-facial-1">IP Facial</label>
+                                            <input type="text" id="ip-facial-1" placeholder="192.168.1.101">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="porta-facial">Porta de Comunicação</label>
+                                            <input type="number" id="porta-facial" value="5000" placeholder="5000">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="usuario-facial">Usuário</label>
+                                            <input type="text" id="usuario-facial" placeholder="Usuário de acesso">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="senha-facial">Senha</label>
+                                            <input type="password" id="senha-facial" placeholder="Senha de acesso">
+                                        </div>
+                                    </div>
+
+                                    <h3 style="margin-top: 20px;"><i class="fas fa-clock"></i> Configurações de Acesso</h3>
+                                    <div class="form-grid">
+                                        <div class="form-group grid-col-full">
+                                            <div class="checkbox-group">
+                                                <input type="checkbox" id="inativar-visitante-facial">
+                                                <label for="inativar-visitante-facial">Inativar Visitante ao registrar saída (pela direção)</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="tempo-acesso-facial">Tempo entre acessos (segundos)</label>
+                                            <input type="number" id="tempo-acesso-facial" value="5" min="0" placeholder="5">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="tempo-rele-facial">Tempo de ativação do Relé (segundos)</label>
+                                            <input type="number" id="tempo-rele-facial" value="2" min="0" placeholder="2">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CAMPOS EXTRAS - HENRY PRIMME -->
+                                <div id="extras-henry" class="extras-section hidden">
+                                    <h3><i class="fas fa-network-wired"></i> Configurações de Rede</h3>
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label for="ip-henry">IP</label>
+                                            <input type="text" id="ip-henry" placeholder="192.168.1.100">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="porta-henry">Porta de Comunicação</label>
+                                            <input type="number" id="porta-henry" value="5000" placeholder="5000">
+                                        </div>
+                                    </div>
+
+                                    <h3 style="margin-top: 20px;"><i class="fas fa-clock"></i> Configurações de Acesso</h3>
+                                    <div class="form-grid">
+                                        <div class="form-group grid-col-full">
+                                            <div class="checkbox-group">
+                                                <input type="checkbox" id="inativar-visitante-henry">
+                                                <label for="inativar-visitante-henry">Inativar Visitante ao registrar acesso?</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="tempo-acesso-henry">Tempo entre acessos (segundos)</label>
+                                            <input type="number" id="tempo-acesso-henry" value="5" min="0" placeholder="5">
+                                        </div>
+                                    </div>
+
+                                    <h3 style="margin-top: 20px;"><i class="fas fa-keyboard"></i> Configurações do Equipamento</h3>
+                                    <div class="form-grid">
+                                        <div class="form-group grid-col-full">
+                                            <div class="checkbox-group">
+                                                <input type="checkbox" id="habilita-biometria">
+                                                <label for="habilita-biometria">Habilita Biometria?</label>
+                                            </div>
+                                            <div class="checkbox-group">
+                                                <input type="checkbox" id="habilita-teclado">
+                                                <label for="habilita-teclado">Habilita Teclado?</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <h3 style="margin-top: 20px;"><i class="fas fa-id-card"></i> Configuração das Leitoras</h3>
+                                    <div class="leitoras-grid">
+                                        <!-- Leitora 1 -->
+                                        <div class="form-group">
+                                            <label for="leitora-1">Leitora 1</label>
+                                            <select id="leitora-1">
+                                                <option value="nenhum">Nenhum</option>
+                                                <option value="codigo-barras">Código de Barras</option>
+                                                <option value="wiegand">Wiegand</option>
+                                                <option value="abatrack">Abatrack II</option>
+                                                <option value="proximidade-barras">Proximidade e Barras</option>
+                                                <option value="mifare">Mifare</option>
+                                                <option value="barras-wiegand-mifare">Barras, Wiegand e Mifare</option>
+                                                <option value="barras-mifare">Barras e Mifare</option>
+                                                <option value="wiegand-mifare">Wiegand e Mifare</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Leitora 2 -->
+                                        <div class="form-group">
+                                            <label for="leitora-2">Leitora 2</label>
+                                            <select id="leitora-2">
+                                                <option value="nenhum">Nenhum</option>
+                                                <option value="codigo-barras">Código de Barras</option>
+                                                <option value="wiegand">Wiegand</option>
+                                                <option value="abatrack">Abatrack II</option>
+                                                <option value="proximidade-barras">Proximidade e Barras</option>
+                                                <option value="mifare">Mifare</option>
+                                                <option value="barras-wiegand-mifare">Barras, Wiegand e Mifare</option>
+                                                <option value="barras-mifare">Barras e Mifare</option>
+                                                <option value="wiegand-mifare">Wiegand e Mifare</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Leitora 4 -->
+                                        <div class="form-group">
+                                            <label for="leitora-4">Leitora 4</label>
+                                            <select id="leitora-4">
+                                                <option value="nenhum">Nenhum</option>
+                                                <option value="codigo-barras">Código de Barras</option>
+                                                <option value="wiegand">Wiegand</option>
+                                                <option value="abatrack">Abatrack II</option>
+                                                <option value="proximidade-barras">Proximidade e Barras</option>
+                                                <option value="mifare">Mifare</option>
+                                                <option value="barras-wiegand-mifare">Barras, Wiegand e Mifare</option>
+                                                <option value="barras-mifare">Barras e Mifare</option>
+                                                <option value="wiegand-mifare">Wiegand e Mifare</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Leitora 5 -->
+                                        <div class="form-group">
+                                            <label for="leitora-5">Leitora 5</label>
+                                            <select id="leitora-5">
+                                                <option value="nenhum">Nenhum</option>
+                                                <option value="codigo-barras">Código de Barras</option>
+                                                <option value="wiegand">Wiegand</option>
+                                                <option value="abatrack">Abatrack II</option>
+                                                <option value="proximidade-barras">Proximidade e Barras</option>
+                                                <option value="mifare">Mifare</option>
+                                                <option value="barras-wiegand-mifare">Barras, Wiegand e Mifare</option>
+                                                <option value="barras-mifare">Barras e Mifare</option>
+                                                <option value="wiegand-mifare">Wiegand e Mifare</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-secondary" onclick="showEquipamentoList()">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Salvar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Sincronizar -->
+    <div id="modal-sincronizar" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:14px; padding:28px 32px; min-width:360px; max-width:520px; width:90%; box-shadow:0 8px 32px rgba(0,0,0,0.18);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="font-size:1.15rem; color:#1e293b; margin:0;"><i class="fas fa-sync" style="color:#4a90d9; margin-right:8px;"></i>Sincronizar Pessoas</h3>
+                <button onclick="fecharModalSincronizar()" style="background:none; border:none; font-size:1.3rem; color:#94a3b8; cursor:pointer; padding:0 4px;">&times;</button>
+            </div>
+            <p style="color:#64748b; font-size:0.92rem; margin-bottom:18px;">Selecione o equipamento para sincronizar todos os cadastros:</p>
+            <div id="modal-sincronizar-lista" style="display:flex; flex-direction:column; gap:10px; max-height:280px; overflow-y:auto; margin-bottom:20px;"></div>
+            <div style="display:flex; justify-content:flex-end; gap:10px; border-top:1px solid #e2e8f0; padding-top:16px;">
+                <button class="btn btn-secondary" onclick="fecharModalSincronizar()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+
+    <script>
+        let equipamentos = [];
+        let editandoId = null;
+
+        // Funções de API
+        const API_URL = '/api';
+
+        function getAuthHeader() {
+            const token = localStorage.getItem('acesscontrol_accessToken');
+            const tenantId = localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id') || 'default';
+            const headers = {
+                'X-Tenant-ID': tenantId
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            return headers;
+        }
+
+        // Carregar equipamentos do banco de dados
+        async function loadEquipamentosFromAPI() {
+            try {
+                console.log('Carregando equipamentos da API...');
+                const response = await fetch(`${API_URL}/equipments`, {
+                    headers: getAuthHeader()
+                });
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    const error = await response.json();
+                    console.error('Erro da API:', error);
+                    throw new Error('Erro ao carregar equipamentos');
+                }
+                const result = await response.json();
+                console.log('Dados recebidos da API:', result);
+                if (result.success) {
+                    equipamentos = result.data || [];
+                    console.log('Equipamentos carregados:', equipamentos);
+                } else {
+                    console.error('API retornou erro:', result.message);
+                    equipamentos = [];
+                }
+            } catch (error) {
+                console.error('Erro ao carregar equipamentos:', error);
+                equipamentos = [];
+            }
+        }
+
+        // Salvar equipamento no banco de dados
+        async function saveEquipamentoToAPI(equipamento) {
+            const isEditing = editandoId && editandoId > 0;
+            const url = isEditing ? `${API_URL}/equipments/${editandoId}` : `${API_URL}/equipments`;
+            const method = isEditing ? 'PUT' : 'POST';
+
+            // Mapear campos do formulário para o formato da API
+            const apiData = {
+                name: equipamento.nome,
+                marca: equipamento.marca,
+                modelo: equipamento.modelo,
+                tipo: equipamento.tipo || 'outro',
+                validador: equipamento.codigoValidador || null,
+                ipAddress: equipamento.ip || equipamento.ipFacial1 || equipamento.ipHenry || null,
+                port: equipamento.porta || equipamento.portaFacial || equipamento.portaHenry || 8080,
+                usuario: equipamento.usuario || equipamento.usuarioFacial || null,
+                senha: equipamento.senha || equipamento.senhaFacial || null,
+                serial: equipamento.serial || null,
+                controlaEstacionamento: equipamento.controlaEstacionamento || document.getElementById('controla-estacionamento')?.checked || false,
+                equipamentoSaida: equipamento.equipamentoSaida || document.getElementById('equipamento-saida')?.checked || false,
+                localizacao: equipamento.localizacao || null,
+                descricao: equipamento.descricao || null,
+                directionEntrada: equipamento.directionEntrada || null,
+                directionSaida: equipamento.directionSaida || null,
+                inativarVisitante: equipamento.inativarVisitante || false
+            };
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...getAuthHeader()
+                },
+                body: JSON.stringify(apiData)
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Erro ao salvar equipamento');
+            }
+
+            return await response.json();
+        }
+
+        // Excluir equipamento do banco de dados
+        async function deleteEquipamentoFromAPI(id) {
+            if (!id || id <= 0) return; // IDs menores ou iguais a 0 são locais
+
+            const response = await fetch(`${API_URL}/equipments/${id}`, {
+                method: 'DELETE',
+                headers: getAuthHeader()
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro ao excluir equipamento');
+            }
+
+            return await response.json();
+        }
+
+        // Inativar equipamento no banco de dados
+        async function inactivateEquipamentoInAPI(id) {
+            const response = await fetch(`${API_URL}/equipments/${id}/inactivate`, {
+                method: 'POST',
+                headers: getAuthHeader()
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro ao inativar equipamento');
+            }
+
+            return await response.json();
+        }
+
+        // Modelos por marca
+        const modelosPorMarca = {
+            'control-id': [
+                'IDBlock',
+                'IDBlock Facial',
+                'IDBlock Next',
+                'IDBlock Next Facial',
+                'IDFace',
+                'IDFlex',
+                'IDUHF'
+            ],
+            'henry': ['Primme Acesso', 'Primme SF'],
+            'outro': ['Modelo Genérico']
+        };
+
+        // Modelos que requerem campos faciais
+        const modelosFaciais = [
+            'IDBlock Facial',
+            'IDBlock Next Facial'
+        ];
+
+        // Modelos padrão (com IP, porta, usuário, senha, serial)
+        const modelosPadrao = [
+            'IDBlock',
+            'IDBlock Next',
+            'IDFace',
+            'IDFlex',
+            'IDUHF'
+        ];
+
+        function showEquipamentoForm(shouldReset = true) {
+            try {
+                const listView = document.getElementById('equipamentos-list');
+                const formView = document.getElementById('equipamentos-form');
+                console.log('showEquipamentoForm - listView:', listView);
+                console.log('showEquipamentoForm - formView:', formView);
+                if (listView) {
+                    listView.classList.add('hidden');
+                    console.log('Adicionado hidden à listView');
+                }
+                if (formView) {
+                    formView.classList.remove('hidden');
+                    console.log('Removido hidden de formView');
+                }
+                const title = document.getElementById('equipamento-form-title');
+                if (title) title.textContent = editandoId ? 'Editar Equipamento' : 'Novo Equipamento';
+                const formEl = document.getElementById('equipamentoForm');
+                if (formEl && shouldReset) {
+                    formEl.reset();
+                    document.getElementById('equipamento-id').value = '';
+                    document.getElementById('modelo').disabled = true;
+                }
+                console.log('Formulário mostrado com sucesso');
+            } catch (e) {
+                console.error('Erro em showEquipamentoForm:', e);
+            }
+        }
+
+        function showEquipamentoList() {
+            try {
+                const listView = document.getElementById('equipamentos-list');
+                const formView = document.getElementById('equipamentos-form');
+                if (listView) listView.classList.remove('hidden');
+                if (formView) formView.classList.add('hidden');
+                editandoId = null;
+            } catch (e) {
+                console.error('Erro em showEquipamentoList:', e);
+            }
+        }
+
+        function atualizarModelos() {
+            const marca = document.getElementById('marca').value;
+            const modeloSelect = document.getElementById('modelo');
+            
+            modeloSelect.innerHTML = '<option value="">Selecione...</option>';
+            
+            if (marca && modelosPorMarca[marca]) {
+                modeloSelect.disabled = false;
+                modelosPorMarca[marca].forEach(modelo => {
+                    const option = document.createElement('option');
+                    option.value = modelo;
+                    option.textContent = modelo;
+                    modeloSelect.appendChild(option);
+                });
+            } else {
+                modeloSelect.disabled = true;
+                modeloSelect.innerHTML = '<option value="">Selecione uma marca...</option>';
+            }
+            
+            // Esconder todos os extras
+            document.getElementById('extras-control-id-padrao').classList.add('hidden');
+            document.getElementById('extras-control-id-facial').classList.add('hidden');
+            document.getElementById('extras-henry').classList.add('hidden');
+        }
+
+        function mostrarCamposExtras() {
+            const marca = document.getElementById('marca').value;
+            const modelo = document.getElementById('modelo').value;
+
+            // Esconder todos os extras
+            document.getElementById('extras-control-id-padrao').classList.add('hidden');
+            document.getElementById('extras-control-id-facial').classList.add('hidden');
+            document.getElementById('extras-henry').classList.add('hidden');
+
+            if (marca === 'control-id') {
+                if (modelosFaciais.includes(modelo)) {
+                    document.getElementById('extras-control-id-facial').classList.remove('hidden');
+                } else if (modelosPadrao.includes(modelo)) {
+                    document.getElementById('extras-control-id-padrao').classList.remove('hidden');
+                    // IDUHF: marcar "Controla Estacionamento" automaticamente
+                    if (modelo === 'IDUHF') {
+                        const cb = document.getElementById('controla-estacionamento');
+                        if (cb && !cb.checked) cb.checked = true;
+                    }
+                }
+            } else if (marca === 'henry' && (modelo === 'Primme Acesso' || modelo === 'Primme SF')) {
+                document.getElementById('extras-henry').classList.remove('hidden');
+            }
+
+            // Aplicar visibilidade dos campos de estacionamento
+            toggleEstacionamentoVisibility();
+        }
+
+        // Função para mostrar/ocultar campos baseado no checkbox de estacionamento
+        function toggleEstacionamentoVisibility() {
+            const controlaEstacionamento = document.getElementById('controla-estacionamento');
+            const equipamentoSaidaWrapper = document.getElementById('equipamento-saida-wrapper');
+            const modelo = document.getElementById('modelo')?.value || '';
+            const isFacialDir = modelosFaciais.includes(modelo);
+            const isSaidaEspecial = modelo === 'IDFace' || modelo.toLowerCase().includes('facial');
+            
+            // Sempre mostrar checkboxes de inativar visitante se for facial ou padrão
+            const inativarVisitantes = document.querySelectorAll('[id^="inativar-visitante"]');
+            inativarVisitantes.forEach(cb => {
+                const wrapper = cb.closest('.checkbox-group');
+                if (wrapper) wrapper.style.display = 'flex';
+            });
+            
+            if ((controlaEstacionamento && controlaEstacionamento.checked) || isFacialDir || isSaidaEspecial) {
+                // Mostrar checkbox de equipamento de saída
+                if (equipamentoSaidaWrapper) {
+                    equipamentoSaidaWrapper.style.display = 'block';
+                }
+            } else {
+                // Esconder checkbox de equipamento de saída
+                if (equipamentoSaidaWrapper) {
+                    equipamentoSaidaWrapper.style.display = 'none';
+                }
+            }
+        }
+
+        function toggleFaciais() {
+            // Função mantida para compatibilidade, mas não é mais usada
+            // Os campos de direção substituem a seleção de quantidade de faciais
+        }
+
+        // Adicionar listeners para os checkboxes quando o DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', function() {
+            const controlaEstacionamento = document.getElementById('controla-estacionamento');
+            const equipamentoSaida = document.getElementById('equipamento-saida');
+            
+            if (controlaEstacionamento) {
+                controlaEstacionamento.addEventListener('change', toggleEstacionamentoVisibility);
+                // Executar uma vez para configurar o estado inicial
+                // Usar setTimeout para garantir que o DOM esteja pronto
+                setTimeout(toggleEstacionamentoVisibility, 100);
+            }
+            
+            if (equipamentoSaida) {
+                equipamentoSaida.addEventListener('change', toggleEstacionamentoVisibility);
+            }
+            
+            const marcaSelect = document.getElementById('marca');
+            const modeloSelect = document.getElementById('modelo');
+            
+            if (marcaSelect) {
+                marcaSelect.addEventListener('change', () => {
+                    setTimeout(toggleEstacionamentoVisibility, 150);
+                });
+            }
+            if (modeloSelect) {
+                modeloSelect.addEventListener('change', toggleEstacionamentoVisibility);
+            }
+            
+            // Também aplicar quando o formulário for mostrado
+            const originalShowForm = showEquipamentoForm;
+            window.showEquipamentoForm = function(shouldReset = true) {
+                originalShowForm(shouldReset);
+                setTimeout(toggleEstacionamentoVisibility, 150);
+            };
+        });
+        
+        function saveEquipamento(e) {
+            e.preventDefault();
+
+            const controlaEstacionamento = document.getElementById('controla-estacionamento')?.checked || false;
+
+            const equipamento = {
+                id: editandoId || null,
+                nome: document.getElementById('nome').value,
+                marca: document.getElementById('marca').value,
+                modelo: document.getElementById('modelo').value,
+                codigoValidador: document.getElementById('codigo-validador').value,
+                controlaEstacionamento: controlaEstacionamento,
+                equipamentoSaida: document.getElementById('equipamento-saida')?.checked || false,
+                status: 'ativo'
+            };
+
+            // Adicionar campos extras baseado no tipo
+            const marca = equipamento.marca;
+            const modelo = equipamento.modelo;
+
+            if (marca === 'control-id') {
+                if (modelosFaciais.includes(modelo)) {
+                    equipamento.tipo = 'facial';
+                    equipamento.directionEntrada = document.getElementById('direction-entrada').value;
+                    equipamento.directionSaida = document.getElementById('direction-saida').value;
+                    equipamento.ipFacial1 = document.getElementById('ip-facial-1').value;
+                    equipamento.portaFacial = document.getElementById('porta-facial').value;
+                    equipamento.usuarioFacial = document.getElementById('usuario-facial').value;
+                    equipamento.senhaFacial = document.getElementById('senha-facial').value;
+                    equipamento.inativarVisitante = document.getElementById('inativar-visitante-facial').checked;
+                    equipamento.tempoAcessoFacial = document.getElementById('tempo-acesso-facial').value;
+                    equipamento.tempoReleFacial = document.getElementById('tempo-rele-facial').value;
+                } else if (modelosPadrao.includes(modelo)) {
+                    equipamento.tipo = modelo === 'IDUHF' ? 'uhf' : 'padrao';
+                    equipamento.ip = document.getElementById('ip').value;
+                    equipamento.porta = document.getElementById('porta').value;
+                    equipamento.usuario = document.getElementById('usuario').value;
+                    equipamento.senha = document.getElementById('senha').value;
+                    equipamento.serial = document.getElementById('serial').value;
+                    equipamento.inativarVisitante = document.getElementById('inativar-visitante').checked;
+                    equipamento.tempoAcesso = document.getElementById('tempo-acesso').value;
+                    equipamento.tempoRele = document.getElementById('tempo-rele').value;
+                    // IDUHF controla estacionamento por padrão
+                    if (modelo === 'IDUHF') {
+                        equipamento.controlaEstacionamento = true;
+                    }
+                }
+            } else if (marca === 'henry') {
+                equipamento.tipo = 'henry';
+                equipamento.ipHenry = document.getElementById('ip-henry').value;
+                equipamento.portaHenry = document.getElementById('porta-henry').value;
+                equipamento.inativarVisitante = document.getElementById('inativar-visitante-henry').checked;
+                equipamento.tempoAcessoHenry = document.getElementById('tempo-acesso-henry').value;
+                equipamento.habilitaBiometria = document.getElementById('habilita-biometria').checked;
+                equipamento.habilitaTeclado = document.getElementById('habilita-teclado').checked;
+                equipamento.leitora1 = document.getElementById('leitora-1').value;
+                equipamento.leitora2 = document.getElementById('leitora-2').value;
+                equipamento.leitora4 = document.getElementById('leitora-4').value;
+                equipamento.leitora5 = document.getElementById('leitora-5').value;
+            }
+
+            if (editandoId) {
+                const index = equipamentos.findIndex(eq => eq.id === editandoId);
+                if (index !== -1) {
+                    equipamentos[index] = equipamento;
+                }
+            } else {
+                equipamentos.push(equipamento);
+            }
+
+            // Salvar no banco de dados
+            saveEquipamentoToAPI(equipamento)
+                .then(() => {
+                    alert(editandoId ? 'Equipamento atualizado com sucesso!' : 'Equipamento cadastrado com sucesso!');
+                    loadEquipamentosFromAPI().then(() => {
+                        showEquipamentoList();
+                        renderizarLista();
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao salvar equipamento:', error);
+                    alert('Erro ao salvar equipamento: ' + error.message);
+                });
+        }
+
+        function editarEquipamento(id) {
+            const equipamento = equipamentos.find(eq => eq.id === id);
+            console.log('Editar equipamento - ID:', id);
+            console.log('Editar equipamento - dados:', equipamento);
+            if (!equipamento) return;
+
+            editandoId = id;
+            
+            // Primeiro mostra o formulário
+            console.log('Chamando showEquipamentoForm(false)...');
+            showEquipamentoForm(false);
+            console.log('showEquipamentoForm retornou');
+            
+            // Usar setTimeout para garantir que o DOM esteja pronto
+            setTimeout(() => {
+                // Suportar campos da API (name, ipAddress) e campos locais (nome, ip)
+                const nomeInput = document.getElementById('nome');
+                console.log('nomeInput:', nomeInput);
+                if (nomeInput) {
+                    nomeInput.value = equipamento.name || equipamento.nome || '';
+                    console.log('Nome definido:', equipamento.name || equipamento.nome || '');
+                }
+                const marcaInput = document.getElementById('marca');
+                console.log('marcaInput:', marcaInput);
+                if (marcaInput) {
+                    marcaInput.value = equipamento.marca || '';
+                    console.log('Marca definida:', equipamento.marca || '');
+                }
+                atualizarModelos();
+                setTimeout(() => {
+                    const modeloInput = document.getElementById('modelo');
+                    if (modeloInput) {
+                        modeloInput.value = equipamento.modelo || '';
+                        console.log('Modelo definido:', equipamento.modelo || '');
+                    }
+                    
+                    // Tipo do equipamento
+                    console.log('Tipo do equipamento:', equipamento.tipo);
+                    
+                    // Mapear tipo do banco para tipo do frontend
+                    let tipoFrontend = equipamento.tipo;
+                    if (equipamento.tipo === 'facial_entrada' || equipamento.tipo === 'facial_saida') {
+                        tipoFrontend = 'facial';
+                    } else if (equipamento.tipo === 'controle_acesso') {
+                        tipoFrontend = 'padrao';
+                    }
+                    
+                    console.log('Tipo frontend:', tipoFrontend);
+                    
+                    // Carregar checkbox de estacionamento
+                    const controlaEstacionamentoEl = document.getElementById('controla-estacionamento');
+                    if (controlaEstacionamentoEl) {
+                        controlaEstacionamentoEl.checked = equipamento.controlaEstacionamento === true || equipamento.controlaEstacionamento === 1;
+                    }
+
+                    // Carregar checkbox de equipamento de saída
+                    const equipamentoSaidaEl = document.getElementById('equipamento-saida');
+                    if (equipamentoSaidaEl) {
+                        equipamentoSaidaEl.checked = equipamento.equipamentoSaida === true || equipamento.equipamentoSaida === 1 || equipamento.equipamento_saida === 1;
+                    }
+
+                    // Primeiro mostra os campos extras baseados na marca
+                    mostrarCamposExtras();
+                    
+                    // Depois preenche os campos baseados no tipo
+                    if (tipoFrontend === 'facial') {
+                        // Novos campos de direção (entrada/saída)
+                        document.getElementById('direction-entrada').value = equipamento.direction_entrada || equipamento.directionEntrada || '';
+                        document.getElementById('direction-saida').value = equipamento.direction_saida || equipamento.directionSaida || '';
+                        document.getElementById('ip-facial-1').value = equipamento.ipFacial1 || '';
+                        document.getElementById('porta-facial').value = equipamento.portaFacial || '5000';
+                        document.getElementById('usuario-facial').value = equipamento.usuarioFacial || '';
+                        document.getElementById('senha-facial').value = equipamento.senhaFacial || '';
+                        document.getElementById('inativar-visitante-facial').checked = (equipamento.inativarVisitante !== undefined ? equipamento.inativarVisitante : (equipamento.inativar_visitante === 1 || equipamento.inativarVisitanteFacial)) || false;
+                        document.getElementById('tempo-acesso-facial').value = equipamento.tempoAcessoFacial || '5';
+                        document.getElementById('tempo-rele-facial').value = equipamento.tempoReleFacial || '2';
+                    } else if (tipoFrontend === 'padrao') {
+                        // IP e Porta
+                        document.getElementById('ip').value = equipamento.ipAddress || equipamento.ip || '';
+                        document.getElementById('porta').value = equipamento.port || '5000';
+                        // Usuario, Senha, Serial
+                        document.getElementById('usuario').value = equipamento.usuario || '';
+                        document.getElementById('senha').value = equipamento.senha || '';
+                        document.getElementById('serial').value = equipamento.serial || '';
+                        // Configurações
+                        document.getElementById('inativar-visitante').checked = (equipamento.inativarVisitante !== undefined ? equipamento.inativarVisitante : (equipamento.inativar_visitante === 1)) || false;
+                        document.getElementById('tempo-acesso').value = equipamento.tempoAcesso || '5';
+                        document.getElementById('tempo-rele').value = equipamento.tempoRele || '2';
+                    } else if (tipoFrontend === 'henry') {
+                        document.getElementById('ip-henry').value = equipamento.ipHenry || '';
+                        document.getElementById('porta-henry').value = equipamento.portaHenry || '5000';
+                        document.getElementById('inativar-visitante-henry').checked = (equipamento.inativarVisitante !== undefined ? equipamento.inativarVisitante : (equipamento.inativar_visitante === 1 || equipamento.inativarVisitanteHenry)) || false;
+                        document.getElementById('tempo-acesso-henry').value = equipamento.tempoAcessoHenry || '5';
+                        document.getElementById('habilita-biometria').checked = equipamento.habilitaBiometria || false;
+                        document.getElementById('habilita-teclado').checked = equipamento.habilitaTeclado || false;
+                    }
+                    
+                    // Validador
+                    const validadorInput = document.getElementById('codigo-validador');
+                    if (validadorInput) {
+                        validadorInput.value = equipamento.validador || equipamento.codigoValidador || '';
+                        console.log('Validador definido:', equipamento.validador || equipamento.codigoValidador || '');
+                    }
+                    
+                    // Configurações globais (Saída e Estacionamento)
+                    if (document.getElementById('equipamento-saida')) {
+                        document.getElementById('equipamento-saida').checked = (equipamento.equipamentoSaida !== undefined ? equipamento.equipamentoSaida : (equipamento.equipamento_saida === 1)) || false;
+                    }
+                    if (document.getElementById('controla-estacionamento')) {
+                        document.getElementById('controla-estacionamento').checked = (equipamento.controlaEstacionamento !== undefined ? equipamento.controlaEstacionamento : (equipamento.controla_estacionamento === 1)) || false;
+                    }
+
+                    console.log('Todos os campos preenchidos!');
+                    
+                    // Define o ID do equipamento para edição
+                    document.getElementById('equipamento-id').value = id;
+                    document.getElementById('equipamento-form-title').textContent = 'Editar Equipamento';
+                }, 200);
+            }, 100);
+        }
+
+        function excluirEquipamento(id) {
+            if (confirm('Deseja realmente excluir este equipamento?')) {
+                // Tentar excluir do banco de dados
+                deleteEquipamentoFromAPI(id)
+                    .then(() => {
+                        alert('Equipamento excluído com sucesso!');
+                        loadEquipamentosFromAPI().then(() => {
+                            renderizarLista();
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Erro ao excluir equipamento:', error);
+                        // Se der erro, remove localmente
+                        equipamentos = equipamentos.filter(eq => eq.id !== id);
+                        alert('Equipamento excluído com sucesso!');
+                        renderizarLista();
+                    });
+            }
+        }
+
+        function renderizarLista() {
+            const tbody = document.getElementById('tbody-equipamentos');
+            
+            if (!tbody) return;
+            
+            if (equipamentos.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-message">
+                                <i class="fas fa-microchip"></i>
+                                <p>Nenhum equipamento cadastrado</p>
+                                <button class="btn btn-primary btn-sm" onclick="showEquipamentoForm()" style="margin-top: 12px;">
+                                    <i class="fas fa-plus"></i> Cadastrar primeiro equipamento
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = equipamentos.map(eq => {
+                const statusClass = eq.status === 'active' || eq.status === 'ativo' ? 'badge-success' : 'badge-warning';
+                const statusText = eq.status === 'active' || eq.status === 'ativo' ? 'Ativo' : 'Inativo';
+                const identificador = eq.ipAddress || eq.ip || eq.validador || '-';
+                const validador = eq.validador || eq.codigoValidador || '';
+
+                return `
+                    <tr>
+                        <td><strong>${eq.name || eq.nome || '-'}</strong></td>
+                        <td>${eq.marca || '-'}</td>
+                        <td>${eq.modelo || '-'}</td>
+                        <td>${identificador}</td>
+                        <td>
+                            <span class="badge ${statusClass}">${statusText}</span>
+                            ${eq.syncStatus ? `<span class="badge ${eq.syncStatus === 'syncing' ? 'badge-warning' : 'badge-secondary'}" style="margin-left:6px;">${eq.syncStatus === 'syncing' ? 'Sincronizando' : 'Sincronização Pendente'}</span>` : ''}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="liberarAcessoEquipamento('${validador}')" title="Liberar Acesso">
+                                <i class="fas fa-unlock"></i>
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="editarEquipamento(${eq.id})" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="excluirEquipamento(${eq.id})" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Função para liberar acesso em um equipamento específico
+        function liberarAcessoEquipamento(equipValidator) {
+            if (!equipValidator) {
+                alert('Equipamento sem código validador. Configure o código do validador primeiro.');
+                return;
+            }
+            
+            const tenantId = localStorage.getItem('acesscontrol_tenant') || 'demo';
+            
+            fetch(`${API_URL}/access-tasks`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Tenant-ID': tenantId
+                },
+                body: JSON.stringify({
+                    tenant_id: tenantId,
+                    equip_validator: equipValidator,
+                    task_type: 'liberar_acesso'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Acesso liberado com sucesso!');
+                } else {
+                    alert('Erro ao liberar acesso: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao liberar acesso:', error);
+                alert('Erro ao liberar acesso');
+            });
+        }
+        
+        // Função para sincronizar todas as pessoas para um equipamento
+        async function sincronizarTodasPessoas() {
+            const tenantId = localStorage.getItem('acesscontrol_tenant') || 'demo';
+
+            await loadEquipamentosFromAPI();
+            const equipamentosSelecionados = equipamentos.filter(eq => eq.validador);
+
+            if (equipamentosSelecionados.length === 0) {
+                alert('Nenhum equipamento com código validador encontrado. Cadastre um equipamento primeiro.');
+                return;
+            }
+
+            // Buscar tarefas pendentes para marcar equipamentos com fila
+            let tarefasPendentes = [];
+            try {
+                const response = await fetch(`${API_URL}/access-tasks?tenant_id=${tenantId}`, {
+                    headers: { 'X-Tenant-ID': tenantId }
+                });
+                const result = await response.json();
+                tarefasPendentes = result.data ? result.data.filter(t => !t.resolved) : [];
+            } catch (e) {
+                console.warn('Não foi possível verificar tarefas pendentes:', e);
+            }
+
+            abrirModalSincronizar(equipamentosSelecionados, tarefasPendentes, tenantId);
+        }
+
+        async function sincronizarTodosEquipamentos() {
+            const tenantId = localStorage.getItem('acesscontrol_tenant') || 'demo';
+            if (!confirm('Deseja sincronizar todos os equipamentos ativos? Isso colocará todos em fila de sincronização.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/access-tasks/sync-all`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAuthHeader()
+                    },
+                    body: JSON.stringify({
+                        tenant_id: tenantId,
+                        equip_validator: 'all'
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert(data.message + (data.errors ? '\n\nAlguns erros: ' + data.errors.join(', ') : ''));
+                    await loadEquipamentosFromAPI();
+                    renderizarLista();
+                } else {
+                    alert('Erro ao sincronizar todos: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Erro ao sincronizar todos os equipamentos:', error);
+                alert('Erro ao sincronizar todos os equipamentos');
+            }
+        }
+
+        function abrirModalSincronizar(equipamentos, tarefasPendentes, tenantId) {
+            const validatorsComTarefas = new Set(tarefasPendentes.map(t => t.equip_validator));
+            const lista = document.getElementById('modal-sincronizar-lista');
+
+            lista.innerHTML = equipamentos.map(eq => {
+                const temFila = validatorsComTarefas.has(eq.validador);
+                const temSync = eq.syncStatus === 'pending' || eq.syncStatus === 'syncing';
+                const qtd = tarefasPendentes.filter(t => t.equip_validator === eq.validador).length;
+                const nome = eq.name || eq.ipAddress || eq.validador || eq.codigoValidador || eq.validador;
+
+                const statusText = temSync
+                    ? `<div style="font-size:0.78rem; color:#92400e; margin-top:2px;"><i class="fas fa-sync-alt"></i> Sincronização ${eq.syncStatus}</div>`
+                    : temFila
+                        ? `<div style="font-size:0.78rem; color:#92400e; margin-top:2px;"><i class="fas fa-clock"></i> ${qtd} tarefa(s) pendente(s)</div>`
+                        : '<div style="font-size:0.78rem; color:#065f46; margin-top:2px;"><i class="fas fa-check-circle"></i> Disponível</div>';
+
+                return `
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border:1.5px solid ${temSync ? '#fde68a' : temFila ? '#fde68a' : '#e2e8f0'}; border-radius:8px; background:${temSync ? '#fffbeb' : temFila ? '#fffbeb' : '#f8fafc'};">
+                        <div>
+                            <div style="font-weight:600; color:#1e293b; font-size:0.95rem;">${nome}</div>
+                            ${statusText}
+                        </div>
+                        <button class="btn btn-sm ${temSync || temFila ? 'btn-secondary' : 'btn-success'}"
+                            onclick="confirmarSincronizar('${eq.validador}', '${nome}', '${tenantId}')"
+                            ${temSync ? 'disabled' : ''}>
+                            <i class="fas fa-sync"></i> ${temSync ? 'Em fila' : 'Sincronizar'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            const modal = document.getElementById('modal-sincronizar');
+            modal.style.display = 'flex';
+        }
+
+        function fecharModalSincronizar() {
+            document.getElementById('modal-sincronizar').style.display = 'none';
+        }
+
+        function confirmarSincronizar(validador, nome, tenantId) {
+            fecharModalSincronizar();
+            if (!confirm(`Isso vai criar uma lista de sincronização com TODAS as pessoas cadastradas para o equipamento "${nome}". Continuar?`)) {
+                return;
+            }
+            sincronizarParaEquipamento(validador, tenantId);
+        }
+        
+        // Função para fazer a sincronização para um equipamento específico
+        async function sincronizarParaEquipamento(equipValidador, tenantId) {
+            if (!equipValidador) {
+                alert('Equipamento sem código validador.');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/access-tasks/sync-all`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAuthHeader()
+                    },
+                    body: JSON.stringify({
+                        tenant_id: tenantId,
+                        equip_validator: equipValidador
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert(data.message + (data.errors ? '\n\nAlguns erros: ' + data.errors.join(', ') : ''));
+                    await loadEquipamentosFromAPI();
+                    renderizarLista();
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Erro ao sincronizar:', error);
+                alert('Erro ao sincronizar pessoas');
+            }
+        }
+
+        // Dados de exemplo - não usados mais, agora carrega do banco
+        const equipamentosExemplo = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Carregar equipamentos do banco de dados
+            loadEquipamentosFromAPI().then(() => {
+                renderizarLista();
+            }).catch(error => {
+                console.error('Erro ao carregar equipamentos:', error);
+                equipamentos = [];
+                renderizarLista();
+            });
+        });
+    </script>
+</body>
+</html>

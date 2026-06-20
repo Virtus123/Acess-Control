@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>Acess Control - Provisionar Equipamento Push</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+
+    <style>
+        body { background: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .container { max-width: 980px; margin: 24px auto; padding: 0 16px; }
+        .card { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .card h2 { font-size: 1.1rem; color: #334155; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .card h2 .step { background: #6366f1; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+        .grid label { font-size: 0.85rem; color: #64748b; font-weight: 500; }
+        .grid input { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; margin-top: 4px; }
+        .grid input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+        .grid .full { grid-column: 1 / -1; }
+
+        .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+        .btn { padding: 10px 18px; border: none; border-radius: 6px; font-size: 0.95rem; cursor: pointer; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: 0.15s; }
+        .btn-primary { background: #6366f1; color: #fff; }
+        .btn-primary:hover { background: #4f46e5; }
+        .btn-secondary { background: #e2e8f0; color: #334155; }
+        .btn-secondary:hover { background: #cbd5e1; }
+        .btn-danger { background: #ef4444; color: #fff; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-accent { background: #10b981; color: #fff; padding: 12px 24px; font-size: 1rem; font-weight: 600; }
+        .btn-accent:hover { background: #059669; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; display: flex; gap: 10px; }
+        .alert-info { background: #eff6ff; color: #1e3a8a; border-left: 4px solid #3b82f6; }
+        .alert-warn { background: #fffbeb; color: #78350f; border-left: 4px solid #f59e0b; }
+
+        .log-area { background: #0f172a; color: #cbd5e1; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.85rem; padding: 16px; border-radius: 8px; height: 320px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
+        .log-area .ok { color: #22c55e; }
+        .log-area .err { color: #ef4444; }
+        .log-area .warn { color: #f59e0b; }
+        .log-area .ts { color: #64748b; }
+
+        h1 { font-size: 1.6rem; color: #1e293b; margin-bottom: 8px; }
+        .subtitle { color: #64748b; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1><i class="fas fa-cogs"></i> Provisionar Equipamento Push</h1>
+    <p class="subtitle">Aponte um equipamento Control iD para o Push Service. Roda 100% no navegador — sem instalar nada.</p>
+
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        <div>
+            <strong>Como funciona:</strong> seu navegador (esta página) faz as chamadas direto no IP local do equipamento.
+            Por isso só funciona se você estiver na <strong>mesma rede</strong> do equipamento.
+            Se o site Acess Control estiver em HTTPS, o navegador pode bloquear acesso ao equip em HTTP — abra esta página por HTTP nesse caso.
+        </div>
+    </div>
+
+    <div class="card">
+        <h2><span class="step">1</span> Equipamento (na sua LAN)</h2>
+        <div class="grid">
+            <div>
+                <label>IP do equipamento</label>
+                <input id="eq-ip" type="text" placeholder="192.168.1.100" value="192.168.0.">
+            </div>
+            <div>
+                <label>Porta</label>
+                <input id="eq-port" type="number" value="80">
+            </div>
+            <div>
+                <label>Login (admin)</label>
+                <input id="eq-login" type="text" value="admin">
+            </div>
+            <div>
+                <label>Senha</label>
+                <input id="eq-password" type="password" value="admin">
+            </div>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-secondary" onclick="testEquip()"><i class="fas fa-plug"></i> Testar conexão</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2><span class="step">2</span> Push Service</h2>
+        <div class="grid">
+            <div class="full">
+                <label>Host/IP do servidor (o equipamento precisa alcançar isso)</label>
+                <input id="srv-host" type="text" placeholder="example.com ou IP da máquina rodando o Push">
+            </div>
+            <div>
+                <label>Porta</label>
+                <input id="srv-port" type="number" value="3001">
+            </div>
+            <div>
+                <label>Slot na tabela devices (default 5)</label>
+                <input id="srv-id" type="number" value="5">
+            </div>
+            <div class="full">
+                <label>Nome do server (cosmético)</label>
+                <input id="srv-name" type="text" value="acess-push">
+            </div>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-secondary" onclick="testPush()"><i class="fas fa-server"></i> Testar Push (/health)</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2><span class="step">3</span> Ações</h2>
+        <div class="btn-row">
+            <button class="btn btn-accent" onclick="provision()"><i class="fas fa-rocket"></i> PROVISIONAR EQUIPAMENTO</button>
+            <button class="btn btn-danger" onclick="deprovision()"><i class="fas fa-power-off"></i> Desprovisionar</button>
+            <button class="btn btn-secondary" onclick="clearLog()" style="margin-left:auto"><i class="fas fa-eraser"></i> Limpar log</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2><i class="fas fa-terminal"></i> Log</h2>
+        <div id="log" class="log-area">Aguardando ação…</div>
+    </div>
+</div>
+
+<script>
+// ===========================================================================
+// Provisionador 100% client-side. Faz fetch direto pro equipamento (LAN).
+// Espelha exatamente o provisionador Python: 6 passos do runOnline().
+// ===========================================================================
+
+const HTTP_TIMEOUT_MS = 10_000;
+
+// Auto-preenche srv-host com o host atual da página (se não for localhost)
+document.addEventListener('DOMContentLoaded', () => {
+    const inputHost = document.getElementById('srv-host');
+    if (!inputHost.value && location.hostname && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+        inputHost.value = location.hostname;
+    }
+});
+
+function log(msg, level = '') {
+    const el = document.getElementById('log');
+    const ts = new Date().toTimeString().slice(0, 8);
+    if (el.textContent === 'Aguardando ação…') el.textContent = '';
+    el.innerHTML += `<span class="ts">[${ts}]</span> <span class="${level}">${escapeHtml(msg)}</span>\n`;
+    el.scrollTop = el.scrollHeight;
+}
+
+function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function clearLog() {
+    document.getElementById('log').textContent = '';
+}
+
+function readForm() {
+    return {
+        eqIp: document.getElementById('eq-ip').value.trim(),
+        eqPort: document.getElementById('eq-port').value.trim() || '80',
+        login: document.getElementById('eq-login').value.trim(),
+        password: document.getElementById('eq-password').value,
+        srvHost: document.getElementById('srv-host').value.trim(),
+        srvPort: document.getElementById('srv-port').value.trim() || '3001',
+        srvId: parseInt(document.getElementById('srv-id').value || '5', 10),
+        srvName: document.getElementById('srv-name').value.trim() || 'acess-push',
+    };
+}
+
+function validateEquip(f) {
+    if (!f.eqIp || !f.login) { log('❌ Preencha IP e login do equipamento', 'err'); return false; }
+    return true;
+}
+
+function validateServer(f) {
+    if (!f.srvHost || !f.srvPort) { log('❌ Preencha host e porta do Push Service', 'err'); return false; }
+    if (['localhost','127.0.0.1','0.0.0.0',''].includes(f.srvHost)) {
+        if (!confirm(`O host '${f.srvHost}' aponta o equipamento pra si mesmo. Continuar?`)) return false;
+    }
+    return true;
+}
+
+// fetch com timeout via AbortController
+async function timedFetch(url, opts = {}) {
+    const ctl = new AbortController();
+    const tid = setTimeout(() => ctl.abort(), HTTP_TIMEOUT_MS);
+    try {
+        return await fetch(url, { ...opts, signal: ctl.signal });
+    } finally {
+        clearTimeout(tid);
+    }
+}
+
+async function postJson(url, body) {
+    const resp = await timedFetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+    const text = await resp.text();
+    let json = null;
+    try { json = JSON.parse(text); } catch {}
+    return { status: resp.status, text, json };
+}
+
+// ===========================================================================
+// PROVISIONADOR — segue exatamente o provisionador_push.py (6 passos)
+// ===========================================================================
+class Provisionador {
+    constructor(f) {
+        this.base = `http://${f.eqIp}:${f.eqPort}`;
+        this.login = f.login;
+        this.password = f.password;
+        this.srvHost = f.srvHost;
+        this.srvPort = String(f.srvPort);
+        this.srvId = f.srvId;
+        this.srvName = f.srvName;
+        this.session = null;
+    }
+
+    async doLogin() {
+        log(`[1/6] login.fcgi @ ${this.base}`);
+        const r = await postJson(`${this.base}/login.fcgi`, { login: this.login, password: this.password });
+        if (r.status !== 200) throw new Error(`login HTTP ${r.status}: ${r.text.slice(0,200)}`);
+        if (!r.json || !r.json.session) throw new Error(`login sem session: ${r.text.slice(0,200)}`);
+        this.session = r.json.session;
+        log(`      session=${this.session}`);
+    }
+
+    async getSerial() {
+        if (!this.session) return null;
+        try {
+            const r = await postJson(`${this.base}/info.fcgi?session=${this.session}`, {});
+            if (r.status === 200 && r.json) {
+                return r.json.serial || r.json.device_id || r.json.model_serial || null;
+            }
+        } catch {}
+        return null;
+    }
+
+    async post(path, body) {
+        return postJson(`${this.base}${path}?session=${this.session}`, body);
+    }
+
+    async stepDisableOnline() {
+        log('[2/6] set_configuration: general.online=0 (limpar estado)');
+        const r = await this.post('/set_configuration.fcgi', { general: { online: '0' } });
+        log(`      HTTP ${r.status}: ${r.text.slice(0,140)}`);
+    }
+
+    async stepDestroyOldDevice() {
+        log(`[3/6] destroy_objects devices id=${this.srvId}`);
+        const r = await this.post('/destroy_objects.fcgi', {
+            object: 'devices', where: { devices: { id: this.srvId } },
+        });
+        log(`      HTTP ${r.status}: ${r.text.slice(0,140)}`);
+    }
+
+    async stepCreateDevice() {
+        log(`[4/6] create_objects devices id=${this.srvId} ip=${this.srvHost}:${this.srvPort}`);
+        const r = await this.post('/create_objects.fcgi', {
+            object: 'devices',
+            values: [{
+                id: this.srvId,
+                name: this.srvName,
+                ip: `${this.srvHost}:${this.srvPort}`,
+                public_key: '',
+            }],
+        });
+        if (r.status !== 200) throw new Error(`create_objects HTTP ${r.status}: ${r.text.slice(0,200)}`);
+        log(`      HTTP ${r.status}: ${r.text.slice(0,140)}`);
+    }
+
+    async stepSetOnlineClient() {
+        log(`[5/6] set_configuration: online_client.server_id=${this.srvId}`);
+        const r = await this.post('/set_configuration.fcgi', {
+            online_client: { server_id: String(this.srvId) },
+        });
+        log(`      HTTP ${r.status}: ${r.text.slice(0,140)}`);
+    }
+
+    async stepEnableAll() {
+        const cfg = {
+            general: { local_identification: '1', online: '1' },
+            online_client: { extract_template: '0', max_request_attempts: '5' },
+            push_server: {
+                push_remote_address: `http://${this.srvHost}:${this.srvPort}/api`,
+                push_request_period: '5',
+                push_request_timeout: '30000',
+            },
+            monitor: {
+                request_timeout: '5000',
+                hostname: this.srvHost,
+                port: this.srvPort,
+                path: 'api/notifications',
+            },
+        };
+        log('[6/6] set_configuration: online=1 + push_server + monitor');
+        const r = await this.post('/set_configuration.fcgi', cfg);
+        if (r.status !== 200) throw new Error(`set_configuration final HTTP ${r.status}: ${r.text.slice(0,200)}`);
+        log(`      HTTP ${r.status}: ${r.text.slice(0,200)}`);
+    }
+
+    async runAll() {
+        await this.doLogin();
+        const serial = await this.getSerial();
+        if (serial) {
+            log(`      → serial detectado: ${serial}`, 'ok');
+            log('      → IMPORTANTE: cadastre o equipamento no Acess Control', 'warn');
+            log(`        com VALIDADOR=${serial} antes de habilitar Push.`, 'warn');
+        } else {
+            log('      ⚠ serial não detectado (info.fcgi sem campo) — siga em frente.', 'warn');
+        }
+        await this.stepDisableOnline();
+        await this.stepDestroyOldDevice();
+        await this.stepCreateDevice();
+        await this.stepSetOnlineClient();
+        await this.stepEnableAll();
+        log('');
+        log('✅ Equipamento configurado.', 'ok');
+        log('   Em alguns segundos ele deve começar a:', 'ok');
+        log('   • GET  /api/push (a cada 5s)');
+        log('   • POST /device_is_alive.fcgi (a cada 5s)');
+        log('   • POST /new_user_identified.fcgi (quando reconhecer rosto)');
+        return serial;
+    }
+
+    async desprovisionar() {
+        await this.doLogin();
+        log('Desprovisionando — desligando modo online e zerando push_server.');
+        await this.post('/set_configuration.fcgi', {
+            general: { online: '0' },
+            push_server: { push_remote_address: '' },
+        });
+        await this.post('/destroy_objects.fcgi', {
+            object: 'devices', where: { devices: { id: this.srvId } },
+        });
+        log('✅ Desprovisionado.', 'ok');
+    }
+}
+
+// ===========================================================================
+// HANDLERS de botão
+// ===========================================================================
+async function testEquip() {
+    const f = readForm();
+    if (!validateEquip(f)) return;
+    const p = new Provisionador(f);
+    try {
+        await p.doLogin();
+        const serial = await p.getSerial();
+        if (serial) log(`✅ Equipamento OK. Serial/validador: ${serial}`, 'ok');
+        else log('✅ Login OK (serial não detectado).', 'ok');
+    } catch (e) {
+        log(`❌ Erro: ${e.message}`, 'err');
+        log('   Dicas: IP errado? Equip desligado? Firewall? CORS bloqueando?', 'warn');
+    }
+}
+
+async function testPush() {
+    const f = readForm();
+    if (!validateServer(f)) return;
+    const url = `http://${f.srvHost}:${f.srvPort}/health`;
+    log(`GET ${url}`);
+    try {
+        const r = await timedFetch(url);
+        const body = await r.text();
+        if (r.status === 200) log(`✅ Push OK: ${body.slice(0,200)}`, 'ok');
+        else log(`⚠ HTTP ${r.status}: ${body.slice(0,200)}`, 'warn');
+    } catch (e) {
+        log(`❌ ${e.message}`, 'err');
+    }
+}
+
+async function provision() {
+    const f = readForm();
+    if (!validateEquip(f) || !validateServer(f)) return;
+
+    log('='.repeat(60));
+    log(`Iniciando provisionamento → http://${f.eqIp}:${f.eqPort}`);
+    log('='.repeat(60));
+
+    const p = new Provisionador(f);
+    try {
+        const serial = await p.runAll();
+        const msg = serial
+            ? `Equipamento configurado.\n\nSerial/validador: ${serial}\n\nCadastre esse validador no Acess Control se ainda não estiver, e habilite Push.`
+            : 'Equipamento configurado.';
+        alert(msg);
+    } catch (e) {
+        log(`❌ FALHOU: ${e.message}`, 'err');
+        alert('Provisionamento falhou: ' + e.message);
+    }
+}
+
+async function deprovision() {
+    const f = readForm();
+    if (!validateEquip(f)) return;
+    if (!confirm('Tirar o equipamento do modo Push?\n\nEle vai parar de chegar no servidor Push Service.')) return;
+
+    const p = new Provisionador(f);
+    try {
+        await p.desprovisionar();
+        alert('Equipamento desprovisionado.');
+    } catch (e) {
+        log(`❌ ${e.message}`, 'err');
+        alert('Falhou: ' + e.message);
+    }
+}
+</script>
+</body>
+</html>

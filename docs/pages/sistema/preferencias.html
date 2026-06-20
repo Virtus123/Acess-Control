@@ -1,0 +1,2759 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Acess Control - Preferências</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <style>
+        /* Reset e estilos base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            margin-top: 20px;
+        }
+
+        .tabs-nav {
+            display: flex;
+            gap: 8px;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #64748b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn i {
+            font-size: 1rem;
+        }
+
+        .tab-btn:hover {
+            color: #4a90d9;
+        }
+
+        .tab-btn.active {
+            color: #4a90d9;
+            border-bottom-color: #4a90d9;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Settings Grid */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.2s;
+        }
+
+        .settings-card:hover {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+        }
+
+        .settings-card-header {
+            padding: 20px 24px;
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .settings-card-header i {
+            font-size: 1.5rem;
+            color: #4a90d9;
+        }
+
+        .settings-card-header h3 {
+            font-size: 1.1rem;
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .settings-card-body {
+            padding: 24px;
+        }
+
+        /* Form groups */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .form-hint {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a90d9, #10b981);
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        /* Checkbox Label */
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: #475569;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* Botões */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.2);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-info {
+            background: #38bdf8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #0284c7;
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+
+        /* Módulos do Sistema */
+        .modulos-categoria {
+            margin-bottom: 30px;
+        }
+
+        .modulos-categoria h4 {
+            font-size: 1rem;
+            color: #1e293b;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .modulos-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .modulo-item {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+
+        .modulo-item:hover {
+            border-color: #4a90d9;
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.1);
+        }
+
+        .modulo-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .modulo-header i {
+            width: 32px;
+            height: 32px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4a90d9;
+            font-size: 1.1rem;
+        }
+
+        .modulo-header span {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .modulo-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e0;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #4a90d9;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .modulo-subitens {
+            margin-top: 12px;
+            padding-left: 44px;
+        }
+
+        .subitem {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .subitem:last-child {
+            border-bottom: none;
+        }
+
+        .subitem span {
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* Cards de dados */
+        .flex {
+            display: flex;
+        }
+
+        .flex-gap-30 {
+            gap: 30px;
+        }
+
+        .flex-1 {
+            flex: 1;
+        }
+
+        .mb-15 {
+            margin-bottom: 15px;
+        }
+
+        /* LGPD Compliance */
+        .lgpd-compliance {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .compliance-item {
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .compliance-item h4 {
+            font-size: 0.95rem;
+            color: #1e293b;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .compliance-item h4 i {
+            color: #4a90d9;
+        }
+
+        .compliance-item p {
+            font-size: 0.9rem;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .privacy-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .data-collection-info ul {
+            list-style: none;
+            padding: 0;
+            margin: 12px 0;
+        }
+
+        .data-collection-info li {
+            padding: 6px 0;
+            color: #475569;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-collection-info li:last-child {
+            border-bottom: none;
+        }
+
+        /* Import type buttons */
+        .import-type-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 12px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .import-type-btn:hover {
+            border-color: #4a90d9;
+            color: #4a90d9;
+            background: #eff6ff;
+        }
+
+        .import-type-btn.active {
+            border-color: #4a90d9;
+            color: #4a90d9;
+            background: #eff6ff;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.15);
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .tabs-nav {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .flex {
+                flex-direction: column;
+            }
+
+            .lgpd-compliance {
+                grid-template-columns: 1fr;
+            }
+
+            .modulos-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="preferencias" class="content-section active">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1>Preferências</h1>
+                            <p>Personalize as configurações do sistema</p>
+                        </div>
+                    </div>
+
+                    <!-- Sistema de Abas -->
+                    <div class="tabs-container">
+                        <div class="tabs-nav">
+                            <button class="tab-btn active" data-tab="geral" onclick="showPreferenciasTab('geral')">
+                                <i class="fas fa-cog"></i> Geral
+                            </button>
+                            <button class="tab-btn" data-tab="modulos" onclick="showPreferenciasTab('modulos')">
+                                <i class="fas fa-puzzle-piece"></i> Módulos
+                            </button>
+                            <button class="tab-btn" data-tab="dados" onclick="showPreferenciasTab('dados')">
+                                <i class="fas fa-database"></i> Dados
+                            </button>
+                            <button class="tab-btn" data-tab="privacidade" onclick="showPreferenciasTab('privacidade')">
+                                <i class="fas fa-shield-alt"></i> Privacidade
+                            </button>
+                            <button class="tab-btn" data-tab="importacao" onclick="showPreferenciasTab('importacao')">
+                                <i class="fas fa-file-import"></i> Importação
+                            </button>
+                        </div>
+
+                        <!-- Aba Geral -->
+                        <div class="tab-content active" id="preferencias-tab-geral">
+                            <div class="settings-grid">
+                                <!-- Card de Limpeza Automática -->
+                                <div class="settings-card">
+                                    <div class="settings-card-header">
+                                        <i class="fas fa-broom"></i>
+                                        <h3>Limpeza Automática de Visitantes</h3>
+                                    </div>
+                                    <div class="settings-card-body">
+                                        <p style="margin-bottom: 15px; color: #64748b;">
+                                            Configure a limpeza automática de visitantes. Quando ativado, o sistema irá inativar todos os visitantes ativos às 00:00 e criar tarefas de exclusão para o comunicador processar.
+                                        </p>
+                                        <div class="form-group" style="margin-bottom: 15px;">
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" id="config-inativar-visitantes-dia">
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                            <span style="margin-left: 10px;">Inativar visitantes ao trocar o dia (00:00)</span>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 15px;">
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" id="config-reset-estatisticas-diario">
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                            <span style="margin-left: 10px;">Zerar estatísticas de ocupação às 00:00</span>
+                                        </div>
+                                        <div id="info-inativar" style="background: #f0f9ff; padding: 10px; border-radius: 6px; font-size: 0.9em; color: #0369a1; display: none;">
+                                            <i class="fas fa-info-circle"></i>
+                                            <strong>Funcionamento:</strong>
+                                            <ul style="margin: 5px 0 0 20px;">
+                                                <li>Às 00:00, todos os visitantes ativos serão inativados</li>
+                                                <li>Os contadores "Pessoas no Local" e "Visitantes no Local" serão zerados</li>
+                                                <li>Uma lista de tarefas de exclusão será criada para cada visitante inativado</li>
+                                                <li>Os logs de acesso serão mantidos</li>
+                                                <li>O comunicador acessa a lista, deleta os visitantes e resolve as tarefas</li>
+                                            </ul>
+                                        </div>
+                                        <button class="btn btn-primary w-100" onclick="saveLimpezaAuto()" style="margin-top: 15px;">
+                                            <i class="fas fa-save"></i> Salvar Configuração
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Card: Notificações de Acesso -->
+                                <div class="settings-card">
+                                    <div class="settings-card-header">
+                                        <i class="fas fa-envelope"></i>
+                                        <h3>Notificações de Acesso</h3>
+                                    </div>
+                                    <div class="settings-card-body">
+                                        <p style="margin-bottom: 15px; color: #64748b;">
+                                            Ative o disparo de e-mails automáticos para visitantes e empresas no momento do acesso. 
+                                            Configure os templates na página de <a href="../equipamentos/notificacao.html" style="color: #4a90d9; font-weight: 600;">Notificações</a>.
+                                        </p>
+                                        <div class="form-group" style="margin-bottom: 20px;">
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" id="notif-visitante-entrada-email">
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                            <span style="margin-left: 10px; font-weight: 600;">Enviar e-mail para visitante e empresa visitada</span>
+                                            <div class="form-hint" style="margin-left: 54px;">Dispara um e-mail quando a entrada do visitante é registrada.</div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 20px;">
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" id="notif-encomenda-email">
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                            <span style="margin-left: 10px; font-weight: 600;">Ao cadastrar uma encomenda, enviar e-mail para o destinatário</span>
+                                            <div class="form-hint" style="margin-left: 54px;">Dispara um e-mail quando uma nova encomenda é salva.</div>
+                                        </div>
+                                        <div style="background: #f0f9ff; padding: 12px; border-radius: 8px; font-size: 0.85rem; color: #0369a1; margin-bottom: 20px;">
+                                            <i class="fas fa-info-circle"></i>
+                                            Os e-mails serão enviados conforme os endereços cadastrados na empresa e/ou pessoa selecionada. Templates configurados em <strong>Equipamentos > Notificações</strong>.
+                                        </div>
+                                        <button class="btn btn-primary w-100" onclick="saveNotificacaoConfig()">
+                                            <i class="fas fa-save"></i> Salvar Notificações
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Card: Autorizador - Modo de Busca -->
+                                <div class="settings-card">
+                                    <div class="settings-card-header">
+                                        <i class="fas fa-search"></i>
+                                        <h3>Autorizador - Modo de Busca</h3>
+                                    </div>
+                                    <div class="settings-card-body">
+                                        <p style="margin-bottom: 15px; color: #64748b;">
+                                            Define como o autorizador localiza a pessoa/visitante ao receber um identificador do equipamento.
+                                        </p>
+                                        <div class="form-group" style="margin-bottom: 15px;">
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" id="config-autorizador-busca-id-primeiro">
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                            <span style="margin-left: 10px; font-weight: 600;">Buscar por ID antes da matrícula</span>
+                                            <div class="form-hint" style="margin-left: 54px;">
+                                                Quando ativado: tenta localizar pelo <strong>ID interno</strong> primeiro, depois pela <strong>matrícula</strong>.<br>
+                                                Quando desativado (padrão): busca pela <strong>matrícula</strong> primeiro, depois pelo <strong>ID</strong>.
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-primary w-100" onclick="saveAutorizadorBusca()" style="margin-top: 10px;">
+                                            <i class="fas fa-save"></i> Salvar Configuração
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="settings-card">
+                                    <div class="settings-card-header">
+                                        <i class="fas fa-tag"></i>
+                                        <h3>Labels Personalizados</h3>
+                                    </div>
+                                    <div class="settings-card-body">
+                                        <div class="form-group">
+                                            <label for="config-label-pessoas">Label para "Pessoas"</label>
+                                            <input type="text" id="config-label-pessoas"
+                                                placeholder="Ex: Condôminos, Moradores...">
+                                            <div class="form-hint">Este nome será usado em todo o sistema</div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="config-label-grupos">Label para "Grupos"</label>
+                                            <input type="text" id="config-label-grupos"
+                                                placeholder="Ex: Blocos, Unidades, Salas...">
+                                            <div class="form-hint">Este nome será usado em todo o sistema</div>
+                                        </div>
+                                        <button class="btn btn-primary w-100" onclick="saveLabels()">
+                                            <i class="fas fa-save"></i> Salvar Labels
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Card: Aparência -->
+                                <div class="settings-card">
+                                    <div class="settings-card-header">
+                                        <i class="fas fa-font"></i>
+                                        <h3>Aparência</h3>
+                                    </div>
+                                    <div class="settings-card-body">
+                                        <div class="form-group">
+                                            <label for="config-font-size">Tamanho da Fonte Global</label>
+                                            <select id="config-font-size" onchange="applyFontSizePreview(this.value)">
+                                                <option value="small">Pequeno (13px)</option>
+                                                <option value="normal" selected>Normal (15px)</option>
+                                                <option value="large">Grande (17px)</option>
+                                            </select>
+                                            <div class="form-hint">Altera o tamanho do texto em todo o sistema para todos os usuários deste tenant.</div>
+                                        </div>
+                                        <button class="btn btn-primary w-100" onclick="saveFontSize()">
+                                            <i class="fas fa-save"></i> Salvar Preferência de Fonte
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Card: Dados da Empresa nos Relatórios -->
+                                <div class="settings-card" style="grid-column: 1 / -1;">
+                                    <div class="settings-card-header">
+                                        <i class="fas fa-building"></i>
+                                        <h3>Dados da Empresa nos Relatórios</h3>
+                                    </div>
+                                    <div class="settings-card-body">
+                                        <p style="margin-bottom: 16px; color: #64748b;">
+                                            Estas informações aparecerão no cabeçalho de todos os relatórios PDF/Excel gerados pelo sistema. Salvas no banco de dados — disponíveis em qualquer computador.
+                                        </p>
+                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                                            <div class="form-group">
+                                                <label for="report-company-razao">Razão Social</label>
+                                                <input type="text" id="report-company-razao" placeholder="Ex: EMPRESA LTDA">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="report-company-cnpj">CNPJ</label>
+                                                <input type="text" id="report-company-cnpj" placeholder="00.000.000/0001-00">
+                                            </div>
+                                            <div class="form-group" style="grid-column: 1 / -1;">
+                                                <label for="report-company-endereco">Endereço Completo</label>
+                                                <input type="text" id="report-company-endereco" placeholder="Rua, número, bairro, cidade - UF">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="report-company-telefone">Telefone</label>
+                                                <input type="text" id="report-company-telefone" placeholder="(00) 0000-0000">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="report-company-email">E-mail</label>
+                                                <input type="email" id="report-company-email" placeholder="contato@empresa.com.br">
+                                            </div>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px;">
+                                            <button class="btn btn-primary" onclick="saveReportCompany()" style="min-width: 150px;">
+                                                <i class="fas fa-save"></i> Salvar Dados
+                                            </button>
+                                            <span id="report-company-status" style="color: #10b981; font-size: 0.85rem; display: none;">
+                                                <i class="fas fa-check"></i> Salvo com sucesso!
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Aba Módulos do Sistema (NOVA) -->
+                        <div class="tab-content" id="preferencias-tab-modulos">
+                            <div class="settings-grid">
+                                <div class="settings-card">
+                                    <div class="settings-card-header">
+                                        <i class="fas fa-puzzle-piece"></i>
+                                        <h3>Módulos do Sistema</h3>
+                                    </div>
+                                    <div class="settings-card-body">
+                                        <p style="margin-bottom: 20px; color: #64748b;">
+                                            Ative ou desative os módulos conforme sua necessidade. Módulos desativados não aparecerão no menu.
+                                        </p>
+
+                                        <!-- Módulo de Cadastro -->
+                                        <div class="modulos-categoria">
+                                            <h4><i class="fas fa-database"></i> Página Módulo de Cadastro</h4>
+                                            <div class="modulos-grid">
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-mobile-alt"></i>
+                                                        <span>Celular</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <span class="badge badge-info">Campo</span>
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-cadastro-celular" checked>
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-credit-card"></i>
+                                                        <span>Seção: Cartão de Acesso</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <span class="badge badge-info">Seção</span>
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-cadastro-cartao" checked>
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-building"></i>
+                                                        <span>Empresa do Visitante</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <span class="badge badge-info">Campo</span>
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-cadastro-empresa" checked>
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-user-tag"></i>
+                                                        <span>Pessoa Visitada</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <span class="badge badge-info">Campo</span>
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-cadastro-pessoa-visitada" checked>
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Submenus - Cadastros -->
+                                        <div class="modulos-categoria">
+                                            <h4><i class="fas fa-folder-open"></i> Cadastros</h4>
+                                            <div class="modulos-grid">
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-utensils"></i>
+                                                        <span>Refeitório</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-cadastro-refeitorio">
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-box"></i>
+                                                        <span>Encomendas</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-cadastro-encomendas" checked>
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-key"></i>
+                                                        <span>Claviculário</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-cadastro-claviculario">
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-parking"></i>
+                                                        <span>Estacionamentos</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-cadastro-estacionamento">
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-car"></i>
+                                                        <span>Veículos</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-cadastro-veiculos">
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Submenus - Autorização -->
+                                        <div class="modulos-categoria">
+                                            <h4><i class="fas fa-shield-alt"></i> Autorização</h4>
+                                            <div class="modulos-grid">
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-utensils"></i>
+                                                        <span>Refeição</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-autorizacao-refeicao">
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-key"></i>
+                                                        <span>Claviculário</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-autorizacao-claviculario">
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-car-side"></i>
+                                                        <span>Nível de Acesso Veículos</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-autorizacao-nivel-acesso-veiculos">
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-car"></i>
+                                                        <span>Acesso Veículos</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-autorizacao-acesso-veiculos">
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Outros Módulos -->
+                                        <div class="modulos-categoria">
+                                            <h4><i class="fas fa-cubes"></i> Outros Módulos</h4>
+                                            <div class="modulos-grid">
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-users"></i>
+                                                        <span>Pessoas</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-pessoas" checked>
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-user-friends"></i>
+                                                        <span>Visitantes</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-visitantes" checked>
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-car"></i>
+                                                        <span>Veículos</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-veiculos" checked>
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-building"></i>
+                                                        <span>Empresas</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-empresas" checked>
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-clock"></i>
+                                                        <span>Horários</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-horarios" checked>
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-calendar-alt"></i>
+                                                        <span>Feriados</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-feriados" checked>
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-parking"></i>
+                                                        <span>Estacionamento</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-estacionamento" checked>
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modulo-item">
+                                                    <div class="modulo-header">
+                                                        <i class="fas fa-microchip"></i>
+                                                        <span>Equipamentos</span>
+                                                    </div>
+                                                    <div class="modulo-toggle">
+                                                        <label class="toggle-switch">
+                                                            <input type="checkbox" id="mod-equipamentos" checked>
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <button class="btn btn-primary w-100" onclick="saveModulos()" style="margin-top: 20px;">
+                                            <i class="fas fa-save"></i> Salvar Configurações
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Aba Dados -->
+                        <div class="tab-content" id="preferencias-tab-dados">
+                            <div class="settings-grid">
+                                <!-- Card Limites de Pessoas -->
+                                <div class="settings-card">
+                                    <div class="settings-card-header">
+                                        <i class="fas fa-users"></i>
+                                        <h3>Limites de Cadastro - Pessoas</h3>
+                                    </div>
+                                    <div class="settings-card-body">
+                                        <div class="flex flex-gap-30">
+                                            <div style="width: 300px; height: 300px; position: relative;">
+                                                <canvas id="chartPessoas"></canvas>
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="mb-15">
+                                                    <p style="font-size: 14px; color: #64748b; margin-bottom: 5px;">Total
+                                                        cadastrado:</p>
+                                                    <p style="font-size: 28px; font-weight: bold; color: #1e293b;"><span
+                                                            id="pessoas-count">0</span> / <span
+                                                            id="pessoas-limit">1000</span></p>
+                                                </div>
+                                                <div class="mb-15">
+                                                    <p style="font-size: 14px; color: #64748b; margin-bottom: 5px;">Disponível:
+                                                    </p>
+                                                    <p style="font-size: 28px; font-weight: bold; color: #10b981;"><span
+                                                            id="pessoas-available">1000</span></p>
+                                                </div>
+                                                <div class="mb-15">
+                                                    <p style="font-size: 14px; color: #64748b; margin-bottom: 5px;">Uso:</p>
+                                                    <p style="font-size: 28px; font-weight: bold; color: #4a90d9;"><span
+                                                            id="pessoas-percent">0</span>%</p>
+                                                </div>
+                                                <div
+                                                    style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                                                    <p style="font-size: 12px; color: #64748b; margin: 0;">
+                                                        <strong>Atenção:</strong> Quando atingir 100%, não será possível
+                                                        cadastrar novas pessoas. Considere expandir o limite ou arquivar
+                                                        registros inativos.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card Limites de Equipamentos -->
+                                <div class="settings-card">
+                                    <div class="settings-card-header">
+                                        <i class="fas fa-microchip"></i>
+                                        <h3>Limites de Cadastro - Equipamentos</h3>
+                                    </div>
+                                    <div class="settings-card-body">
+                                        <div class="flex flex-gap-30">
+                                            <div style="width: 300px; height: 300px; position: relative;">
+                                                <canvas id="chartEquipamentos"></canvas>
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="mb-15">
+                                                    <p style="font-size: 14px; color: #64748b; margin-bottom: 5px;">Total
+                                                        cadastrado:</p>
+                                                    <p style="font-size: 28px; font-weight: bold; color: #1e293b;"><span
+                                                            id="equipamentos-count">0</span> / <span
+                                                            id="equipamentos-limit">50</span></p>
+                                                </div>
+                                                <div class="mb-15">
+                                                    <p style="font-size: 14px; color: #64748b; margin-bottom: 5px;">Disponível:
+                                                    </p>
+                                                    <p style="font-size: 28px; font-weight: bold; color: #10b981;"><span
+                                                            id="equipamentos-available">50</span></p>
+                                                </div>
+                                                <div class="mb-15">
+                                                    <p style="font-size: 14px; color: #64748b; margin-bottom: 5px;">Uso:</p>
+                                                    <p style="font-size: 28px; font-weight: bold; color: #4a90d9;"><span
+                                                            id="equipamentos-percent">0</span>%</p>
+                                                </div>
+                                                <div
+                                                    style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                                                    <p style="font-size: 12px; color: #64748b; margin: 0;">
+                                                        <strong>Atenção:</strong> Quando atingir 100%, não será possível
+                                                        cadastrar novos equipamentos.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card Visitantes (Ilimitado) -->
+                                <div class="settings-card">
+                                    <div class="settings-card-header">
+                                        <i class="fas fa-user-friends"></i>
+                                        <h3>Visitantes</h3>
+                                    </div>
+                                    <div class="settings-card-body">
+                                        <div style="text-align: center; padding: 40px;">
+                                            <div style="font-size: 48px; color: #10b981; margin-bottom: 15px;">
+                                                <i class="fas fa-infinity"></i>
+                                            </div>
+                                            <p
+                                                style="font-size: 18px; font-weight: bold; color: #1e293b; margin-bottom: 10px;">
+                                                Ilimitado</p>
+                                            <p style="font-size: 14px; color: #64748b;">
+                                                Total de visitantes: <strong id="visitantes-count">0</strong>
+                                            </p>
+                                            <p style="font-size: 12px; color: #94a3b8; margin-top: 20px;">
+                                                Visitantes não possui limite de cadastro.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Aba Importação (unificada) -->
+                        <div class="tab-content" id="preferencias-tab-importacao">
+
+                            <!-- Seletor de tipo de importação -->
+                            <div class="settings-card" style="margin-bottom: 24px;">
+                                <div class="settings-card-header">
+                                    <i class="fas fa-file-import"></i>
+                                    <h3>Tipo de Importação</h3>
+                                </div>
+                                <div class="settings-card-body">
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
+                                        <button class="import-type-btn active" id="import-type-btn-pessoas" onclick="selectImportType('pessoas')">
+                                            <i class="fas fa-users" style="font-size: 1.5rem; display: block; margin-bottom: 6px;"></i>
+                                            <span>Pessoas</span>
+                                        </button>
+                                        <button class="import-type-btn" id="import-type-btn-visitantes" onclick="selectImportType('visitantes')">
+                                            <i class="fas fa-user-plus" style="font-size: 1.5rem; display: block; margin-bottom: 6px;"></i>
+                                            <span>Visitantes</span>
+                                        </button>
+                                        <button class="import-type-btn" id="import-type-btn-idsecure" onclick="selectImportType('idsecure')">
+                                            <i class="fas fa-cloud-download-alt" style="font-size: 1.5rem; display: block; margin-bottom: 6px;"></i>
+                                            <span>IDSecure</span>
+                                        </button>
+                                        <button class="import-type-btn" id="import-type-btn-acesscontrol" onclick="selectImportType('acesscontrol')">
+                                            <i class="fas fa-database" style="font-size: 1.5rem; display: block; margin-bottom: 6px;"></i>
+                                            <span>AcessControl</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Seção: Importar Pessoas -->
+                            <div id="import-section-pessoas">
+                                <div class="settings-grid">
+                                    <div class="settings-card">
+                                        <div class="settings-card-header">
+                                            <i class="fas fa-users"></i>
+                                            <h3>Importar Pessoas</h3>
+                                        </div>
+                                        <div class="settings-card-body">
+                                            <p style="margin-bottom: 20px; color: #64748b;">
+                                                Importe pessoas a partir de um arquivo CSV. O formato esperado deve seguir o padrão de exportação.
+                                            </p>
+
+                                            <div class="form-group">
+                                                <label for="import-layout">Layout de Importação</label>
+                                                <select id="import-layout" onchange="toggleLayoutOptions()">
+                                                    <option value="1">Layout 1 (Padrão)</option>
+                                                    <option value="2">Layout 2 (Unificado)</option>
+                                                    <option value="3">Layout 3 (IDSecure Cloud)</option>
+                                                </select>
+                                                <div class="form-hint">Selecione o formato do arquivo</div>
+                                            </div>
+
+                                            <div id="layout1-instructions" class="layout-instructions">
+                                                <p style="color: #4a90d9; font-weight: 600; margin-bottom: 10px;">📁 Estrutura do Layout 1:</p>
+                                                <ul style="margin-bottom: 15px; padding-left: 20px; color: #64748b;">
+                                                    <li><strong>Empresas.csv</strong> - Lista de empresas</li>
+                                                    <li><strong>Grupos.csv</strong> - Lista de grupos</li>
+                                                    <li><strong>Pessoas.csv</strong> - Lista de pessoas</li>
+                                                    <li><strong>photos/</strong> - Pasta com fotos (opcional)</li>
+                                                </ul>
+                                            </div>
+
+                                            <div id="layout2-instructions" class="layout-instructions" style="display: none;">
+                                                <p style="color: #10b981; font-weight: 600; margin-bottom: 10px;">📁 Estrutura do Layout 2:</p>
+                                                <ul style="margin-bottom: 15px; padding-left: 20px; color: #64748b;">
+                                                    <li><strong>groups.csv</strong> - Grupos e Empresas (idType: 1=grupo, 2=empresa)</li>
+                                                    <li><strong>peoples.csv</strong> - Pessoas e Visitantes (idType: 0=pessoa, 1=visitante)</li>
+                                                    <li><strong>vehicles.csv</strong> - Veículos (opcional)</li>
+                                                    <li><strong>photos/</strong> - Fotos no formato: usuario-&lt;id&gt;.jpg</li>
+                                                </ul>
+                                            </div>
+
+                                            <div id="layout3-instructions" class="layout-instructions" style="display: none;">
+                                                <p style="color: #6366f1; font-weight: 600; margin-bottom: 10px;">📁 Estrutura do Layout 3 (IDSecure Cloud):</p>
+                                                <ul style="margin-bottom: 15px; padding-left: 20px; color: #64748b;">
+                                                    <li><strong>Empresas_*.csv</strong> - Empresas (delimitador: , ou ;)</li>
+                                                    <li><strong>Grupos_*.csv</strong> - Grupos (delimitador: , ou ;)</li>
+                                                    <li><strong>Pessoas_*.csv</strong> - Pessoas e Visitantes (delimitador: ;)</li>
+                                                    <li><strong>Veículos_*.csv</strong> - Veículos (delimitador: ;)</li>
+                                                </ul>
+                                                <p style="font-size: 0.85rem; color: #64748b;">* Envie todos os arquivos compactados em um único ZIP.</p>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="import-person-csv">Arquivo CSV *</label>
+                                                <input type="file" id="import-person-csv" accept=".csv" required>
+                                                <div class="form-hint" id="csv-hint">Arquivo CSV com dados das pessoas</div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="import-person-zip">Arquivo ZIP (obrigatório) *</label>
+                                                <input type="file" id="import-person-zip" accept=".zip" required>
+                                                <div class="form-hint" id="zip-hint">ZIP contendo: pessoas.csv, empresas.csv, grupos.csv (e fotos opcionais)</div>
+                                            </div>
+
+                                            <div id="layout2-options" style="display: none; border-top: 1px solid #e2e8f0; padding-top: 15px; margin-top: 15px;">
+                                                <div class="form-group">
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" id="import-visitors" onchange="toggleVisitorsOptions()">
+                                                        <span>Importar visitantes?</span>
+                                                    </label>
+                                                </div>
+                                                <div id="visitors-options" style="display: none; margin-left: 20px;">
+                                                    <div class="form-group">
+                                                        <label class="checkbox-label">
+                                                            <input type="checkbox" id="import-visitors-as-inactive">
+                                                            <span>Importar visitantes como inativos?</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" id="import-vehicles" onchange="toggleVehiclesOptions()">
+                                                        <span>Importar veículos?</span>
+                                                    </label>
+                                                </div>
+                                                <div id="vehicles-options" style="display: none; margin-left: 20px;">
+                                                    <div class="form-group">
+                                                        <label class="checkbox-label">
+                                                            <input type="checkbox" id="import-vehicles-rotative">
+                                                            <span>Veículos rotativos?</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" id="import-person-with-photo" checked>
+                                                    <span>Importar com foto</span>
+                                                </label>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" id="import-person-as-inactive">
+                                                    <span>Importar como inativo</span>
+                                                </label>
+                                            </div>
+
+                                            <button class="btn btn-primary w-100" onclick="importPessoas()">
+                                                <i class="fas fa-upload"></i> Importar Pessoas
+                                            </button>
+
+                                            <div id="person-import-progress" style="display: none; margin-top: 20px;">
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" id="person-progress-fill"></div>
+                                                </div>
+                                                <p class="progress-text" id="person-progress-text">Processando...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="settings-card">
+                                        <div class="settings-card-header">
+                                            <i class="fas fa-history"></i>
+                                            <h3>Histórico de Importações</h3>
+                                        </div>
+                                        <div class="settings-card-body">
+                                            <div id="person-import-history">
+                                                <p style="color: #64748b; text-align: center;">Carregando histórico...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Seção: Importar Visitantes -->
+                            <div id="import-section-visitantes" style="display: none;">
+                                <div class="settings-grid">
+                                    <div class="settings-card">
+                                        <div class="settings-card-header">
+                                            <i class="fas fa-user-friends"></i>
+                                            <h3>Importar Visitantes</h3>
+                                        </div>
+                                        <div class="settings-card-body">
+                                            <p style="margin-bottom: 20px; color: #64748b;">
+                                                Importe visitantes a partir de um arquivo CSV. O formato esperado deve seguir o padrão de exportação.
+                                            </p>
+
+                                            <div class="form-group">
+                                                <label for="import-visitor-csv">Arquivo CSV *</label>
+                                                <input type="file" id="import-visitor-csv" accept=".csv" required>
+                                                <div class="form-hint">Arquivo CSV com dados dos visitantes</div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="import-visitor-zip">Arquivo de Fotos (ZIP)</label>
+                                                <input type="file" id="import-visitor-zip" accept=".zip">
+                                                <div class="form-hint">ZIP contendo fotos no formato: ID.jpg ou ID.png</div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" id="import-visitor-with-photo">
+                                                    <span>Importar com foto</span>
+                                                </label>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" id="import-visitor-as-inactive">
+                                                    <span>Importar como inativo</span>
+                                                </label>
+                                            </div>
+
+                                            <button class="btn btn-primary w-100" onclick="importVisitantes()">
+                                                <i class="fas fa-upload"></i> Importar Visitantes
+                                            </button>
+
+                                            <div id="visitor-import-progress" style="display: none; margin-top: 20px;">
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" id="visitor-progress-fill"></div>
+                                                </div>
+                                                <p class="progress-text" id="visitor-progress-text">Processando...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="settings-card">
+                                        <div class="settings-card-header">
+                                            <i class="fas fa-history"></i>
+                                            <h3>Histórico de Importações</h3>
+                                        </div>
+                                        <div class="settings-card-body">
+                                            <div id="visitor-import-history">
+                                                <p style="color: #64748b; text-align: center;">Carregando histórico...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Seção: IDSecure -->
+                            <div id="import-section-idsecure" style="display: none;">
+                                <div class="settings-grid">
+                                    <div class="settings-card">
+                                        <div class="settings-card-header">
+                                            <i class="fas fa-car"></i>
+                                            <h3>Importar Veículos via CSV</h3>
+                                        </div>
+                                        <div class="settings-card-body">
+                                            <p style="margin-bottom: 15px; color: #64748b;">
+                                                Importe o CSV de veículos exportado do iDSecure. Vincula automaticamente o veículo à pessoa pelo ID do condutor e registra a tag UHF.
+                                            </p>
+                                            <div style="background: #f0f9ff; padding: 10px; border-radius: 6px; font-size: 0.85rem; color: #0369a1; margin-bottom: 15px;">
+                                                <i class="fas fa-info-circle"></i>
+                                                Colunas esperadas: <strong>Marca; Modelo; Cor; Placa; Tipo de Cartao; Codigo Legivel; DriverType; Condutor</strong>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="vehicles-csv-file">Arquivo CSV</label>
+                                                <input type="file" id="vehicles-csv-file" accept=".csv" style="padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; width: 100%;">
+                                            </div>
+                                            <button class="btn btn-primary w-100" onclick="importVehiclesCsv()">
+                                                <i class="fas fa-upload"></i> Importar Veículos
+                                            </button>
+                                            <div id="vehicles-csv-result" style="display:none; margin-top: 15px; padding: 12px; border-radius: 8px; font-size: 0.9rem;"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="settings-card">
+                                        <div class="settings-card-header">
+                                            <i class="fas fa-cloud-download-alt"></i>
+                                            <h3>Importação do IDSecure</h3>
+                                        </div>
+                                        <div class="settings-card-body">
+                                            <p style="margin-bottom: 20px; color: #64748b;">
+                                                Conecte-se com sua conta do IDSecure para baixar pessoas, empresas, grupos, visitantes e fotos automaticamente.
+                                            </p>
+
+                                            <div class="form-group">
+                                                <label for="idsecure-email">E-mail de Operador</label>
+                                                <input type="email" id="idsecure-email" placeholder="Eletrobrás@..." required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="idsecure-password">Senha de Operador</label>
+                                                <input type="password" id="idsecure-password" required>
+                                            </div>
+
+                                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                                                <div style="padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                                    <label class="checkbox-label" style="font-weight: 600; margin-bottom: 8px; display: block;">
+                                                        <input type="checkbox" id="idsecure-import-persons" checked>
+                                                        <span>Importar Pessoas</span>
+                                                    </label>
+                                                    <label class="checkbox-label" style="margin-left: 20px; font-size: 0.85rem; color: #64748b;">
+                                                        <input type="checkbox" id="idsecure-person-active" checked>
+                                                        <span>Ativos (Status=1)</span>
+                                                    </label>
+                                                    <label class="checkbox-label" style="margin-left: 20px; font-size: 0.85rem; color: #64748b;">
+                                                        <input type="checkbox" id="idsecure-person-inactive">
+                                                        <span>Inativos (Status=0)</span>
+                                                    </label>
+                                                </div>
+                                                <div style="padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                                    <label class="checkbox-label" style="font-weight: 600; margin-bottom: 8px; display: block;">
+                                                        <input type="checkbox" id="idsecure-import-visitors" checked>
+                                                        <span>Importar Visitantes</span>
+                                                    </label>
+                                                    <label class="checkbox-label" style="margin-left: 20px; font-size: 0.85rem; color: #64748b;">
+                                                        <input type="checkbox" id="idsecure-visitor-active" checked>
+                                                        <span>Ativos (Status=1)</span>
+                                                    </label>
+                                                    <label class="checkbox-label" style="margin-left: 20px; font-size: 0.85rem; color: #64748b;">
+                                                        <input type="checkbox" id="idsecure-visitor-inactive">
+                                                        <span>Inativos (Status=0)</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" id="idsecure-force-inactive">
+                                                    <span>Importar todos como INATIVOS no sistema</span>
+                                                </label>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" id="idsecure-first-page-only">
+                                                    <span style="color: #f59e0b; font-weight: 600;">Apenas primeira página (modo teste)</span>
+                                                </label>
+                                                <div class="form-hint" style="margin-left: 24px;">Importa só os primeiros 50 registros de cada categoria.</div>
+                                            </div>
+
+                                            <button class="btn btn-primary w-100" onclick="importIdsecure()">
+                                                <i class="fas fa-cloud-download-alt"></i> Iniciar Sincronização
+                                            </button>
+
+                                            <div id="idsecure-import-progress" style="display: none; margin-top: 20px;">
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" id="idsecure-progress-fill" style="width: 100%; background: linear-gradient(90deg, #3b82f6, #06b6d4);"></div>
+                                                </div>
+                                                <p class="progress-text" id="idsecure-progress-text">Iniciando em segundo plano...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Seção: AcessControl (download de fotos via .db) -->
+                            <div id="import-section-acesscontrol" style="display: none;">
+                                <div class="settings-grid">
+                                    <div class="settings-card">
+                                        <div class="settings-card-header">
+                                            <i class="fas fa-database"></i>
+                                            <h3>Importar Fotos do AcessControl (VPS)</h3>
+                                        </div>
+                                        <div class="settings-card-body">
+                                            <p style="margin-bottom: 20px; color: #64748b;">
+                                                Envie o arquivo <strong>.db</strong> exportado da VPS. O sistema lerá os caminhos de fotos das pessoas, baixará cada imagem diretamente da VPS e atualizará os registros locais automaticamente.
+                                            </p>
+
+                                            <div style="background: #f0f9ff; padding: 12px; border-radius: 8px; font-size: 0.85rem; color: #0369a1; margin-bottom: 20px;">
+                                                <i class="fas fa-info-circle"></i>
+                                                <strong>Como exportar o .db:</strong> No servidor VPS, copie o arquivo
+                                                <code>/acesscontrol/backend/databases/tenants/tenant_SEUID.db</code> para sua máquina local.
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="acesscontrol-vps-url">URL da VPS *</label>
+                                                <input type="url" id="acesscontrol-vps-url" placeholder="https://example.com">
+                                                <div class="form-hint">URL base do servidor AcessControl na VPS (sem barra no final)</div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="acesscontrol-vps-token">Token JWT (opcional)</label>
+                                                <input type="text" id="acesscontrol-vps-token" placeholder="eyJhbGciOiJIUzI1NiI...">
+                                                <div class="form-hint">Token de autenticação para acessar fotos protegidas na VPS</div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="acesscontrol-db-file">Arquivo .db da VPS *</label>
+                                                <input type="file" id="acesscontrol-db-file" accept=".db" required>
+                                                <div class="form-hint">Banco de dados SQLite exportado da VPS (tenant_SEUID.db)</div>
+                                            </div>
+
+                                            <button class="btn btn-primary w-100" onclick="importLegacyPhotos()">
+                                                <i class="fas fa-cloud-download-alt"></i> Baixar Fotos da VPS
+                                            </button>
+
+                                            <div id="acesscontrol-import-progress" style="display: none; margin-top: 20px;">
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" id="acesscontrol-progress-fill"></div>
+                                                </div>
+                                                <p class="progress-text" id="acesscontrol-progress-text">Processando...</p>
+                                            </div>
+
+                                            <div id="acesscontrol-import-results" style="display: none; margin-top: 20px;"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="settings-card">
+                                        <div class="settings-card-header">
+                                            <i class="fas fa-question-circle"></i>
+                                            <h3>Como Funciona</h3>
+                                        </div>
+                                        <div class="settings-card-body">
+                                            <ol style="padding-left: 20px; color: #475569; line-height: 2;">
+                                                <li>O sistema abre o arquivo <strong>.db</strong> enviado</li>
+                                                <li>Lê a coluna <code>photo_url</code> da tabela <code>persons</code></li>
+                                                <li>Para cada foto encontrada, faz o download diretamente da VPS</li>
+                                                <li>Salva as fotos em <code>uploads/photos/person/</code></li>
+                                                <li>Atualiza o banco local: associa cada pessoa (pelo ID) ao caminho local da foto</li>
+                                            </ol>
+                                            <div style="margin-top: 16px; padding: 12px; background: #fef9c3; border-radius: 8px; font-size: 0.85rem; color: #713f12;">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                                <strong>Importante:</strong> O matching entre VPS e sistema local é feito pelo <strong>ID da pessoa</strong>. Certifique-se de que o .db é do mesmo tenant que está configurado localmente.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Aba Privacidade -->
+                        <div class="tab-content" id="preferencias-tab-privacidade">
+                            <div class="settings-grid">
+                                <!-- LGPD Compliance Card -->
+                                <div class="settings-card">
+                                    <div class="settings-card-header">
+                                        <i class="fas fa-shield-alt"></i>
+                                        <h3>LGPD - Lei Geral de Proteção de Dados</h3>
+                                    </div>
+                                    <div class="settings-card-body">
+                                        <div class="lgpd-compliance">
+                                            <div class="compliance-item">
+                                                <h4><i class="fas fa-bullseye"></i> Finalidade</h4>
+                                                <p>Dados coletados são utilizados exclusivamente para controle de acesso e
+                                                    segurança.</p>
+                                            </div>
+                                            <div class="compliance-item">
+                                                <h4><i class="fas fa-balance-scale"></i> Adequação</h4>
+                                                <p>O sistema está alinhado com a legislação vigente (LGPD 2026).</p>
+                                            </div>
+                                            <div class="compliance-item">
+                                                <h4><i class="fas fa-minimize-2"></i> Necessidade</h4>
+                                                <p>Apenas dados essenciais são coletados e armazenados.</p>
+                                            </div>
+                                            <div class="compliance-item">
+                                                <h4><i class="fas fa-book-open"></i> Livre Acesso</h4>
+                                                <p>Você pode acessar, revisar e solicitar cópia de todos os seus dados.</p>
+                                            </div>
+                                            <div class="compliance-item">
+                                                <h4><i class="fas fa-check-circle"></i> Qualidade e Integridade</h4>
+                                                <p>Sistema mantém dados precisos, atualizados e íntegros.</p>
+                                            </div>
+                                            <div class="compliance-item">
+                                                <h4><i class="fas fa-lightbulb"></i> Transparência</h4>
+                                                <p>Política clara sobre coleta, uso e proteção de dados.</p>
+                                            </div>
+                                            <div class="compliance-item">
+                                                <h4><i class="fas fa-lock"></i> Segurança</h4>
+                                                <p>Implementadas medidas técnicas e organizacionais de proteção.</p>
+                                            </div>
+                                            <div class="compliance-item">
+                                                <h4><i class="fas fa-search"></i> Prevenção e Monitoramento</h4>
+                                                <p>Sistema monitora acessos e previne uso inadequado de dados.</p>
+                                            </div>
+                                            <div class="compliance-item">
+                                                <h4><i class="fas fa-equals"></i> Não Discriminação</h4>
+                                                <p>Dados não são usados para discriminação ou perfilamento prejudicial.</p>
+                                            </div>
+                                            <div class="compliance-item">
+                                                <h4><i class="fas fa-user-check"></i> Responsabilização</h4>
+                                                <p>Responsáveis pelos dados cumprem obrigações legais e éticas.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Privacy Actions Card -->
+                                <div class="settings-card">
+                                    <div class="settings-card-header">
+                                        <i class="fas fa-cog"></i>
+                                        <h3>Ações de Privacidade</h3>
+                                    </div>
+                                    <div class="settings-card-body">
+                                        <div class="privacy-actions">
+                                            <button class="btn btn-secondary w-100" onclick="LGPDManager.exportMyData()">
+                                                <i class="fas fa-download"></i> Exportar Meus Dados
+                                            </button>
+                                            <button class="btn btn-secondary w-100" onclick="LGPDManager.viewAccessLog()">
+                                                <i class="fas fa-history"></i> Ver Histórico de Acessos
+                                            </button>
+                                            <button class="btn btn-warning w-100" onclick="LGPDManager.requestDataDeletion()">
+                                                <i class="fas fa-trash-alt"></i> Solicitar Exclusão de Dados
+                                            </button>
+                                            <button class="btn btn-info w-100" onclick="showPrivacyPolicy()">
+                                                <i class="fas fa-file-contract"></i> Ver Política Completa
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Data Collection Card -->
+                                <div class="settings-card">
+                                    <div class="settings-card-header">
+                                        <i class="fas fa-database"></i>
+                                        <h3>Dados Coletados</h3>
+                                    </div>
+                                    <div class="settings-card-body">
+                                        <div class="data-collection-info">
+                                            <p><strong>Categorias de Dados Pessoais:</strong></p>
+                                            <ul>
+                                                <li>Identificação: Nome, CPF, RG</li>
+                                                <li>Contato: E-mail, Telefone, Celular</li>
+                                                <li>Localização: Endereço, CEP, Cidade</li>
+                                                <li>Profissional: Cargo, Empresa, Profissão</li>
+                                                <li>Familiar: Filiação, Estado Civil</li>
+                                                <li>Veículos: Placa, Marca, Modelo, Cor</li>
+                                                <li>Acessos: Data, Hora, Duração, Foto</li>
+                                            </ul>
+                                            <p style="margin-top: 1rem;"><strong>Base Legal:</strong> Consentimento do
+                                                titular e interesse legítimo da empresa</p>
+                                            <p><strong>Retenção:</strong> Dados retidos enquanto houver necessidade legal ou
+                                                contratual</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+    <script src="../../auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+    <script>
+        function showPreferenciasTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(`preferencias-tab-${tabName}`).classList.add('active');
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+            if (tabName === 'dados') {
+                setTimeout(() => initCharts(), 100);
+            }
+
+            if (tabName === 'importacao') {
+                // Load history for whichever sub-section is active
+                setTimeout(() => {
+                    const activeSection = document.querySelector('[id^="import-section-"]:not([style*="display: none"])');
+                    if (activeSection) {
+                        const type = activeSection.id.replace('import-section-', '');
+                        if (type === 'pessoas') loadImportHistory('person');
+                        if (type === 'visitantes') loadImportHistory('visitor');
+                    }
+                }, 100);
+            }
+        }
+
+        function selectImportType(type) {
+            // Toggle section visibility
+            ['pessoas', 'visitantes', 'idsecure', 'acesscontrol'].forEach(t => {
+                document.getElementById(`import-section-${t}`).style.display = t === type ? '' : 'none';
+                const btn = document.getElementById(`import-type-btn-${t}`);
+                if (btn) btn.classList.toggle('active', t === type);
+            });
+
+            // Load history on switch
+            if (type === 'pessoas') loadImportHistory('person');
+            if (type === 'visitantes') loadImportHistory('visitor');
+        }
+
+        async function saveLabels() {
+            const labels = {
+                pessoas: document.getElementById('config-label-pessoas').value.trim(),
+                grupos: document.getElementById('config-label-grupos').value.trim()
+            };
+
+            try {
+                if (typeof api !== 'undefined') {
+                    const result = await api.request('/config/labels', {
+                        method: 'PUT',
+                        body: JSON.stringify(labels)
+                    });
+                    
+                    if (result.success) {
+                        alert('Labels salvos com sucesso!');
+                        // Atualiza o localStorage para uso imediato
+                        localStorage.setItem('acesscontrol_labels', JSON.stringify(labels));
+                        // Aplicar labels (se houver a função)
+                        if (window.translateLabels) window.translateLabels();
+                    } else {
+                        alert('Erro ao salvar labels: ' + result.message);
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao salvar labels:', error);
+                alert('Erro ao salvar os labels personalizados.');
+            }
+        }
+
+        // Carregar dados da empresa para relatórios
+        async function loadReportCompany() {
+            if (typeof api === 'undefined') return;
+            try {
+                const data = await api.getReportCompany();
+                if (data) {
+                    document.getElementById('report-company-razao').value = data.razao || '';
+                    document.getElementById('report-company-cnpj').value = data.cnpj || '';
+                    document.getElementById('report-company-endereco').value = data.endereco || '';
+                    document.getElementById('report-company-telefone').value = data.telefone || '';
+                    document.getElementById('report-company-email').value = data.email || '';
+                }
+            } catch (e) {
+                console.error('Erro ao carregar dados da empresa:', e);
+            }
+        }
+
+        // Salvar dados da empresa para relatórios
+        async function saveReportCompany() {
+            if (typeof api === 'undefined') { alert('API não disponível'); return; }
+            const payload = {
+                razao: document.getElementById('report-company-razao').value.trim(),
+                cnpj: document.getElementById('report-company-cnpj').value.trim(),
+                endereco: document.getElementById('report-company-endereco').value.trim(),
+                telefone: document.getElementById('report-company-telefone').value.trim(),
+                email: document.getElementById('report-company-email').value.trim()
+            };
+            try {
+                const ok = await api.updateReportCompany(payload);
+                const status = document.getElementById('report-company-status');
+                if (ok) {
+                    status.style.display = 'inline';
+                    setTimeout(() => status.style.display = 'none', 3000);
+                } else {
+                    alert('Erro ao salvar dados da empresa.');
+                }
+            } catch (e) {
+                console.error('Erro ao salvar:', e);
+                alert('Erro ao salvar dados da empresa.');
+            }
+        }
+
+        // Carregar labels ao iniciar
+        async function loadLabels() {
+            if (typeof api === 'undefined') return;
+            try {
+                const result = await api.request('/config/labels');
+                if (result.success && result.data) {
+                    const labels = result.data;
+                    document.getElementById('config-label-pessoas').value = labels.pessoas || '';
+                    document.getElementById('config-label-grupos').value = labels.grupos || '';
+                    // Atualiza o localStorage
+                    localStorage.setItem('acesscontrol_labels', JSON.stringify(labels));
+                }
+            } catch (e) {
+                console.error('Erro ao carregar labels:', e);
+            }
+        }
+
+        // Carregar módulos ao iniciar
+        async function loadModulos() {
+            try {
+                if (typeof api !== 'undefined') {
+                    const result = await api.request('/config/modules');
+                    
+                    if (result.success && result.data) {
+                        const modules = result.data;
+                        
+                        // Página Módulo de Cadastro
+                        setCheckboxValue('mod-cadastro-celular', modules.module_cadastro_celular);
+                        setCheckboxValue('mod-cadastro-cartao', modules.module_cadastro_cartao);
+                        setCheckboxValue('mod-cadastro-grupo', modules.module_cadastro_grupo);
+                        setCheckboxValue('mod-cadastro-empresa', modules.module_cadastro_empresa);
+                        setCheckboxValue('mod-cadastro-pessoa-visitada', modules.module_cadastro_pessoa_visitada);
+                        
+                        // Cadastros
+                        setCheckboxValue('mod-cadastro-refeitorio', modules.module_cadastro_refeitorio);
+                        setCheckboxValue('mod-cadastro-encomendas', modules.module_cadastro_encomendas);
+                        setCheckboxValue('mod-cadastro-claviculario', modules.module_cadastro_claviculario);
+                        setCheckboxValue('mod-cadastro-estacionamento', modules.module_cadastro_estacionamento);
+                        setCheckboxValue('mod-cadastro-veiculos', modules.module_cadastro_veiculos);
+                        
+                        // Autorização
+                        setCheckboxValue('mod-autorizacao-refeicao', modules.module_autorizacao_refeicao);
+                        setCheckboxValue('mod-autorizacao-claviculario', modules.module_autorizacao_claviculario);
+                        setCheckboxValue('mod-autorizacao-nivel-acesso-veiculos', modules.module_autorizacao_nivel_acesso_veiculos);
+                        setCheckboxValue('mod-autorizacao-acesso-veiculos', modules.module_autorizacao_acesso_veiculos);
+                        
+                        // Outros módulos
+                        setCheckboxValue('mod-pessoas', modules.module_pessoas);
+                        setCheckboxValue('mod-visitantes', modules.module_visitantes);
+                        setCheckboxValue('mod-veiculos', modules.module_veiculos);
+                        setCheckboxValue('mod-empresas', modules.module_empresas);
+                        setCheckboxValue('mod-horarios', modules.module_horarios);
+                        setCheckboxValue('mod-feriados', modules.module_feriados);
+                        setCheckboxValue('mod-estacionamento', modules.module_estacionamento);
+                        setCheckboxValue('mod-equipamentos', modules.module_equipamentos);
+
+                        // Limpeza automática
+                        setCheckboxValue('config-inativar-visitantes-dia', modules.module_inativar_visitantes_dia);
+                        setCheckboxValue('config-reset-estatisticas-diario', modules.reset_estatisticas_diario);
+
+                        // Notificações
+                        setCheckboxValue('notif-visitante-entrada-email', modules.notif_visitante_entrada_email);
+                        setCheckboxValue('notif-encomenda-email', modules.notif_encomenda_email);
+
+                        // Autorizador - modo de busca
+                        setCheckboxValue('config-autorizador-busca-id-primeiro', modules.autorizador_busca_id_primeiro);
+
+                        // Aparência
+                        if (modules.font_size) {
+                            document.getElementById('config-font-size').value = modules.font_size;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao carregar módulos:', error);
+            }
+        }
+        
+        function setCheckboxValue(id, value) {
+            const checkbox = document.getElementById(id);
+            if (checkbox) {
+                checkbox.checked = value === 'true' || value === true;
+            }
+        }
+
+        
+        // Função helper para obter valor de checkbox com verificação de existência
+        function getCheckboxValue(id) {
+            const element = document.getElementById(id);
+            return element ? element.checked : false;
+        }
+
+        async function saveFontSize() {
+            const config = {
+                font_size: document.getElementById('config-font-size').value
+            };
+
+            try {
+                if (typeof api !== 'undefined') {
+                    const result = await api.request('/config/modules', {
+                        method: 'PUT',
+                        body: JSON.stringify(config)
+                    });
+                    
+                    if (result.success) {
+                        alert('Preferência de fonte salva com sucesso!');
+                        // Atualiza o localStorage para refletir imediatamente
+                        const stored = JSON.parse(localStorage.getItem('acesscontrol_modules') || '{}');
+                        stored.font_size = config.font_size;
+                        localStorage.setItem('acesscontrol_modules', JSON.stringify(stored));
+                        
+                        // Aplica a fonte globalmente (se houver a função applyFontSize no app.js)
+                        if (window.applyFontSize) {
+                            window.applyFontSize(config.font_size);
+                        }
+                    } else {
+                        alert('Erro ao salvar: ' + result.message);
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao salvar fonte:', error);
+                alert('Erro ao salvar a preferência de fonte.');
+            }
+        }
+
+        // Preview da fonte ao trocar no select
+        function applyFontSizePreview(value) {
+            const map = { small: '13px', normal: '15px', large: '17px' };
+            document.documentElement.style.setProperty('--font-size-base', map[value] || '15px');
+        }
+
+        async function saveLimpezaAuto() {
+            const config = {
+                module_inativar_visitantes_dia: getCheckboxValue('config-inativar-visitantes-dia'),
+                reset_estatisticas_diario: getCheckboxValue('config-reset-estatisticas-diario')
+            };
+
+            try {
+                if (typeof api !== 'undefined') {
+                    const result = await api.request('/config/modules', {
+                        method: 'PUT',
+                        body: JSON.stringify(config)
+                    });
+                    
+                    if (result.success) {
+                        alert('Configurações de limpeza e reset salvas com sucesso!');
+                        // Atualiza o localStorage
+                        const stored = JSON.parse(localStorage.getItem('acesscontrol_modules') || '{}');
+                        stored.module_inativar_visitantes_dia = config.module_inativar_visitantes_dia;
+                        stored.reset_estatisticas_diario = config.reset_estatisticas_diario;
+                        localStorage.setItem('acesscontrol_modules', JSON.stringify(stored));
+                    } else {
+                        alert('Erro ao salvar: ' + result.message);
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao salvar configuração:', error);
+                alert('Erro ao salvar a configuração.');
+            }
+        }
+        
+        async function saveNotificacaoConfig() {
+            const config = {
+                notif_visitante_entrada_email: getCheckboxValue('notif-visitante-entrada-email'),
+                notif_encomenda_email:         getCheckboxValue('notif-encomenda-email')
+            };
+
+            try {
+                if (typeof api !== 'undefined') {
+                    const result = await api.request('/config/modules', {
+                        method: 'PUT',
+                        body: JSON.stringify(config)
+                    });
+                    
+                    if (result.success) {
+                        alert('Configurações de notificação salvas!');
+                        // Atualiza o localStorage
+                        const stored = JSON.parse(localStorage.getItem('acesscontrol_modules') || '{}');
+                        stored.notif_visitante_entrada_email = config.notif_visitante_entrada_email;
+                        stored.notif_encomenda_email = config.notif_encomenda_email;
+                        localStorage.setItem('acesscontrol_modules', JSON.stringify(stored));
+                    } else {
+                        alert('Erro ao salvar: ' + result.message);
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao salvar configuração:', error);
+                alert('Erro ao salvar a configuração.');
+            }
+        }
+        async function saveAutorizadorBusca() {
+            const config = {
+                autorizador_busca_id_primeiro: getCheckboxValue('config-autorizador-busca-id-primeiro')
+            };
+
+            try {
+                if (typeof api !== 'undefined') {
+                    const result = await api.request('/config/modules', {
+                        method: 'PUT',
+                        body: JSON.stringify(config)
+                    });
+
+                    if (result.success) {
+                        alert('Configuração do autorizador salva com sucesso!');
+                        const stored = JSON.parse(localStorage.getItem('acesscontrol_modules') || '{}');
+                        stored.autorizador_busca_id_primeiro = config.autorizador_busca_id_primeiro;
+                        localStorage.setItem('acesscontrol_modules', JSON.stringify(stored));
+                    } else {
+                        alert('Erro ao salvar: ' + result.message);
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao salvar configuração:', error);
+                alert('Erro ao salvar a configuração.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkbox = document.getElementById('config-inativar-visitantes-dia');
+            if (checkbox) {
+                checkbox.addEventListener('change', function() {
+                    const info = document.getElementById('info-inativar');
+                    if (info) {
+                        info.style.display = this.checked ? 'block' : 'none';
+                    }
+                });
+            }
+        });
+
+        async function saveModulos() {
+            const modulos = {
+                // Página Módulo de Cadastro
+                module_cadastro_celular: getCheckboxValue('mod-cadastro-celular'),
+                module_cadastro_cartao: getCheckboxValue('mod-cadastro-cartao'),
+                module_cadastro_grupo: getCheckboxValue('mod-cadastro-grupo'),
+                module_cadastro_empresa: getCheckboxValue('mod-cadastro-empresa'),
+                module_cadastro_pessoa_visitada: getCheckboxValue('mod-cadastro-pessoa-visitada'),
+                
+                // Submenus - Cadastros
+                module_cadastro_refeitorio: getCheckboxValue('mod-cadastro-refeitorio'),
+                module_cadastro_encomendas: getCheckboxValue('mod-cadastro-encomendas'),
+                module_cadastro_claviculario: getCheckboxValue('mod-cadastro-claviculario'),
+                module_cadastro_estacionamento: getCheckboxValue('mod-cadastro-estacionamento'),
+                module_cadastro_veiculos: getCheckboxValue('mod-cadastro-veiculos'),
+                
+                // Submenus - Autorização
+                module_autorizacao_refeicao: getCheckboxValue('mod-autorizacao-refeicao'),
+                module_autorizacao_claviculario: getCheckboxValue('mod-autorizacao-claviculario'),
+                module_autorizacao_nivel_acesso_veiculos: getCheckboxValue('mod-autorizacao-nivel-acesso-veiculos'),
+                module_autorizacao_acesso_veiculos: getCheckboxValue('mod-autorizacao-acesso-veiculos'),
+                
+                // Outros módulos
+                module_pessoas: getCheckboxValue('mod-pessoas'),
+                module_visitantes: getCheckboxValue('mod-visitantes'),
+                module_veiculos: getCheckboxValue('mod-veiculos'),
+                module_empresas: getCheckboxValue('mod-empresas'),
+                module_horarios: getCheckboxValue('mod-horarios'),
+                module_feriados: getCheckboxValue('mod-feriados'),
+                module_estacionamento: getCheckboxValue('mod-estacionamento'),
+                module_equipamentos: getCheckboxValue('mod-equipamentos'),
+                
+                // Notificações
+                notif_visitante_entrada_email: getCheckboxValue('notif-visitante-entrada-email'),
+                notif_encomenda_email:         getCheckboxValue('notif-encomenda-email')
+            };
+
+            try {
+                if (typeof api !== 'undefined') {
+                    const result = await api.request('/config/modules', {
+                        method: 'PUT',
+                        body: JSON.stringify(modulos)
+                    });
+                    
+                    if (result.success) {
+                        alert('Configurações dos módulos salvas com sucesso!');
+                        // Armazenar no localStorage para uso imediato no frontend
+                        localStorage.setItem('acesscontrol_modules', JSON.stringify(modulos));
+                        // Recarregar a página para aplicar as mudanças
+                        window.location.reload();
+                    } else {
+                        alert('Erro ao salvar: ' + result.message);
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao salvar módulos:', error);
+                alert('Erro ao salvar as configurações dos módulos.');
+            }
+        }
+
+        function showPrivacyPolicy() {
+            alert('Exibindo política de privacidade completa...');
+        }
+
+        // Dados mockados
+        const dados = {
+            pessoas: {
+                count: 342,
+                limit: 1000
+            },
+            equipamentos: {
+                count: 28,
+                limit: 50
+            },
+            visitantes: {
+                count: 156
+            }
+        };
+
+        function initCharts() {
+            // Atualizar números
+            document.getElementById('pessoas-count').textContent = dados.pessoas.count;
+            document.getElementById('pessoas-limit').textContent = dados.pessoas.limit;
+            document.getElementById('pessoas-available').textContent = dados.pessoas.limit - dados.pessoas.count;
+            document.getElementById('pessoas-percent').textContent = Math.round((dados.pessoas.count / dados.pessoas.limit) * 100);
+
+            document.getElementById('equipamentos-count').textContent = dados.equipamentos.count;
+            document.getElementById('equipamentos-limit').textContent = dados.equipamentos.limit;
+            document.getElementById('equipamentos-available').textContent = dados.equipamentos.limit - dados.equipamentos.count;
+            document.getElementById('equipamentos-percent').textContent = Math.round((dados.equipamentos.count / dados.equipamentos.limit) * 100);
+
+            document.getElementById('visitantes-count').textContent = dados.visitantes.count;
+
+            // Gráfico de Pessoas
+            const ctxPessoas = document.getElementById('chartPessoas').getContext('2d');
+            new Chart(ctxPessoas, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Usado', 'Disponível'],
+                    datasets: [{
+                        data: [dados.pessoas.count, dados.pessoas.limit - dados.pessoas.count],
+                        backgroundColor: ['#4a90d9', '#e2e8f0'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    cutout: '70%',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de Equipamentos
+            const ctxEquipamentos = document.getElementById('chartEquipamentos').getContext('2d');
+            new Chart(ctxEquipamentos, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Usado', 'Disponível'],
+                    datasets: [{
+                        data: [dados.equipamentos.count, dados.equipamentos.limit - dados.equipamentos.count],
+                        backgroundColor: ['#4a90d9', '#e2e8f0'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    cutout: '70%',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Inicializar gráficos quando a página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                initCharts();
+            }, 100);
+            
+            // Carregar módulos do servidor
+            loadModulos();
+
+            // Carregar dados da empresa para relatórios
+            setTimeout(() => {
+                loadReportCompany();
+                loadLabels();
+            }, 500);
+        });
+        
+        // =======================
+        // Funções de Importação
+        // =======================
+        
+        // Importar Pessoas
+        async function importPessoas() {
+            const zipFile = document.getElementById('import-person-zip').files[0];
+            const asInactive = document.getElementById('import-person-as-inactive').checked;
+            const layout = document.getElementById('import-layout').value;
+            
+            // Novos parâmetros do Layout 2
+            const importVehicles = document.getElementById('import-vehicles')?.checked || false;
+            const vehiclesRotative = document.getElementById('import-vehicles-rotative')?.checked || false;
+            const importVisitors = document.getElementById('import-visitors')?.checked || false;
+            const visitorsAsInactive = document.getElementById('import-visitors-as-inactive')?.checked || false;
+            
+            if (!zipFile) {
+                if (layout === '3') {
+                    alert('Por favor, selecione um arquivo ZIP contendo os CSVs do IDSecure Cloud (Empresas, Grupos, Pessoas, Veículos).');
+                } else if (layout === '2') {
+                    alert('Por favor, selecione um arquivo ZIP contendo: groups.csv, peoples.csv, vehicles.csv (opcional), photos/ (opcional)');
+                } else {
+                    alert('Por favor, selecione um arquivo ZIP contendo: pessoas.csv, empresas.csv, grupos.csv');
+                }
+                return;
+            }
+            
+            // Verify it's a ZIP file
+            if (!zipFile.name.toLowerCase().endsWith('.zip')) {
+                alert('O arquivo deve ser um ZIP');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('zip', zipFile);
+            formData.append('type', 'person');
+            formData.append('layout', layout);
+            formData.append('import_with_photo', 'true'); // Photos are inside the ZIP
+            formData.append('import_as_inactive', asInactive ? 'true' : 'false');
+            
+            // Parâmetros do Layout 2
+            if (layout === '2') {
+                formData.append('import_vehicles', importVehicles ? 'true' : 'false');
+                formData.append('vehicles_rotative', vehiclesRotative ? 'true' : 'false');
+                formData.append('import_visitors', importVisitors ? 'true' : 'false');
+                formData.append('visitors_as_inactive', visitorsAsInactive ? 'true' : 'false');
+            }
+            
+            // Show progress
+            document.getElementById('person-import-progress').style.display = 'block';
+            document.getElementById('person-progress-fill').style.width = '0%';
+            document.getElementById('person-progress-text').textContent = 'Enviando arquivo...';
+            
+            try {
+                const tenantId = localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id') || 'demo';
+                const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('token');
+                
+                const response = await fetch(`/api/imports?tenant_id=${tenantId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Tenant-ID': tenantId
+                    },
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('person-progress-fill').style.width = '100%';
+                    document.getElementById('person-progress-text').textContent = 
+                        `Concluído! Total: ${result.data.total}, Processados: ${result.data.processed}, Erros: ${result.data.errors}`;
+                    
+                    setTimeout(() => {
+                        loadImportHistory('person');
+                    }, 1000);
+                } else {
+                    alert('Erro: ' + result.message);
+                    document.getElementById('person-import-progress').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Erro ao importar:', error);
+                alert('Erro ao importar pessoas: ' + error.message);
+                document.getElementById('person-import-progress').style.display = 'none';
+            }
+        }
+        
+        // Controlar visibilidade das opções baseado no layout
+        function toggleLayoutOptions() {
+            const layout = document.getElementById('import-layout').value;
+            const layout2Options = document.getElementById('layout2-options');
+            const layout1Instructions = document.getElementById('layout1-instructions');
+            const layout2Instructions = document.getElementById('layout2-instructions');
+            const csvHint = document.getElementById('csv-hint');
+            const zipHint = document.getElementById('zip-hint');
+            
+            if (layout === '3') {
+                layout2Options.style.display = 'block'; // Show options for visitors/vehicles
+                layout1Instructions.style.display = 'none';
+                layout2Instructions.style.display = 'none';
+                document.getElementById('layout3-instructions').style.display = 'block';
+                csvHint.textContent = 'Use o arquivo ZIP abaixo';
+                zipHint.textContent = 'ZIP contendo arquivos CSV do IDSecure Cloud';
+            } else if (layout === '2') {
+                layout2Options.style.display = 'block';
+                layout1Instructions.style.display = 'none';
+                layout2Instructions.style.display = 'block';
+                document.getElementById('layout3-instructions').style.display = 'none';
+                csvHint.textContent = 'Arquivo peoples.csv (pessoas e visitantes)';
+                zipHint.textContent = 'ZIP contendo: groups.csv, peoples.csv, vehicles.csv (opcional), photos/';
+            } else {
+                layout2Options.style.display = 'none';
+                layout1Instructions.style.display = 'block';
+                layout2Instructions.style.display = 'none';
+                document.getElementById('layout3-instructions').style.display = 'none';
+                csvHint.textContent = 'Arquivo CSV com dados das pessoas';
+                zipHint.textContent = 'ZIP contendo: pessoas.csv, empresas.csv, grupos.csv (e fotos opcionais)';
+            }
+        }
+        
+        // Controlar visibilidade das opções de visitantes
+        function toggleVisitorsOptions() {
+            const importVisitors = document.getElementById('import-visitors').checked;
+            const visitorsOptions = document.getElementById('visitors-options');
+            visitorsOptions.style.display = importVisitors ? 'block' : 'none';
+        }
+        
+        // Controlar visibilidade das opções de veículos
+        function toggleVehiclesOptions() {
+            const importVehicles = document.getElementById('import-vehicles').checked;
+            const vehiclesOptions = document.getElementById('vehicles-options');
+            vehiclesOptions.style.display = importVehicles ? 'block' : 'none';
+        }
+        
+        // Importar Visitantes
+        async function importVisitantes() {
+            const csvFile = document.getElementById('import-visitor-csv').files[0];
+            const zipFile = document.getElementById('import-visitor-zip').files[0];
+            const withPhoto = document.getElementById('import-visitor-with-photo').checked;
+            const asInactive = document.getElementById('import-visitor-as-inactive').checked;
+            
+            if (!csvFile) {
+                alert('Por favor, selecione um arquivo CSV.');
+                return;
+            }
+            
+            if (withPhoto && !zipFile) {
+                alert('Por favor, selecione um arquivo ZIP com as fotos.');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('csv', csvFile);
+            if (zipFile) formData.append('zip', zipFile);
+            formData.append('type', 'visitor');
+            formData.append('import_with_photo', withPhoto ? 'true' : 'false');
+            formData.append('import_as_inactive', asInactive ? 'true' : 'false');
+            
+            // Show progress
+            document.getElementById('visitor-import-progress').style.display = 'block';
+            document.getElementById('visitor-progress-fill').style.width = '0%';
+            document.getElementById('visitor-progress-text').textContent = 'Enviando arquivo...';
+            
+            try {
+                const tenantId = localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id') || 'demo';
+                const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('token');
+                
+                const response = await fetch(`/api/imports?tenant_id=${tenantId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Tenant-ID': tenantId
+                    },
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('visitor-progress-fill').style.width = '100%';
+                    document.getElementById('visitor-progress-text').textContent = 
+                        `Concluído! Total: ${result.data.total}, Processados: ${result.data.processed}, Erros: ${result.data.errors}`;
+                    
+                    setTimeout(() => {
+                        loadImportHistory('visitor');
+                    }, 1000);
+                } else {
+                    alert('Erro: ' + result.message);
+                    document.getElementById('visitor-import-progress').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Erro ao importar:', error);
+                alert('Erro ao importar visitantes: ' + error.message);
+                document.getElementById('visitor-import-progress').style.display = 'none';
+            }
+        }
+        
+        // Carregar histórico de importações
+        async function loadImportHistory(type) {
+            const containerId = type === 'person' ? 'person-import-history' : 'visitor-import-history';
+            const container = document.getElementById(containerId);
+            
+            if (!container) return;
+            
+            try {
+                const tenantId = localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id') || 'demo';
+                const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('token');
+                
+                const response = await fetch(`/api/imports/${tenantId}?type=${type}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Tenant-ID': tenantId
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.data.length > 0) {
+                    let html = '<div style="max-height: 400px; overflow-y: auto;">';
+                    html += '<table style="width: 100%; border-collapse: collapse;">';
+                    html += '<thead><tr style="background: #f8fafc;">';
+                    html += '<th style="padding: 10px; text-align: left;">Data</th>';
+                    html += '<th style="padding: 10px; text-align: center;">Total</th>';
+                    html += '<th style="padding: 10px; text-align: center;">OK</th>';
+                    html += '<th style="padding: 10px; text-align: center;">Erros</th>';
+                    html += '<th style="padding: 10px; text-align: center;">Status</th>';
+                    html += '</tr></thead><tbody>';
+                    
+                    result.data.forEach(imp => {
+                        const statusClass = imp.status === 'finished' ? 'badge-success' : 
+                                          imp.status === 'processing' ? 'badge-warning' : 'badge-error';
+                        const statusText = imp.status === 'finished' ? 'Concluído' : 
+                                         imp.status === 'processing' ? 'Processando' : 'Pendente';
+                        
+                        html += `<tr style="border-bottom: 1px solid #e2e8f0;">`;
+                        html += `<td style="padding: 10px;">${new Date(imp.created_at).toLocaleString('pt-BR')}</td>`;
+                        html += `<td style="padding: 10px; text-align: center;">${imp.total}</td>`;
+                        html += `<td style="padding: 10px; text-align: center; color: #10b981;">${imp.processed}</td>`;
+                        html += `<td style="padding: 10px; text-align: center; color: #ef4444;">${imp.errors}</td>`;
+                        html += `<td style="padding: 10px; text-align: center;"><span class="badge ${statusClass}">${statusText}</span></td>`;
+                        html += `</tr>`;
+                    });
+                    
+                    html += '</tbody></table></div>';
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<p style="color: #64748b; text-align: center;">Nenhuma importação encontrada.</p>';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar histórico:', error);
+                container.innerHTML = '<p style="color: #ef4444; text-align: center;">Erro ao carregar histórico.</p>';
+            }
+        }
+
+        // Importar IDSecure
+        async function importIdsecure() {
+            const email = document.getElementById('idsecure-email').value;
+            const password = document.getElementById('idsecure-password').value;
+            
+            if (!email || !password) {
+                alert('Por favor, preencha o email e a senha do operador do IDSecure.');
+                return;
+            }
+            
+            const import_persons = document.getElementById('idsecure-import-persons').checked;
+            const person_active = document.getElementById('idsecure-person-active').checked;
+            const person_inactive = document.getElementById('idsecure-person-inactive').checked;
+            
+            const import_visitors = document.getElementById('idsecure-import-visitors').checked;
+            const visitor_active = document.getElementById('idsecure-visitor-active').checked;
+            const visitor_inactive = document.getElementById('idsecure-visitor-inactive').checked;
+
+            const force_inactive      = document.getElementById('idsecure-force-inactive').checked;
+            const first_page_only     = document.getElementById('idsecure-first-page-only').checked;
+
+            // Show progress
+            const progressContainer = document.getElementById('idsecure-import-progress');
+            const progressText = document.getElementById('idsecure-progress-text');
+            progressContainer.style.display = 'block';
+            progressText.textContent = 'Autenticando e conectando à base de dados (pode levar alguns minutos)...';
+            
+            try {
+                const tenantId = localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id') || 'demo';
+                const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('token');
+                
+                const response = await fetch(`/api/imports/idsecure?tenant_id=${tenantId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Tenant-ID': tenantId,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email,
+                        password,
+                        import_persons,
+                        person_active,
+                        person_inactive,
+                        import_visitors,
+                        visitor_active,
+                        visitor_inactive,
+                        force_inactive,
+                        first_page_only,
+                        tenant_id: tenantId
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    progressText.textContent = 'A sincronização está rodando em segundo plano. Os dados (pessoas, visitantes, empresas, grupos, fotos) aparecerão no sistema em breve.';
+                } else {
+                    alert('Erro: ' + result.message);
+                    progressContainer.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Erro ao conectar com IDSecure:', error);
+                alert('Erro de conexão ao iniciar importação: ' + error.message);
+                progressContainer.style.display = 'none';
+            }
+        }
+
+        // Importar fotos do AcessControl via arquivo .db da VPS
+        async function importLegacyPhotos() {
+            const dbFile = document.getElementById('acesscontrol-db-file').files[0];
+            const vpsUrl = document.getElementById('acesscontrol-vps-url').value.trim();
+            const vpsToken = document.getElementById('acesscontrol-vps-token').value.trim();
+
+            if (!dbFile) {
+                alert('Por favor, selecione o arquivo .db exportado da VPS.');
+                return;
+            }
+            if (!vpsUrl) {
+                alert('Por favor, informe a URL da VPS.');
+                return;
+            }
+
+            const progressDiv = document.getElementById('acesscontrol-import-progress');
+            const progressFill = document.getElementById('acesscontrol-progress-fill');
+            const progressText = document.getElementById('acesscontrol-progress-text');
+            const resultsDiv = document.getElementById('acesscontrol-import-results');
+
+            progressDiv.style.display = 'block';
+            progressFill.style.width = '30%';
+            progressText.textContent = 'Enviando arquivo e iniciando download das fotos...';
+            resultsDiv.style.display = 'none';
+
+            try {
+                const tenantId = localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id') || 'demo';
+                const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('token');
+
+                const formData = new FormData();
+                formData.append('db', dbFile);
+                formData.append('vps_url', vpsUrl);
+                if (vpsToken) formData.append('vps_token', vpsToken);
+
+                progressFill.style.width = '60%';
+                progressText.textContent = 'Baixando fotos da VPS (pode demorar alguns minutos)...';
+
+                const response = await fetch(`/api/imports/acesscontrol?tenant_id=${tenantId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Tenant-ID': tenantId
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                progressFill.style.width = '100%';
+
+                if (result.success) {
+                    const d = result.data;
+                    progressText.textContent = `Concluído! Total: ${d.total} | Baixadas: ${d.downloaded} | Atualizadas: ${d.updated} | Erros: ${d.errors}`;
+
+                    function buildGroupHtml(group, label) {
+                        if (!group || group.total === 0) return '';
+                        const notFound = group.results.filter(r => r.status === 'not_found');
+                        const errored  = group.results.filter(r => r.status === 'error');
+                        let h = `<div style="margin-bottom: 12px; padding: 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <strong style="color: #1e293b;">${label}</strong>
+                            <span style="font-size: 0.85rem; color: #64748b; margin-left: 8px;">
+                                ${group.total} no .db &nbsp;|&nbsp; ${group.downloaded} baixadas &nbsp;|&nbsp; ${group.updated} atualizadas &nbsp;|&nbsp; ${group.errors} erros
+                            </span>`;
+                        if (notFound.length > 0) {
+                            h += `<div style="margin-top: 8px; font-size: 0.8rem; color: #713f12; background: #fef9c3; padding: 6px 10px; border-radius: 6px;">
+                                <i class="fas fa-exclamation-triangle"></i> ${notFound.length} foto(s) sem registro correspondente no banco local (IDs: ${notFound.map(r => r.id).join(', ')})
+                            </div>`;
+                        }
+                        if (errored.length > 0) {
+                            h += `<div style="margin-top: 8px; font-size: 0.8rem; color: #991b1b; background: #fef2f2; padding: 6px 10px; border-radius: 6px;">
+                                <i class="fas fa-times-circle"></i> ${errored.length} erro(s): ${errored.map(r => `ID ${r.id}: ${r.reason}`).join(' | ')}
+                            </div>`;
+                        }
+                        h += `</div>`;
+                        return h;
+                    }
+
+                    let html = `<div style="padding: 16px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0; margin-bottom: 16px;">
+                        <strong style="color: #166534;"><i class="fas fa-check-circle"></i> Importação concluída</strong><br>
+                        <span style="color: #166534; font-size: 0.9rem;">
+                            ${d.total} fotos encontradas &nbsp;|&nbsp;
+                            ${d.downloaded} baixadas &nbsp;|&nbsp;
+                            ${d.updated} registros atualizados &nbsp;|&nbsp;
+                            ${d.errors} erros
+                        </span>
+                    </div>`;
+
+                    html += buildGroupHtml(d.persons,  '<i class="fas fa-users"></i> Pessoas');
+                    html += buildGroupHtml(d.visitors, '<i class="fas fa-user-plus"></i> Visitantes');
+
+                    resultsDiv.innerHTML = html;
+                    resultsDiv.style.display = 'block';
+                } else {
+                    progressFill.style.width = '0%';
+                    progressText.textContent = 'Erro: ' + result.message;
+                    resultsDiv.innerHTML = `<div style="padding: 12px; background: #fef2f2; border-radius: 8px; color: #991b1b; font-size: 0.9rem;">
+                        <i class="fas fa-times-circle"></i> ${result.message}
+                    </div>`;
+                    resultsDiv.style.display = 'block';
+                }
+            } catch (error) {
+                progressFill.style.width = '0%';
+                progressText.textContent = 'Erro de conexão.';
+                resultsDiv.innerHTML = `<div style="padding: 12px; background: #fef2f2; border-radius: 8px; color: #991b1b; font-size: 0.9rem;">
+                    <i class="fas fa-times-circle"></i> ${error.message}
+                </div>`;
+                resultsDiv.style.display = 'block';
+            }
+        }
+
+        async function importVehiclesCsv() {
+            const fileInput = document.getElementById('vehicles-csv-file');
+            const resultDiv = document.getElementById('vehicles-csv-result');
+
+            if (!fileInput.files || !fileInput.files[0]) {
+                alert('Selecione um arquivo CSV.');
+                return;
+            }
+
+            const tenantId = localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id') || 'demo';
+            const token    = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('token');
+
+            resultDiv.style.display = 'block';
+            resultDiv.style.background = '#f0f9ff';
+            resultDiv.style.color = '#0369a1';
+            resultDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+
+            try {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                formData.append('tenant_id', tenantId);
+
+                const response = await fetch(`/api/imports/idsecure/vehicles-csv?tenant_id=${tenantId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Tenant-ID': tenantId
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    resultDiv.style.background = '#f0fdf4';
+                    resultDiv.style.color = '#166534';
+                    resultDiv.innerHTML = `
+                        <i class="fas fa-check-circle"></i> <strong>${result.message}</strong><br>
+                        <small>Total: ${result.total} | Importados: ${result.processed} | Não encontrados: ${result.not_found} | Erros: ${result.errors}</small>
+                    `;
+                } else {
+                    resultDiv.style.background = '#fef2f2';
+                    resultDiv.style.color = '#991b1b';
+                    resultDiv.innerHTML = `<i class="fas fa-times-circle"></i> Erro: ${result.message}`;
+                }
+            } catch (error) {
+                resultDiv.style.background = '#fef2f2';
+                resultDiv.style.color = '#991b1b';
+                resultDiv.innerHTML = `<i class="fas fa-times-circle"></i> Erro: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

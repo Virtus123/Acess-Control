@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Acess Control - Empresas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <style>
+        /* Reset e estilos base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+        /* Grid de formulário - 3 colunas */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Form groups */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #ffffff;
+            font-family: inherit;
+        }
+
+        .form-group input:hover,
+        .form-group select:hover,
+        .form-group textarea:hover {
+            border-color: #94a3b8;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .required:after {
+            content: " *";
+            color: #e53e3e;
+        }
+
+        .form-hint {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* Seção de e-mails */
+        .emails-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            margin: 20px 0;
+        }
+
+        .emails-section h3 {
+            margin-bottom: 16px;
+            color: #1e293b;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .emails-section h3 i {
+            color: #4a90d9;
+        }
+
+        .emails-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .email-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .email-item label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .email-item input {
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .email-item input:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .email-item input::placeholder {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .email-hint {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* Botões */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.2);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Section header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-header-compact {
+            margin-bottom: 20px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title h2 {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Search */
+        .search-filter {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0 12px;
+        }
+
+        .search-box i {
+            color: #94a3b8;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            background: none;
+            font-size: 0.95rem;
+        }
+
+        .search-box input:focus {
+            outline: none;
+        }
+
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: auto;
+            margin-bottom: 20px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            color: #1e293b;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Table footer */
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .table-info {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Proprietários display */
+        .proprietarios-display {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            min-height: 100px;
+        }
+
+        .no-proprietarios {
+            text-align: center;
+            padding: 20px;
+            color: #94a3b8;
+        }
+
+        .no-proprietarios i {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            opacity: 0.5;
+        }
+
+        .no-proprietarios p {
+            font-size: 1rem;
+            margin-bottom: 4px;
+            color: #64748b;
+        }
+
+        .no-proprietarios small {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        
+        /* Grid de Proprietários */
+        .proprietarios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
+        }
+        
+        .proprietario-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            transition: all 0.2s;
+        }
+        
+        .proprietario-card:hover {
+            border-color: #4a90d9;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .proprietario-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .proprietario-info i {
+            font-size: 1.5rem;
+            color: #4a90d9;
+            margin-top: 2px;
+        }
+        
+        .proprietario-info div {
+            flex: 1;
+        }
+        
+        .proprietario-info strong {
+            display: block;
+            color: #1e293b;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+        
+        .proprietario-info small {
+            display: block;
+            color: #64748b;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* Grupo selecionado */
+        .grupo-selecionado {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .grupo-selecionado-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .grupo-selecionado-info i {
+            color: #4a90d9;
+            font-size: 1.2rem;
+        }
+
+        .grupo-selecionado-nome {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .grupo-selecionado-tipo {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .btn-remover-grupo {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .btn-remover-grupo:hover {
+            background: #fee2e2;
+        }
+
+        /* Form actions */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Text center */
+        .text-center {
+            text-align: center;
+        }
+
+        /* MODAL - CORRIGIDO */
+        .modal-overlay {
+            position: fixed;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 999999 !important;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            margin: 0 !important;
+            padding: 0 !important;
+            pointer-events: none;
+        }
+
+        .modal-overlay.active {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: all !important;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transform: scale(0.95) translateY(0);
+            transition: transform 0.3s;
+            position: relative;
+            margin: 20px !important;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 {
+            font-size: 1.2rem;
+            color: #1e293b;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-header i {
+            color: #4a90d9;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: all 0.2s;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+
+        .modal-close:hover {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .modal-body {
+            padding: 24px;
+            background: white;
+        }
+
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: white;
+            border-radius: 0 0 16px 16px;
+        }
+
+        .grupos-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .grupo-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .grupo-item:hover {
+            background: #f8fafc;
+        }
+
+        .grupo-item:last-child {
+            border-bottom: none;
+        }
+
+        .grupo-item input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #4a90d9;
+            cursor: pointer;
+        }
+
+        .grupo-item-info {
+            flex: 1;
+        }
+
+        .grupo-item-nome {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .grupo-item-tipo {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .search-filter {
+                flex-direction: column;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .modal-container {
+                width: 95%;
+                margin: 10px !important;
+            }
+        }
+
+        /* CNPJ highlight */
+        .cnpj-highlight {
+            font-family: monospace;
+            font-weight: 600;
+            color: #4a90d9;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="empresas" class="content-section active">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1>Empresas</h1>
+                            <p>Cadastro de empresas parceiras</p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary" onclick="refreshEmpresas()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button class="btn btn-primary" onclick="showEmpresaForm()">
+                                <i class="fas fa-plus"></i> Nova Empresa
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- EMPRESAS LIST VIEW -->
+                    <div id="empresas-list">
+                        <div class="search-filter">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="search-empresas" placeholder="Buscar por razão social, CNPJ..."
+                                    onkeyup="filterEmpresas()">
+                            </div>
+                        </div>
+
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Razão Social</th>
+                                        <th>Nome Fantasia</th>
+                                        <th>CNPJ</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="empresas-table-body">
+                                    <tr>
+                                        <td colspan="6" class="text-center">Carregando dados...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="table-footer">
+                            <div class="table-info">
+                                <span id="empresas-count">0</span> registros encontrados
+                            </div>
+                            <div class="pagination">
+                                <button class="btn btn-sm btn-secondary" id="empresas-prev-btn" onclick="EmpresaManager.prevPage()" disabled>
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span id="empresas-page-info">Página 1 de 1</span>
+                                <button class="btn btn-sm btn-secondary" id="empresas-next-btn" onclick="EmpresaManager.nextPage()" disabled>
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EMPRESAS FORM VIEW -->
+                    <div id="empresas-form" class="hidden">
+                        <div class="section-header section-header-compact">
+                            <div class="section-title">
+                                <h2>Cadastro de Empresa</h2>
+                                <p>Cadastre uma nova empresa parceira</p>
+                            </div>
+                            <div class="section-actions">
+                                <button class="btn btn-secondary" onclick="showEmpresasList()">
+                                    <i class="fas fa-arrow-left"></i> Voltar
+                                </button>
+                            </div>
+                        </div>
+
+                        <form id="form-empresa" onsubmit="saveEmpresa(event)">
+                            <input type="hidden" id="empresa-id">
+                            <input type="hidden" id="empresa-grupo-id">
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="empresa-razao-social" class="required">Razão Social</label>
+                                    <input type="text" id="empresa-razao-social" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="empresa-nome-fantasia">Nome Fantasia</label>
+                                    <input type="text" id="empresa-nome-fantasia">
+                                </div>
+                                <div class="form-group">
+                                    <label for="empresa-cnpj">CNPJ</label>
+                                    <input type="text" id="empresa-cnpj" data-mask="cnpj">
+                                </div>
+                                
+                                <!-- Campo de Grupo (opcional) -->
+                                <div class="form-group full-width">
+                                    <label for="empresa-grupo">Vincular a um Grupo</label>
+                                    <div id="grupo-selecionado-container">
+                                        <!-- Será preenchido via JavaScript -->
+                                    </div>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="abrirModalGrupos()" style="margin-top: 8px;">
+                                        <i class="fas fa-layer-group"></i> Selecionar Grupo
+                                    </button>
+                                    <div class="form-hint">
+                                        Vincule esta empresa a um grupo para organização e notificações.
+                                    </div>
+                                </div>
+
+                                <div class="form-group full-width">
+                                    <label for="empresa-proprietarios">Pessoas Vinculadas</label>
+                                    <div id="proprietarios-list" class="proprietarios-display">
+                                        <div class="no-proprietarios">
+                                            <i class="fas fa-users"></i>
+                                            <p>Nenhuma pessoa vinculada</p>
+                                            <small>As pessoas são vinculadas automaticamente quando selecionam esta
+                                                empresa no cadastro</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Seção de E-mails para Notificação -->
+                            <div class="emails-section">
+                                <h3>
+                                    <i class="fas fa-envelope"></i>
+                                    E-mails para Notificação
+                                </h3>
+                                <div class="emails-grid">
+                                    <div class="email-item">
+                                        <label for="email-1">E-mail 1</label>
+                                        <input type="email" id="email-1" placeholder="exemplo1@email.com">
+                                    </div>
+                                    <div class="email-item">
+                                        <label for="email-2">E-mail 2</label>
+                                        <input type="email" id="email-2" placeholder="exemplo2@email.com">
+                                    </div>
+                                    <div class="email-item">
+                                        <label for="email-3">E-mail 3</label>
+                                        <input type="email" id="email-3" placeholder="exemplo3@email.com">
+                                    </div>
+                                    <div class="email-item">
+                                        <label for="email-4">E-mail 4</label>
+                                        <input type="email" id="email-4" placeholder="exemplo4@email.com">
+                                    </div>
+                                </div>
+                                <div class="email-hint">
+                                    <i class="fas fa-info-circle"></i>
+                                    Os e-mails cadastrados receberão notificações sobre eventos desta empresa.
+                                </div>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" onclick="showEmpresasList()">
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Salvar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Seleção de Grupos - CORRIGIDO -->
+    <div id="gruposModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-layer-group"></i> Selecionar Grupo</h3>
+                <button class="modal-close" onclick="fecharModalGrupos()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 16px; color: #475569;">Escolha um grupo para vincular à empresa:</p>
+                <div style="margin-bottom: 16px;">
+                    <input type="text" id="busca-grupo-modal" placeholder="Pesquisar grupos..." 
+                           style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;"
+                           onkeyup="filtrarGruposModal()">
+                </div>
+                <div class="grupos-list" id="grupos-list-modal">
+                    <!-- Grupos serão carregados via JavaScript -->
+                    <div class="text-center" style="padding: 20px; color: #94a3b8;">
+                        <i class="fas fa-spinner fa-spin"></i> Carregando grupos...
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="fecharModalGrupos()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" onclick="confirmarSelecaoGrupo()">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+    <script src="../../auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        // Variável para armazenar os grupos selecionados temporariamente
+        // Variável global para armazenar os grupos selecionados
+        window.gruposSelecionadosAtual = [];
+        let gruposSelecionadosTemp = [];
+
+        // Função para carregar grupos do storage
+        async function carregarGruposParaModal() {
+            const container = document.getElementById('grupos-list-modal');
+            
+            let grupos = [];
+            
+            // Tentar carregar do storage
+            try {
+                grupos = await storage.getGrupos();
+                gruposCacheModal = grupos; // Armazenar no cache para busca
+            } catch (e) {
+                console.error('Erro ao carregar grupos:', e);
+            }
+            
+            if (!grupos || grupos.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center" style="padding: 20px; color: #94a3b8;">
+                        <i class="fas fa-layer-group"></i>
+                        <p>Nenhum grupo cadastrado</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const tipoLabel = {
+                'block': 'Bloco',
+                'room': 'Sala',
+                'department': 'Departamento',
+                'unit': 'Unidade',
+                'other': 'Outro'
+            };
+
+            container.innerHTML = grupos.map(g => {
+                const isChecked = gruposSelecionadosTemp && gruposSelecionadosTemp.some(gg => gg.id === g.id);
+                
+                return `
+                    <div class="grupo-item" onclick="toggleGrupoModal(${g.id})">
+                        <input type="checkbox" name="grupo-checkbox" value="${g.id}" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()">
+                        <div class="grupo-item-info">
+                            <div class="grupo-item-nome">${g.name || g.nome || 'Sem nome'}</div>
+                            <div class="grupo-item-tipo">${tipoLabel[g.type] || g.tipo || 'Sem tipo'}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Função para toggle grupo no modal (adicionar/remover)
+        async function toggleGrupoModal(id) {
+            // Carregar grupos do storage
+            let grupos = [];
+            try {
+                grupos = await storage.getGrupos();
+            } catch (e) {
+                console.error('Erro ao carregar grupos:', e);
+            }
+            
+            const grupo = grupos.find(g => g.id == id);
+            if (!grupo) return;
+            
+            // Verificar se já está selecionado
+            const idx = gruposSelecionadosTemp.findIndex(g => g.id === grupo.id);
+            if (idx >= 0) {
+                // Remover
+                gruposSelecionadosTemp.splice(idx, 1);
+            } else {
+                // Adicionar
+                gruposSelecionadosTemp.push(grupo);
+            }
+            
+            // Atualizar checkbox
+            const checkbox = document.querySelector(`input[name="grupo-checkbox"][value="${id}"]`);
+            if (checkbox) {
+                checkbox.checked = idx < 0;
+            }
+        }
+
+        // Função para abrir modal de grupos
+        async function abrirModalGrupos() {
+            gruposSelecionadosTemp = window.gruposSelecionadosAtual ? [...window.gruposSelecionadosAtual] : [];
+            
+            await carregarGruposParaModal();
+            
+            document.getElementById('gruposModal').classList.add('active');
+        }
+
+        // Função para fechar modal de grupos
+        function fecharModalGrupos() {
+            document.getElementById('gruposModal').classList.remove('active');
+            gruposSelecionadosTemp = [];
+            // Limpar cache de grupos e campo de busca
+            gruposCacheModal = [];
+            const buscaInput = document.getElementById('busca-grupo-modal');
+            if (buscaInput) buscaInput.value = '';
+        }
+
+        // Função para confirmar seleção de grupos
+        async function confirmarSelecaoGrupo() {
+            // Obter todos os checkboxes marcados
+            const checkboxes = document.querySelectorAll('input[name="grupo-checkbox"]:checked');
+            
+            if (checkboxes.length > 0) {
+                const grupoIds = Array.from(checkboxes).map(c => parseInt(c.value));
+                
+                // Carregar grupos do storage
+                let grupos = [];
+                try {
+                    grupos = await storage.getGrupos();
+                } catch (e) {
+                    console.error('Erro ao carregar grupos:', e);
+                }
+                
+                // Filtrar grupos selecionados
+                window.gruposSelecionadosAtual = grupos.filter(g => grupoIds.includes(g.id));
+                
+                // Atualizar campo hidden com IDs (formato CSV para compatibilidade)
+                document.getElementById('empresa-grupo-id').value = grupoIds.join(',');
+                atualizarDisplayGrupo();
+            } else {
+                window.gruposSelecionadosAtual = [];
+                document.getElementById('empresa-grupo-id').value = '';
+                atualizarDisplayGrupo();
+            }
+            
+            fecharModalGrupos();
+        }
+
+        // Função para remover grupo da empresa (específico)
+        function removerGrupo(id) {
+            if (!id) {
+                // Remover todos
+                window.gruposSelecionadosAtual = [];
+                document.getElementById('empresa-grupo-id').value = '';
+            } else {
+                // Remover específico
+                window.gruposSelecionadosAtual = window.gruposSelecionadosAtual.filter(g => g.id !== id);
+                const ids = window.gruposSelecionadosAtual.map(g => g.id);
+                document.getElementById('empresa-grupo-id').value = ids.join(',');
+            }
+            atualizarDisplayGrupo();
+        }
+
+        // Função para atualizar o display do grupo selecionado
+        function atualizarDisplayGrupo() {
+            console.log('atualizarDisplayGrupo chamada');
+            const container = document.getElementById('grupo-selecionado-container');
+            console.log('Container encontrado:', container);
+            console.log('Grupos selecionados atuais:', window.gruposSelecionadosAtual);
+            
+            const tipoLabel = {
+                'block': 'Bloco',
+                'room': 'Sala',
+                'department': 'Departamento',
+                'unit': 'Unidade',
+                'other': 'Outro'
+            };
+            
+            if (window.gruposSelecionadosAtual && window.gruposSelecionadosAtual.length > 0) {
+                container.innerHTML = `
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        ${window.gruposSelecionadosAtual.map(g => `
+                            <div class="grupo-selecionado">
+                                <div class="grupo-selecionado-info">
+                                    <i class="fas fa-layer-group"></i>
+                                    <div>
+                                        <div class="grupo-selecionado-nome">${g.name || g.nome || 'Sem nome'}</div>
+                                        <div class="grupo-selecionado-tipo">${tipoLabel[g.type] || g.tipo || 'Sem tipo'}</div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-remover-grupo" onclick="removerGrupo(${g.id})" title="Remover grupo">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="grupo-selecionado" style="opacity: 0.5;">
+                        <div class="grupo-selecionado-info">
+                            <i class="fas fa-layer-group"></i>
+                            <span>Nenhum grupo selecionado</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Função para filtrar grupos na pesquisa
+        let gruposCacheModal = [];
+        
+        async function filtrarGruposModal() {
+            const termoBusca = document.getElementById('busca-grupo-modal').value.toLowerCase();
+            const container = document.getElementById('grupos-list-modal');
+            
+            // Se ainda não tem grupos cache, carregar
+            if (gruposCacheModal.length === 0) {
+                try {
+                    gruposCacheModal = await storage.getGrupos();
+                } catch (e) {
+                    console.error('Erro ao carregar grupos:', e);
+                }
+            }
+            
+            const tipoLabel = {
+                'block': 'Bloco',
+                'room': 'Sala',
+                'department': 'Departamento',
+                'unit': 'Unidade',
+                'other': 'Outro'
+            };
+            
+            const gruposFiltrados = gruposCacheModal.filter(g => {
+                const nome = (g.name || g.nome || '').toLowerCase();
+                const tipo = (g.type || g.tipo || '').toLowerCase();
+                return nome.includes(termoBusca) || tipo.includes(termoBusca);
+            });
+            
+            if (gruposFiltrados.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center" style="padding: 20px; color: #94a3b8;">
+                        <i class="fas fa-search"></i>
+                        <p>Nenhum grupo encontrado</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = gruposFiltrados.map(g => {
+                const isChecked = gruposSelecionadosTemp && gruposSelecionadosTemp.some(gg => gg.id === g.id);
+                
+                return `
+                    <div class="grupo-item" onclick="toggleGrupoModal(${g.id})">
+                        <input type="checkbox" name="grupo-checkbox" value="${g.id}" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()">
+                        <div class="grupo-item-info">
+                            <div class="grupo-item-nome">${g.name || g.nome || 'Sem nome'}</div>
+                            <div class="grupo-item-tipo">${tipoLabel[g.type] || g.tipo || 'Sem tipo'}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // helper functions for notification emails
+        function getEmailsFromForm() {
+            const emails = [];
+            for (let i = 1; i <= 4; i++) {
+                const val = document.getElementById(`email-${i}`).value.trim();
+                if (val) emails.push(val);
+            }
+            return emails;
+        }
+
+        function setEmailsOnForm(emails) {
+            // Limpar tudo primeiro
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`email-${i}`).value = '';
+            }
+            
+            // Preencher o que houver
+            if (Array.isArray(emails)) {
+                emails.forEach((email, index) => {
+                    if (index < 4) {
+                        const input = document.getElementById(`email-${index + 1}`);
+                        if (input) input.value = typeof email === 'string' ? email : (email.email || '');
+                    }
+                });
+            }
+        }
+
+        // Sobrescrever a função showForm original para incluir grupo e e-mails
+        const originalShowForm = EmpresaManager.showForm;
+        EmpresaManager.showForm = async function(id = null) {
+            // Chamar original
+            if (originalShowForm) {
+                await originalShowForm.call(this, id);
+            }
+            
+            if (!id) {
+                // Resetar grupos selecionados
+                window.gruposSelecionadosAtual = [];
+                window.gruposSelecionadosTemp = [];
+                gruposCacheModal = [];
+                const buscaInput = document.getElementById('busca-grupo-modal');
+                if (buscaInput) buscaInput.value = '';
+                atualizarDisplayGrupo();
+                
+                // Limpar e-mails
+                setEmailsOnForm([]);
+            }
+        };
+
+        // Sobrescrever loadFormData para carregar os e-mails
+        const originalLoadFormData = EmpresaManager.loadFormData;
+        EmpresaManager.loadFormData = async function(id) {
+            // Chamar original
+            if (originalLoadFormData) {
+                await originalLoadFormData.call(this, id);
+            }
+            
+            // Buscar empresa novamente para garantir que temos os e-mails (ou usar o que o storage retorna)
+            const empresa = await storage.getEmpresa(id);
+            if (empresa && empresa.notification_emails) {
+                setEmailsOnForm(empresa.notification_emails);
+            } else {
+                setEmailsOnForm([]);
+            }
+        };
+
+        // Sobrescrever a função save original para incluir grupo e e-mails
+        const originalSave = EmpresaManager.save;
+        EmpresaManager.save = async function(event) {
+            event.preventDefault();
+            
+            // Validar CNPJ
+            const cnpj = document.getElementById('empresa-cnpj').value;
+            if (cnpj && !InputMask.validateCNPJ(cnpj)) {
+                NotificationSystem.showToast('error', 'CNPJ Inválido', 'Por favor, insira um CNPJ válido.');
+                return;
+            }
+            
+            const grupoIdInput = document.getElementById('empresa-grupo-id');
+            let groupIds = [];
+            if (grupoIdInput && grupoIdInput.value) {
+                const idsStr = grupoIdInput.value.split(',');
+                groupIds = idsStr.map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+            }
+            
+            const empresa = {
+                id: STATE.editMode ? parseInt(document.getElementById('empresa-id').value) : null,
+                razaoSocial: document.getElementById('empresa-razao-social').value,
+                nomeFantasia: document.getElementById('empresa-nome-fantasia').value,
+                cnpj: cnpj,
+                groupIds: groupIds,
+                notification_emails: getEmailsFromForm(),
+                dataCriacao: STATE.editMode ? (await storage.getEmpresa(STATE.currentEditId)).dataCriacao : new Date().toISOString()
+            };
+            
+            try {
+                const savedEmpresa = await storage.saveEmpresa(empresa);
+                
+                NotificationSystem.showToast(
+                    'success',
+                    STATE.editMode ? 'Empresa Atualizada' : 'Empresa Cadastrada',
+                    `Empresa "${savedEmpresa.razaoSocial || savedEmpresa.corporate_name}" foi ${STATE.editMode ? 'atualizada' : 'cadastrada'} com sucesso!`
+                );
+                
+                this.showList();
+                if (typeof DashboardManager !== 'undefined') DashboardManager.load();
+                if (typeof UIManager !== 'undefined' && UIManager.updateBadges) UIManager.updateBadges();
+            } catch (error) {
+                console.error('Erro ao salvar empresa:', error);
+                NotificationSystem.showToast('error', 'Erro', 'Não foi possível salvar a empresa. Tente novamente.');
+            }
+        };
+
+        // Mapear as funções globais se necessário
+        window.saveEmpresa = (e) => EmpresaManager.save(e);
+        window.showEmpresaForm = (id) => EmpresaManager.showForm(id);
+
+        // Fechar modal com ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                fecharModalGrupos();
+            }
+        });
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (typeof EmpresaManager !== 'undefined') {
+                    EmpresaManager.loadList();
+                }
+                
+                // Inicializar display do grupo
+                atualizarDisplayGrupo();
+            }, 100);
+        });
+    </script>
+</body>
+</html>

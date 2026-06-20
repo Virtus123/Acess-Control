@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Acess Control - Sistema de Controle de Acesso</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        .report-filters {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+        }
+        .report-filters .filter-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .report-filters .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .report-filters label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .report-filters select,
+        .report-filters input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        .report-filters .filter-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        .report-results {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        .report-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .report-stat-card {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .report-stat-card h4 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+        .report-stat-card p {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .report-table th,
+        .report-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .report-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+        .report-table tr:hover {
+            background: #f8fafc;
+        }
+        .badge-success { background: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 4px; }
+        .badge-danger { background: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="relatorios" class="content-section active">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1>Relatórios</h1>
+                            <p>Gerar relatórios e estatísticas</p>
+                        </div>
+                    </div>
+
+                    <!-- Abas de Relatórios -->
+                    <div class="monitoring-tabs" style="margin-bottom: 24px;">
+                        <button class="tab-btn active" onclick="mudarAbaRelatorio('pessoas')" id="tab-relatorio-pessoas">
+                            <i class="fas fa-users"></i> ACESSOS PESSOAS
+                        </button>
+                        <button class="tab-btn" onclick="mudarAbaRelatorio('veiculos')" id="tab-relatorio-veiculos">
+                            <i class="fas fa-car"></i> ACESSOS VEÍCULOS
+                        </button>
+                    </div>
+
+                    <!-- Relatório de Acessos de Pessoas -->
+                    <div id="relatorio-pessoas-section">
+                        <div class="report-filters">
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label>Data Início</label>
+                                    <input type="date" id="pessoas-data-inicio">
+                                </div>
+                                <div class="filter-group">
+                                    <label>Data Fim</label>
+                                    <input type="date" id="pessoas-data-fim">
+                                </div>
+                                <div class="filter-group">
+                                    <label>Tipo</label>
+                                    <select id="pessoas-tipo">
+                                        <option value="">Todos</option>
+                                        <option value="person">Pessoas</option>
+                                        <option value="visitor">Visitantes</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Direção</label>
+                                    <select id="pessoas-direcao">
+                                        <option value="">Todos</option>
+                                        <option value="ENTRY">Entrada</option>
+                                        <option value="EXIT">Saída</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Status</label>
+                                    <select id="pessoas-status">
+                                        <option value="">Todos</option>
+                                        <option value="SUCCESS">Liberado</option>
+                                        <option value="DENIED">Negado</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Empresa</label>
+                                    <select id="pessoas-empresa">
+                                        <option value="">Todas</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Grupo/Depto</label>
+                                    <select id="pessoas-grupo">
+                                        <option value="">Todos</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-actions">
+                                <button class="btn btn-primary" onclick="gerarRelatorioPessoas()">
+                                    <i class="fas fa-search"></i> Gerar Relatório
+                                </button>
+                                <button class="btn btn-secondary" onclick="exportarRelatorioPessoas()">
+                                    <i class="fas fa-download"></i> Exportar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="report-results" id="pessoas-results" style="display:none;">
+                            <div class="report-stats" id="pessoas-stats"></div>
+                            <table class="report-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data/Hora</th>
+                                        <th>Nome</th>
+                                        <th>Tipo</th>
+                                        <th>Documento</th>
+                                        <th>Equipamento</th>
+                                        <th>Empresa</th>
+                                        <th>Grupo</th>
+                                        <th>Direção</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pessoas-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Relatório de Acessos de Veículos -->
+                    <div id="relatorio-veiculos-section" style="display:none;">
+                        <div class="report-filters">
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label>Data Início</label>
+                                    <input type="date" id="veiculos-data-inicio">
+                                </div>
+                                <div class="filter-group">
+                                    <label>Data Fim</label>
+                                    <input type="date" id="veiculos-data-fim">
+                                </div>
+                                <div class="filter-group">
+                                    <label>Empresa</label>
+                                    <select id="veiculos-empresa">
+                                        <option value="">Todas</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Direção</label>
+                                    <select id="veiculos-direcao">
+                                        <option value="">Todos</option>
+                                        <option value="ENTRY">Entrada</option>
+                                        <option value="EXIT">Saída</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Status</label>
+                                    <select id="veiculos-status">
+                                        <option value="">Todos</option>
+                                        <option value="SUCCESS">Liberado</option>
+                                        <option value="DENIED">Negado</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-actions">
+                                <button class="btn btn-primary" onclick="gerarRelatorioVeiculos()">
+                                    <i class="fas fa-search"></i> Gerar Relatório
+                                </button>
+                                <button class="btn btn-secondary" onclick="exportarRelatorioVeiculos()">
+                                    <i class="fas fa-download"></i> Exportar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="report-results" id="veiculos-results" style="display:none;">
+                            <div class="report-stats" id="veiculos-stats"></div>
+                            <table class="report-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data/Hora</th>
+                                        <th>Placa</th>
+                                        <th>Modelo</th>
+                                        <th>Proprietário</th>
+                                        <th>Empresa</th>
+                                        <th>Equipamento</th>
+                                        <th>Direção</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="veiculos-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+    <script src="../../auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    
+    <script>
+        // Variáveis globais
+        let relatorioPessoasData = [];
+        let relatorioVeiculosData = [];
+        
+        // URLs da API
+        const API_BASE = '';
+        
+        // Função helper para fazer fetch com headers corretos
+        async function apiFetch(url, options = {}) {
+            const tenantId = localStorage.getItem('acesscontrol_tenant') || 'demo';
+            const accessToken = localStorage.getItem('acesscontrol_accessToken') || '';
+            const headers = {
+                'Content-Type': 'application/json',
+                'X-Tenant-ID': tenantId
+            };
+            if (accessToken) {
+                headers['Authorization'] = `Bearer ${accessToken}`;
+            }
+            return fetch(url, { ...options, headers: { ...headers, ...options.headers } });
+        }
+
+        // Funções de navegação de abas
+        function mudarAbaRelatorio(aba) {
+            document.getElementById('tab-relatorio-pessoas').classList.remove('active');
+            document.getElementById('tab-relatorio-veiculos').classList.remove('active');
+            document.getElementById(`tab-relatorio-${aba}`).classList.add('active');
+            
+            document.getElementById('relatorio-pessoas-section').style.display = aba === 'pessoas' ? 'block' : 'none';
+            document.getElementById('relatorio-veiculos-section').style.display = aba === 'veiculos' ? 'block' : 'none';
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('pessoas-data-inicio').value = today;
+            document.getElementById('pessoas-data-fim').value = today;
+            document.getElementById('veiculos-data-inicio').value = today;
+            document.getElementById('veiculos-data-fim').value = today;
+            
+            carregarEmpresas();
+            carregarGrupos();
+        });
+
+        async function carregarGrupos() {
+            try {
+                const response = await apiFetch(`${API_BASE}/api/groups`);
+                const result = await response.json();
+                if (result.success && result.data) {
+                    const select = document.getElementById('pessoas-grupo');
+                    result.data.forEach(grupo => {
+                        const option = document.createElement('option');
+                        option.value = grupo.id;
+                        option.textContent = grupo.name;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao carregar grupos:', error);
+            }
+        }
+
+        async function carregarEmpresas() {
+            try {
+                const response = await apiFetch(`${API_BASE}/api/companies`);
+                const result = await response.json();
+                if (result.success && result.data) {
+                    const selectVeiculos = document.getElementById('veiculos-empresa');
+                    const selectPessoas = document.getElementById('pessoas-empresa');
+                    
+                    result.data.forEach(empresa => {
+                        const option = document.createElement('option');
+                        option.value = empresa.id;
+                        const name = empresa.trading_name || empresa.corporate_name;
+                        option.textContent = name;
+                        
+                        if (selectVeiculos) selectVeiculos.appendChild(option.cloneNode(true));
+                        if (selectPessoas) selectPessoas.appendChild(option.cloneNode(true));
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao carregar empresas:', error);
+            }
+        }
+
+        // Relatório de Pessoas
+        async function gerarRelatorioPessoas() {
+            const dataInicio = document.getElementById('pessoas-data-inicio').value;
+            const dataFim = document.getElementById('pessoas-data-fim').value;
+            const tipo = document.getElementById('pessoas-tipo').value;
+            const direcao = document.getElementById('pessoas-direcao').value;
+            const status = document.getElementById('pessoas-status').value;
+            const empresaId = document.getElementById('pessoas-empresa').value;
+            const grupoId = document.getElementById('pessoas-grupo').value;
+            
+            let url = `${API_BASE}/api/reports/access?limit=5000`;
+            if (dataInicio) url += `&startDate=${dataInicio}`;
+            if (dataFim) url += `&endDate=${dataFim}`;
+            if (tipo) url += `&personType=${tipo}`;
+            if (direcao) url += `&direction=${direcao}`;
+            if (status) url += `&status=${status}`;
+            if (empresaId) url += `&companyId=${empresaId}`;
+            if (grupoId) url += `&groupId=${grupoId}`;
+            
+            try {
+                const response = await apiFetch(url);
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    relatorioPessoasData = result.data;
+                    exibirRelatorioPessoas(result.data);
+                }
+            } catch (error) {
+                console.error('Erro ao gerar relatório:', error);
+                alert('Erro ao gerar relatório');
+            }
+        }
+
+        function exibirRelatorioPessoas(dados) {
+            document.getElementById('pessoas-results').style.display = 'block';
+            
+            // Estatísticas
+            const total = dados.length;
+            const entradas = dados.filter(d => d.direcao === 'entry').length;
+            const saidas = dados.filter(d => d.direcao === 'exit').length;
+            const negados = dados.filter(d => d.autorizacao === 'denied').length;
+            
+            document.getElementById('pessoas-stats').innerHTML = `
+                <div class="report-stat-card"><h4>${total}</h4><p>Total</p></div>
+                <div class="report-stat-card"><h4>${entradas}</h4><p>Entradas</p></div>
+                <div class="report-stat-card"><h4>${saidas}</h4><p>Saídas</p></div>
+                <div class="report-stat-card"><h4>${negados}</h4><p>Negados</p></div>
+            `;
+            
+            // Tabela
+            const tbody = document.getElementById('pessoas-table-body');
+            tbody.innerHTML = dados.map(d => {
+                const data = new Date(d.dataHora);
+                const dataFormatada = data.toLocaleDateString('pt-BR') + ' ' + data.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+                const statusClass = d.autorizacao === 'success' ? 'badge-success' : 'badge-danger';
+                const direcaoIcon = d.direcao === 'entry' ? 'fa-sign-in-alt' : 'fa-sign-out-alt';
+                
+                return `
+                    <tr>
+                        <td>${dataFormatada}</td>
+                        <td>${d.nome || '-'}</td>
+                        <td>${d.person_type === 'person' ? 'Pessoa' : 'Visitante'}</td>
+                        <td>${d.documento || '-'}</td>
+                        <td>${d.equipamento || '-'}</td>
+                        <td>${d.empresa || '-'}</td>
+                        <td>${d.grupo || '-'}</td>
+                        <td><i class="fas ${direcaoIcon}"></i> ${d.direcao === 'entry' ? 'Entrada' : 'Saída'}</td>
+                        <td><span class="${statusClass}">${d.autorizacao === 'success' ? 'Liberado' : 'Negado'}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function exportarRelatorioPessoas() {
+            if (relatorioPessoasData.length === 0) {
+                alert('Gere o relatório primeiro');
+                return;
+            }
+            
+            let report = 'RELATÓRIO DE ACESSOS - PESSOAS\n';
+            report += '='.repeat(50) + '\n';
+            report += `Data: ${new Date().toLocaleDateString('pt-BR')}\n`;
+            report += `Total de registros: ${relatorioPessoasData.length}\n\n`;
+            report += 'Data/Hora | Nome | Tipo | Documento | Equipamento | Empresa | Grupo | Direção | Status\n';
+            report += '-'.repeat(110) + '\n';
+            
+            relatorioPessoasData.forEach(d => {
+                const data = new Date(d.dataHora);
+                const dataFormatada = data.toLocaleString('pt-BR');
+                report += `${dataFormatada} | ${d.nome || '-'} | ${d.person_type === 'person' ? 'Pessoa' : 'Visitante'} | ${d.documento || '-'} | ${d.equipamento || '-'} | ${d.empresa || '-'} | ${d.grupo || '-'} | ${d.direcao === 'entry' ? 'Entrada' : 'Saída'} | ${d.autorizacao === 'success' ? 'Liberado' : 'Negado'}\n`;
+            });
+            
+            downloadReport(report, 'relatorio-acessos-pessoas.txt');
+        }
+
+        // Relatório de Veículos
+        async function gerarRelatorioVeiculos() {
+            const dataInicio = document.getElementById('veiculos-data-inicio').value;
+            const dataFim = document.getElementById('veiculos-data-fim').value;
+            const empresa = document.getElementById('veiculos-empresa').value;
+            const direcao = document.getElementById('veiculos-direcao').value;
+            const status = document.getElementById('veiculos-status').value;
+            
+            let url = `${API_BASE}/api/reports/access/vehicles?limit=5000`;
+            if (dataInicio) url += `&startDate=${dataInicio}`;
+            if (dataFim) url += `&endDate=${dataFim}`;
+            if (empresa) url += `&companyId=${empresa}`;
+            if (direcao) url += `&direction=${direcao}`;
+            if (status) url += `&status=${status}`;
+            
+            try {
+                const response = await apiFetch(url);
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    relatorioVeiculosData = result.data;
+                    exibirRelatorioVeiculos(result.data, result.estatisticas);
+                }
+            } catch (error) {
+                console.error('Erro ao gerar relatório:', error);
+                alert('Erro ao gerar relatório');
+            }
+        }
+
+        function exibirRelatorioVeiculos(dados, estatisticas) {
+            document.getElementById('veiculos-results').style.display = 'block';
+            
+            // Estatísticas
+            const stats = estatisticas || { totalAcessos: dados.length, totalEntradas: 0, totalSaidas: 0, totalNegados: 0, noEstacionamento: 0 };
+            
+            document.getElementById('veiculos-stats').innerHTML = `
+                <div class="report-stat-card"><h4>${stats.totalAcessos}</h4><p>Total</p></div>
+                <div class="report-stat-card"><h4>${stats.totalEntradas}</h4><p>Entradas</p></div>
+                <div class="report-stat-card"><h4>${stats.totalSaidas}</h4><p>Saídas</p></div>
+                <div class="report-stat-card"><h4>${stats.noEstacionamento}</h4><p>No Estacionamento</p></div>
+            `;
+            
+            // Tabela
+            const tbody = document.getElementById('veiculos-table-body');
+            tbody.innerHTML = dados.map(d => {
+                const data = new Date(d.dataHora);
+                const dataFormatada = data.toLocaleDateString('pt-BR') + ' ' + data.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+                const statusClass = d.autorizacao === 'success' ? 'badge-success' : 'badge-danger';
+                const direcaoIcon = d.direcao === 'entry' ? 'fa-sign-in-alt' : 'fa-sign-out-alt';
+                
+                return `
+                    <tr>
+                        <td>${dataFormatada}</td>
+                        <td><strong>${d.placa || '-'}</strong></td>
+                        <td>${d.modelo || '-'}</td>
+                        <td>${d.proprietario || '-'}</td>
+                        <td>${d.empresa || '-'}</td>
+                        <td>${d.equipamento || '-'}</td>
+                        <td><i class="fas ${direcaoIcon}"></i> ${d.direcao === 'entry' ? 'Entrada' : 'Saída'}</td>
+                        <td><span class="${statusClass}">${d.autorizacao === 'success' ? 'Liberado' : 'Negado'}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function exportarRelatorioVeiculos() {
+            if (relatorioVeiculosData.length === 0) {
+                alert('Gere o relatório primeiro');
+                return;
+            }
+            
+            let report = 'RELATÓRIO DE ACESSOS - VEÍCULOS\n';
+            report += '='.repeat(50) + '\n';
+            report += `Data: ${new Date().toLocaleDateString('pt-BR')}\n`;
+            report += `Total de registros: ${relatorioVeiculosData.length}\n\n`;
+            report += 'Data/Hora | Placa | Modelo | Proprietário | Empresa | Equipamento | Direção | Status\n';
+            report += '-'.repeat(120) + '\n';
+            
+            relatorioVeiculosData.forEach(d => {
+                const data = new Date(d.dataHora);
+                const dataFormatada = data.toLocaleString('pt-BR');
+                report += `${dataFormatada} | ${d.placa || '-'} | ${d.modelo || '-'} | ${d.proprietario || '-'} | ${d.empresa || '-'} | ${d.equipamento || '-'} | ${d.direcao === 'entry' ? 'Entrada' : 'Saída'} | ${d.autorizacao === 'success' ? 'Liberado' : 'Negado'}\n`;
+            });
+            
+            downloadReport(report, 'relatorio-acessos-veiculos.txt');
+        }
+
+        function downloadReport(content, filename) {
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

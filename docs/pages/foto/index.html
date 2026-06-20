@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0f172a">
+<title>Atualizar foto</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --accent: #6366f1;
+    --success: #10b981;
+    --danger: #ef4444;
+    --border: #334155;
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+    overscroll-behavior: none;
+  }
+  .container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 24px 16px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  h1 { font-size: 1.4rem; margin-bottom: 4px; }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 24px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+  input[type="text"] {
+    width: 100%;
+    padding: 14px;
+    background: #0f172a;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 1rem;
+    -webkit-appearance: none;
+  }
+  input[type="text"]:focus { outline: none; border-color: var(--accent); }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn.secondary { background: transparent; border: 1px solid var(--border); }
+  .btn.danger { background: var(--danger); }
+  .btn.success { background: var(--success); }
+
+  .result-item {
+    background: #0f172a;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: 0.15s;
+  }
+  .result-item:active { background: #1e293b; }
+  .result-item .name { font-weight: 600; }
+  .result-item .reg { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+  .result-item .has-photo { font-size: 0.75rem; color: var(--success); margin-top: 4px; }
+
+  .video-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  video, canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .video-overlay {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .face-guide {
+    width: 60%; aspect-ratio: 3 / 4;
+    border: 3px dashed rgba(255,255,255,0.6);
+    border-radius: 50% / 40%;
+  }
+
+  .alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+  }
+  .alert.error { background: rgba(239,68,68,0.15); border: 1px solid var(--danger); color: #fecaca; }
+  .alert.success { background: rgba(16,185,129,0.15); border: 1px solid var(--success); color: #a7f3d0; }
+  .alert.info { background: rgba(99,102,241,0.15); border: 1px solid var(--accent); color: #c7d2fe; }
+
+  .center { text-align: center; }
+  .mt-16 { margin-top: 16px; }
+  .hidden { display: none !important; }
+  .row { display: flex; gap: 8px; }
+  .row .btn { margin-top: 0; }
+
+  .spinner {
+    display: inline-block;
+    width: 20px; height: 20px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Atualizar foto</h1>
+  <p class="subtitle">Use o link fornecido pela sua empresa</p>
+
+  <div id="alert" class="alert hidden"></div>
+
+  <!-- TELA 1: BUSCA -->
+  <div id="screen-search" class="card">
+    <label for="query">Sua matrícula ou nome</label>
+    <input type="text" id="query" placeholder="Ex: 405832 ou João Silva" autocomplete="off" inputmode="text">
+    <button class="btn" id="btn-search">Buscar</button>
+  </div>
+
+  <!-- TELA 2: RESULTADOS -->
+  <div id="screen-results" class="card hidden">
+    <label>Confirme seu cadastro</label>
+    <div id="results-list"></div>
+    <button class="btn secondary" onclick="showScreen('search')">Buscar de novo</button>
+  </div>
+
+  <!-- TELA 3: CÂMERA -->
+  <div id="screen-camera" class="card hidden">
+    <p class="subtitle" id="selected-name" style="margin-bottom: 12px"></p>
+    <div class="video-wrap">
+      <video id="video" autoplay playsinline muted></video>
+      <div class="video-overlay">
+        <div class="face-guide"></div>
+      </div>
+    </div>
+    <div class="alert info">
+      Posicione seu rosto dentro do oval. Iluminação boa, sem boné ou óculos escuros.
+    </div>
+    <button class="btn" id="btn-capture">Tirar foto</button>
+    <button class="btn secondary" onclick="showScreen('results')">Voltar</button>
+  </div>
+
+  <!-- TELA 4: PREVIEW -->
+  <div id="screen-preview" class="card hidden">
+    <p class="subtitle" style="margin-bottom: 12px">Esta é sua foto?</p>
+    <div class="video-wrap">
+      <canvas id="canvas"></canvas>
+    </div>
+    <div class="row">
+      <button class="btn secondary" onclick="showScreen('camera'); startCamera()">Tirar de novo</button>
+      <button class="btn success" id="btn-confirm">Confirmar</button>
+    </div>
+  </div>
+
+  <!-- TELA 5: SUCESSO -->
+  <div id="screen-success" class="card center hidden">
+    <div style="font-size: 4rem; color: var(--success); margin-bottom: 16px">✓</div>
+    <h2 style="margin-bottom: 8px">Foto enviada!</h2>
+    <p class="subtitle">Sua foto está sendo processada e estará liberada nos equipamentos em alguns minutos.</p>
+    <button class="btn mt-16 secondary" onclick="restart()">Atualizar foto de outra pessoa</button>
+  </div>
+</div>
+
+<script>
+// ===========================================================================
+// State
+// ===========================================================================
+const TOKEN = location.pathname.split('/').pop();
+const API_BASE = `/api/public-photo/${TOKEN}`;
+let stream = null;
+let selectedPerson = null;
+let capturedDataUrl = null;
+
+// ===========================================================================
+// UI helpers
+// ===========================================================================
+function showScreen(name) {
+  ['search', 'results', 'camera', 'preview', 'success'].forEach(s => {
+    document.getElementById(`screen-${s}`).classList.toggle('hidden', s !== name);
+  });
+  if (name !== 'camera' && name !== 'preview') stopCamera();
+  hideAlert();
+}
+
+function showAlert(msg, type = 'error') {
+  const el = document.getElementById('alert');
+  el.textContent = msg;
+  el.className = `alert ${type}`;
+  el.classList.remove('hidden');
+  if (type === 'success') setTimeout(hideAlert, 4000);
+}
+
+function hideAlert() {
+  document.getElementById('alert').classList.add('hidden');
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  if (loading) {
+    btn.dataset.originalText = btn.textContent;
+    btn.innerHTML = '<span class="spinner"></span>Aguarde…';
+  } else if (btn.dataset.originalText) {
+    btn.textContent = btn.dataset.originalText;
+  }
+}
+
+// ===========================================================================
+// API
+// ===========================================================================
+async function api(path, body) {
+  const r = await fetch(`${API_BASE}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const json = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    throw new Error(json.message || `HTTP ${r.status}`);
+  }
+  return json;
+}
+
+// ===========================================================================
+// Busca
+// ===========================================================================
+document.getElementById('btn-search').onclick = async () => {
+  const query = document.getElementById('query').value.trim();
+  if (query.length < 2) {
+    showAlert('Digite ao menos 2 caracteres');
+    return;
+  }
+  setLoading('btn-search', true);
+  try {
+    const { data } = await api('/lookup', { query });
+    if (!data || data.length === 0) {
+      showAlert('Nenhum cadastro encontrado. Verifique a matrícula ou fale com a empresa.');
+      return;
+    }
+    renderResults(data);
+    showScreen('results');
+  } catch (e) {
+    showAlert(e.message);
+  } finally {
+    setLoading('btn-search', false);
+  }
+};
+
+document.getElementById('query').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') document.getElementById('btn-search').click();
+});
+
+function renderResults(items) {
+  const list = document.getElementById('results-list');
+  list.innerHTML = items.map(p => `
+    <div class="result-item" data-id="${p.id}" data-name="${escapeHtml(p.name)}">
+      <div class="name">${escapeHtml(p.name)}</div>
+      ${p.registration_masked ? `<div class="reg">Matrícula: ${p.registration_masked}</div>` : ''}
+      ${p.has_photo ? '<div class="has-photo">Já tem foto cadastrada — pode substituir</div>' : ''}
+    </div>
+  `).join('');
+  list.querySelectorAll('.result-item').forEach(el => {
+    el.onclick = () => {
+      selectedPerson = { id: parseInt(el.dataset.id, 10), name: el.dataset.name };
+      document.getElementById('selected-name').textContent = `${selectedPerson.name}`;
+      showScreen('camera');
+      startCamera();
+    };
+  });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ===========================================================================
+// Câmera
+// ===========================================================================
+async function startCamera() {
+  try {
+    if (stream) stopCamera();
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: 'user',
+        width: { ideal: 720 },
+        height: { ideal: 960 },
+      },
+      audio: false,
+    });
+    const video = document.getElementById('video');
+    video.srcObject = stream;
+    await video.play();
+  } catch (e) {
+    let msg = 'Não foi possível acessar a câmera.';
+    if (e.name === 'NotAllowedError') msg = 'Você precisa permitir o acesso à câmera.';
+    if (e.name === 'NotFoundError') msg = 'Nenhuma câmera encontrada no dispositivo.';
+    showAlert(msg);
+    showScreen('results');
+  }
+}
+
+function stopCamera() {
+  if (stream) {
+    stream.getTracks().forEach(t => t.stop());
+    stream = null;
+  }
+}
+
+document.getElementById('btn-capture').onclick = () => {
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const vw = video.videoWidth;
+  const vh = video.videoHeight;
+
+  // Mantém proporção 3:4 (vertical) recortando do centro
+  const targetRatio = 3 / 4;
+  const videoRatio = vw / vh;
+  let sx = 0, sy = 0, sw = vw, sh = vh;
+  if (videoRatio > targetRatio) {
+    // muito largo — recorta laterais
+    sw = vh * targetRatio;
+    sx = (vw - sw) / 2;
+  } else {
+    sh = vw / targetRatio;
+    sy = (vh - sh) / 2;
+  }
+
+  // Output 480x640 (3:4), tamanho razoável pra reconhecimento facial
+  canvas.width = 480;
+  canvas.height = 640;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+  capturedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+  stopCamera();
+  showScreen('preview');
+};
+
+// ===========================================================================
+// Upload
+// ===========================================================================
+document.getElementById('btn-confirm').onclick = async () => {
+  if (!capturedDataUrl || !selectedPerson) return;
+  setLoading('btn-confirm', true);
+  try {
+    // Remove o prefixo "data:image/jpeg;base64," — backend espera só base64
+    const base64 = capturedDataUrl.split(',')[1];
+    await api('/upload', {
+      personId: selectedPerson.id,
+      photoBase64: base64,
+    });
+    showScreen('success');
+  } catch (e) {
+    showAlert(e.message);
+  } finally {
+    setLoading('btn-confirm', false);
+  }
+};
+
+function restart() {
+  selectedPerson = null;
+  capturedDataUrl = null;
+  document.getElementById('query').value = '';
+  showScreen('search');
+}
+
+// ===========================================================================
+// Init
+// ===========================================================================
+if (!TOKEN || TOKEN.length < 16) {
+  showAlert('Link inválido', 'error');
+  document.getElementById('screen-search').classList.add('hidden');
+}
+
+// Permissão da câmera só checa quando entra na tela de câmera
+</script>
+</body>
+</html>

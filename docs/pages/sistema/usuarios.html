@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Acess Control - Configurações</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <style>
+        /* Reset e estilos base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+        /* Cards */
+        .content-box {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Section header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        /* Botões */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.2);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .btn-danger:hover {
+            background: #fecaca;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Settings Grid */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .settings-card-header {
+            padding: 20px 24px;
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .settings-card-header i {
+            font-size: 1.5rem;
+            color: #4a90d9;
+        }
+
+        .settings-card-header h3 {
+            font-size: 1.1rem;
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .settings-card-body {
+            padding: 24px;
+        }
+
+        /* Tabela */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            color: #1e293b;
+            vertical-align: middle;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Ações */
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Text center */
+        .text-center {
+            text-align: center;
+        }
+
+        /* Mensagem vazia */
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+
+        .empty-message i {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .section-actions {
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="configuracoes" class="content-section active">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1>Usuários e Permissões</h1>
+                            <p>Gerenciar operadores do sistema</p>
+                        </div>
+                    </div>
+
+                    <!-- Aba Operadores -->
+                    <div class="settings-grid">
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <i class="fas fa-user-shield"></i>
+                                <h3>Gerenciamento de Operadores</h3>
+                            </div>
+                            <div class="settings-card-body">
+                                <div class="section-actions">
+                                    <button class="btn btn-primary" onclick="showOperadorForm()">
+                                        <i class="fas fa-plus"></i> Novo Operador
+                                    </button>
+                                </div>
+
+                                <div class="table-container">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Nome</th>
+                                                <th>E-mail</th>
+                                                <th>Função</th>
+                                                <th>Status</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="operadores-table-body">
+                                            <tr>
+                                                <td colspan="5">
+                                                    <div class="empty-message">
+                                                        <i class="fas fa-users-cog"></i>
+                                                        <p>Nenhum operador cadastrado</p>
+                                                        <button class="btn btn-primary btn-sm" onclick="showOperadorForm()" style="margin-top: 12px;">
+                                                            <i class="fas fa-plus"></i> Cadastrar primeiro operador
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Cadastro de Operador -->
+    <div id="operadorModal" class="modal-overlay hidden">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> Novo Operador</h3>
+                <button class="modal-close" onclick="fecharModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="operadorForm" onsubmit="salvarOperador(event)">
+                    <div class="form-group">
+                        <label for="operador-nome">Nome Completo</label>
+                        <input type="text" id="operador-nome" required placeholder="Digite o nome completo">
+                    </div>
+                    <div class="form-group">
+                        <label for="operador-email">E-mail</label>
+                        <input type="email" id="operador-email" required placeholder="Digite o e-mail">
+                    </div>
+                    <div class="form-group">
+                        <label for="operador-senha">Senha</label>
+                        <input type="password" id="operador-senha" placeholder="Digite a senha">
+                        <small style="color: #64748b; font-size: 0.75rem;" id="senha-hint"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="operador-perfil">Perfil de Autorização</label>
+                        <select id="operador-perfil" required>
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="operador-status">Status</label>
+                        <select id="operador-status" required>
+                            <option value="ativo">Ativo</option>
+                            <option value="inativo">Inativo</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Salvar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+    <script src="../../auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+    <script>
+        // Dados de operadores (vindo da API)
+        let operadores = [];
+        let editandoId = null;
+
+        // Funções de modal
+        function showOperadorForm() {
+            editandoId = null;
+            document.getElementById('operadorForm').reset();
+            document.getElementById('operador-senha').required = true;
+            document.getElementById('senha-hint').textContent = '';
+            document.querySelector('#operadorModal .modal-header h3').innerHTML = '<i class="fas fa-user-plus"></i> Novo Operador';
+            document.getElementById('operadorModal').classList.remove('hidden');
+        }
+
+        function showOperadorFormEdit(operador) {
+            editandoId = operador.id;
+            document.getElementById('operadorForm').reset();
+            document.getElementById('operador-nome').value = operador.name || '';
+            document.getElementById('operador-email').value = operador.email || '';
+            // Status baseado no active
+            const statusSelect = document.getElementById('operador-status');
+            if (statusSelect) {
+                statusSelect.value = operador.active ? 'ativo' : 'inativo';
+            }
+            // Perfil
+            const perfilSelect = document.getElementById('operador-perfil');
+            if (perfilSelect && operador.profile_id) {
+                perfilSelect.value = operador.profile_id;
+            }
+            // Senha não é obrigatória para edição
+            document.getElementById('operador-senha').required = false;
+            document.getElementById('senha-hint').textContent = 'Deixe em branco para manter a senha atual';
+            
+            document.querySelector('#operadorModal .modal-header h3').innerHTML = '<i class="fas fa-user-edit"></i> Editar Operador';
+            document.getElementById('operadorModal').classList.remove('hidden');
+        }
+
+        function fecharModal() {
+            document.getElementById('operadorModal').classList.add('hidden');
+            document.getElementById('operadorForm').reset();
+            editandoId = null;
+        }
+
+        // Carregar perfis de autorização
+        async function carregarPerfis() {
+            const perfilSelect = document.getElementById('operador-perfil');
+            if (!perfilSelect) return;
+            
+            try {
+                const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('accessToken');
+                const tenantId = localStorage.getItem('tenant_id') || 'default';
+                
+                const response = await fetch('/api/authorization-profiles/profiles', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Tenant-ID': tenantId
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    perfilSelect.innerHTML = '<option value="">Selecione...</option>';
+                    result.data.forEach(perfil => {
+                        const option = document.createElement('option');
+                        option.value = perfil.id;
+                        option.textContent = perfil.name;
+                        perfilSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao carregar perfis:', error);
+            }
+        }
+
+        // Carregar operadores da API
+        async function carregarOperadores() {
+            try {
+                const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('accessToken');
+                const tenantId = localStorage.getItem('tenant_id') || 'default';
+                
+                const response = await fetch('/api/auth/users', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Tenant-ID': tenantId
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    operadores = result.data;
+                } else {
+                    operadores = [];
+                }
+            } catch (error) {
+                console.error('Erro ao carregar operadores:', error);
+                operadores = [];
+            }
+            renderizarOperadores();
+        }
+
+        // Salvar operador (criar ou editar)
+        async function salvarOperador(event) {
+            event.preventDefault();
+
+            const nome = document.getElementById('operador-nome').value;
+            const email = document.getElementById('operador-email').value;
+            const status = document.getElementById('operador-status').value;
+            const senha = document.getElementById('operador-senha').value;
+            const perfilId = document.getElementById('operador-perfil').value;
+
+            const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('accessToken');
+            const tenantId = localStorage.getItem('tenant_id') || 'default';
+
+            const url = editandoId 
+                ? `/api/auth/users/${editandoId}`
+                : '/api/auth/register';
+            
+            const method = editandoId ? 'PUT' : 'POST';
+
+            const body = {
+                name: nome,
+                email: email,
+                role: 'operator', // O banco aceita apenas 'admin', 'operator', 'viewer'
+                active: status === 'ativo',
+                profile_id: perfilId ? parseInt(perfilId) : null
+            };
+
+            // Só adiciona senha se for criação ou se foi preenchida na edição
+            if (!editandoId || senha) {
+                body.password = senha;
+            }
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'X-Tenant-ID': tenantId
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(editandoId ? 'Operador atualizado com sucesso!' : 'Operador criado com sucesso!');
+                    carregarOperadores();
+                    fecharModal();
+                } else {
+                    alert('Erro: ' + (result.message || 'Não foi possível salvar o operador'));
+                }
+            } catch (error) {
+                console.error('Erro ao salvar operador:', error);
+                alert('Erro ao salvar operador. Verifique o console para detalhes.');
+            }
+        }
+
+        // Editar operador
+        function editarOperador(id) {
+            const operador = operadores.find(op => op.id === id);
+            if (operador) {
+                showOperadorFormEdit(operador);
+            }
+        }
+
+        // Excluir operador
+        async function excluirOperador(id) {
+            if (!confirm('Deseja realmente excluir este operador?')) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('accessToken');
+                const tenantId = localStorage.getItem('tenant_id') || 'default';
+
+                const response = await fetch(`/api/auth/users/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Tenant-ID': tenantId
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Operador excluído com sucesso!');
+                    carregarOperadores();
+                } else {
+                    alert('Erro: ' + (result.message || 'Não foi possível excluir o operador'));
+                }
+            } catch (error) {
+                console.error('Erro ao excluir operador:', error);
+                alert('Erro ao excluir operador. Verifique o console para detalhes.');
+            }
+        }
+
+        // Renderizar tabela de operadores
+        function renderizarOperadores() {
+            const tbody = document.getElementById('operadores-table-body');
+            
+            if (!tbody) return;
+
+            if (operadores.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-message">
+                                <i class="fas fa-users-cog"></i>
+                                <p>Nenhum operador cadastrado</p>
+                                <button class="btn btn-primary btn-sm" onclick="showOperadorForm()" style="margin-top: 12px;">
+                                    <i class="fas fa-plus"></i> Cadastrar primeiro operador
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const funcaoLabel = {
+                'admin': 'Administrador',
+                'gerente': 'Gerente',
+                'operador': 'Operador',
+                'visualizador': 'Visualizador'
+            };
+
+            tbody.innerHTML = operadores.map(op => {
+                const statusClass = op.active ? 'badge-success' : 'badge-danger';
+                const statusText = op.active ? 'Ativo' : 'Inativo';
+
+                return `
+                    <tr>
+                        <td><strong>${op.name || op.nome || '-'}</strong></td>
+                        <td>${op.email || '-'}</td>
+                        <td>${op.profileName || funcaoLabel[op.role] || op.role || '-'}</td>
+                        <td><span class="badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <div class="actions">
+                                <button class="btn btn-sm btn-secondary" onclick="editarOperador(${op.id})" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="excluirOperador(${op.id})" title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarPerfis();
+            carregarOperadores();
+
+            // Adicionar CSS do modal se não existir no style.css
+            const style = document.createElement('style');
+            style.textContent = `
+                .modal-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 9999;
+                    transition: all 0.3s;
+                }
+
+                .modal-overlay.hidden {
+                    display: none;
+                }
+
+                .modal-container {
+                    background: white;
+                    border-radius: 12px;
+                    width: 90%;
+                    max-width: 500px;
+                    max-height: 90vh;
+                    overflow-y: auto;
+                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+                }
+
+                .modal-header {
+                    padding: 20px 24px;
+                    border-bottom: 2px solid #e2e8f0;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .modal-header h3 {
+                    font-size: 1.2rem;
+                    color: #1e293b;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                .modal-close {
+                    background: none;
+                    border: none;
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    color: #94a3b8;
+                    transition: color 0.2s;
+                }
+
+                .modal-close:hover {
+                    color: #ef4444;
+                }
+
+                .modal-body {
+                    padding: 24px;
+                }
+
+                .form-group {
+                    margin-bottom: 20px;
+                }
+
+                .form-group label {
+                    display: block;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    color: #475569;
+                    text-transform: uppercase;
+                    letter-spacing: 0.3px;
+                    margin-bottom: 6px;
+                }
+
+                .form-group input,
+                .form-group select {
+                    width: 100%;
+                    padding: 10px 12px;
+                    border: 1.5px solid #e2e8f0;
+                    border-radius: 8px;
+                    font-size: 0.95rem;
+                }
+
+                .form-group input:focus,
+                .form-group select:focus {
+                    outline: none;
+                    border-color: #4a90d9;
+                    box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+                }
+
+                .form-actions {
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 12px;
+                    margin-top: 24px;
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>

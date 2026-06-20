@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Acess Control - Sistema de Controle de Encomendas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        .content-area {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Botões */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.2);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        .btn-icon {
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .card h3 {
+            margin: 0 0 20px 0;
+            color: #1e293b;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .card h3 i {
+            margin-right: 10px;
+            color: #4a90d9;
+            font-size: 1.2rem;
+        }
+
+        /* Grid de campos */
+        .campos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .grid-full {
+            grid-column: 1 / -1;
+        }
+
+        /* Form groups */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #ffffff;
+            font-family: inherit;
+        }
+
+        .form-group input:hover,
+        .form-group select:hover,
+        .form-group textarea:hover {
+            border-color: #94a3b8;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .required:after {
+            content: " *";
+            color: #e53e3e;
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pendente {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-entregue {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-retirado {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-atrasado {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            margin-top: 20px;
+        }
+
+        .tabs-nav {
+            display: flex;
+            gap: 8px;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #64748b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn i {
+            font-size: 1rem;
+        }
+
+        .tab-btn:hover {
+            color: #4a90d9;
+        }
+
+        .tab-btn.active {
+            color: #4a90d9;
+            border-bottom-color: #4a90d9;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Search e filtros */
+        .search-filter {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0 12px;
+        }
+
+        .search-box i {
+            color: #94a3b8;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            background: none;
+            font-size: 0.95rem;
+        }
+
+        .search-box input:focus {
+            outline: none;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .filter-options select,
+        .filter-options input {
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            min-width: 150px;
+        }
+
+        /* Tabela */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: auto;
+            margin-bottom: 20px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: #f8fafc;
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .data-table .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-info {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Ações do formulário */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        /* Código de barras */
+        .codigo-barras {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .campos-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .campos-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-filter {
+                flex-direction: column;
+            }
+
+            .filter-options {
+                flex-direction: column;
+            }
+
+            .tabs-nav {
+                flex-direction: column;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area">
+                <section class="content-section active">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1>Encomendas</h1>
+                            <p>Controle de encomendas e entregas</p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary" onclick="carregarEncomendas()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button class="btn btn-primary" onclick="mostrarFormulario()">
+                                <i class="fas fa-plus"></i> Nova Encomenda
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- LIST VIEW -->
+                    <div id="encomendas-list">
+                        <div class="search-filter">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="search-encomendas"
+                                    placeholder="Buscar por destinatário, código ou remetente..."
+                                    onkeyup="filtrarEncomendas()">
+                            </div>
+                            <div class="filter-options">
+                                <select id="filter-status" onchange="filtrarEncomendas()">
+                                    <option value="">Todos os status</option>
+                                    <option value="pendente">Pendente</option>
+                                    <option value="entregue">Entregue</option>
+                                    <option value="retirado">Retirado</option>
+                                    <option value="atrasado">Atrasado</option>
+                                </select>
+                                <input type="date" id="filter-data" onchange="filtrarEncomendas()">
+                            </div>
+                        </div>
+
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Destinatário</th>
+                                        <th>Data Chegada</th>
+                                        <th>Data Retirada</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="encomendas-table-body">
+                                    <tr>
+                                        <td colspan="7" class="text-center">Carregando dados...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="table-footer">
+                            <div class="table-info">
+                                <span id="encomendas-count">0</span> registros encontrados
+                            </div>
+                            <div class="pagination">
+                                <button class="btn btn-sm btn-secondary" disabled>
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span>Página 1 de 1</span>
+                                <button class="btn btn-sm btn-secondary" disabled>
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FORM VIEW -->
+                    <div id="encomendas-form" class="hidden">
+                        <div class="section-header">
+                            <div class="section-actions">
+                                <button class="btn btn-secondary" onclick="mostrarLista()">
+                                    <i class="fas fa-arrow-left"></i> Voltar
+                                </button>
+                            </div>
+                        </div>
+
+                        <form id="form-encomenda" onsubmit="salvarEncomenda(event)">
+                            <input type="hidden" id="encomenda-id">
+
+                            <!-- Tabs Navigation -->
+                            <div class="tabs-container">
+                                <div class="tabs-nav">
+                                    <button type="button" class="tab-btn active"
+                                        onclick="switchTab('dados-encomenda-tab')">
+                                        <i class="fas fa-box"></i> Dados da Encomenda
+                                    </button>
+                                    <button type="button" class="tab-btn" onclick="switchTab('dados-entrega-tab')">
+                                        <i class="fas fa-truck"></i> Dados da Entrega
+                                    </button>
+                                    <button type="button" class="tab-btn hidden" id="tab-assinatura" onclick="switchTab('assinatura-tab')">
+                                        <i class="fas fa-signature"></i> Comprovante
+                                    </button>
+                                </div>
+
+                                <!-- Tab 1: Dados da Encomenda -->
+                                <div class="tab-content active" id="dados-encomenda-tab">
+                                    <div class="card">
+                                        <h3><i class="fas fa-box"></i> Informações da Encomenda</h3>
+
+                                        <div class="campos-grid">
+                                            <div class="form-group grid-full">
+                                                <label for="encomenda-codigo">Código / Tracking</label>
+                                                <div style="display: flex; gap: 8px;">
+                                                    <input type="text" id="encomenda-codigo"
+                                                        placeholder="Ex: BR123456789" style="flex: 1;">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        onclick="gerarCodigoBarras()">
+                                                        <i class="fas fa-barcode"></i> Gerar
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="encomenda-tipo" class="required">Tipo</label>
+                                                <select id="encomenda-tipo" required>
+                                                    <option value="">Selecione...</option>
+                                                    <option value="pacote">Pacote</option>
+                                                    <option value="carta">Carta</option>
+                                                    <option value="documento">Documento</option>
+                                                    <option value="encomenda">Encomenda</option>
+                                                    <option value="alimento">Alimento</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="encomenda-categoria">Categoria</label>
+                                                <select id="encomenda-categoria">
+                                                    <option value="">Selecione...</option>
+                                                    <option value="pessoal">Pessoal</option>
+                                                    <option value="comercial">Comercial</option>
+                                                    <option value="documentos">Documentos</option>
+                                                    <option value="ecommerce">E-commerce</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="encomenda-urgente">
+                                                    <input type="checkbox" id="encomenda-urgente">
+                                                    Marcar como urgente
+                                                </label>
+                                            </div>
+
+                                            <div class="form-group grid-full">
+                                                <label for="encomenda-descricao">Descrição / Conteúdo</label>
+                                                <textarea id="encomenda-descricao" rows="2"
+                                                    placeholder="Descreva o conteúdo da encomenda"></textarea>
+                                            </div>
+
+                                            <div class="form-group grid-full">
+                                                <label for="encomenda-observacoes">Observações</label>
+                                                <textarea id="encomenda-observacoes" rows="2"
+                                                    placeholder="Informações adicionais"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 2: Dados da Entrega -->
+                                <div class="tab-content" id="dados-entrega-tab">
+                                    <div class="card">
+                                        <h3><i class="fas fa-user"></i> Destinatário</h3>
+
+                                        <div class="campos-grid">
+                                            <div class="form-group grid-full">
+                                                <label for="empresaDestinatario" class="required">Empresa</label>
+                                                <select id="empresaDestinatario" onchange="preencherDadosEmpresa()">
+                                                    <option value="">Nenhuma</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group grid-full">
+                                                <label for="pessoaDestinatario" class="">Pessoa / Recipiente (Opcional)</label>
+                                                <select id="pessoaDestinatario" onchange="preencherDadosDestinatario()">
+                                                    <option value="">Nenhuma</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="destinatario-documento">CPF/CNPJ</label>
+                                                <input type="text" id="destinatario-documento">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="destinatario-telefone">Telefone</label>
+                                                <input type="tel" id="destinatario-telefone">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="destinatario-email">E-mail</label>
+                                                <input type="email" id="destinatario-email">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card">
+                                        <h3><i class="fas fa-truck"></i> Remetente / Origem</h3>
+                                        <div class="campos-grid">
+                                            <div class="form-group grid-full">
+                                                <label for="remetente-nome">Nome do Remetente</label>
+                                                <input type="text" id="remetente-nome" placeholder="Ex: Mercado Livre, Amazon, Nome da pessoa...">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="remetente-documento">Doc. Remetente (Opcional)</label>
+                                                <input type="text" id="remetente-documento">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="remetente-telefone">Tel. Remetente</label>
+                                                <input type="tel" id="remetente-telefone">
+                                            </div>
+                                            <div class="form-group grid-full">
+                                                <label for="remetente-origem">Origem / Transportadora</label>
+                                                <input type="text" id="remetente-origem" placeholder="Ex: Correios, Loggi, Entrega Própria...">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card">
+                                        <h3><i class="fas fa-calendar"></i> Datas e Status</h3>
+
+                                        <div class="campos-grid">
+                                            <div class="form-group">
+                                                <label for="data-chegada" class="required">Data de Chegada</label>
+                                                <input type="datetime-local" id="data-chegada" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="data-retirada">Data de Retirada</label>
+                                                <input type="datetime-local" id="data-retirada">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="status-encomenda" class="required">Status</label>
+                                                <select id="status-encomenda" required
+                                                    onchange="atualizarDataRetirada()">
+                                                    <option value="pendente">Pendente</option>
+                                                    <option value="entregue">Entregue</option>
+                                                    <option value="retirado">Retirado</option>
+                                                    <option value="atrasado">Atrasado</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="responsavel">Responsável pela retirada</label>
+                                                <input type="text" id="responsavel">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 3: Comprovante -->
+                                <div class="tab-content" id="assinatura-tab">
+                                    <div class="card">
+                                        <h3><i class="fas fa-signature"></i> Comprovante de Retirada</h3>
+                                        <div class="campos-grid">
+                                            <div class="form-group grid-full">
+                                                <label>Recebedor:</label>
+                                                <p id="recebedor-nome">Não informado</p>
+                                            </div>
+                                            <div class="form-group grid-full">
+                                                <label>Data da Retirada:</label>
+                                                <p id="recebedor-data">Não informada</p>
+                                            </div>
+                                            <div class="form-group grid-full">
+                                                <label>Assinatura:</label>
+                                                <img id="assinatura-imagem" src="" alt="Assinatura do recebedor" style="max-width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; background-color: #fff;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" onclick="mostrarLista()">
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Salvar Encomenda
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let choicesEmpresa = null;
+        let choicesPessoa = null;
+
+        // Função para carregar dados automaticamente
+        function initEncomendas() {
+            setTimeout(() => {
+                carregarEncomendas();
+                carregarEmpresasDestinatario();
+                configurarMascaras();
+                
+                // Inicializar Choices.js
+                const selectEmpresa = document.getElementById('empresaDestinatario');
+                const selectPessoa = document.getElementById('pessoaDestinatario');
+                
+                if (selectEmpresa) {
+                    choicesEmpresa = new Choices(selectEmpresa, { searchEnabled: true, itemSelectText: '', placeholderValue: 'Selecione uma empresa...' });
+                    selectEmpresa.addEventListener('change', preencherDadosEmpresa);
+                }
+                if (selectPessoa) {
+                    choicesPessoa = new Choices(selectPessoa, { searchEnabled: true, itemSelectText: '', placeholderValue: 'Selecione uma pessoa...' });
+                    selectPessoa.addEventListener('change', preencherDadosDestinatario);
+                }
+            }, 100);
+        }
+
+        // Função para carregar empresas no select de destinatário
+        async function carregarEmpresasDestinatario() {
+            try {
+                const data = await api.request('/companies?limit=1000');
+                if (data.success && data.data) {
+                    const options = [{ value: '', label: 'Nenhuma' }];
+                    data.data.forEach(emp => {
+                        options.push({ value: emp.id, label: emp.trading_name || emp.corporate_name });
+                    });
+                    if (choicesEmpresa) choicesEmpresa.setChoices(options, 'value', 'label', true);
+                }
+            } catch (e) {
+                console.error('Erro ao carregar empresas:', e);
+            }
+        }
+
+        // Função chamada quando muda a empresa do destinatário
+        async function preencherDadosEmpresa() {
+            const empresaId = document.getElementById('empresaDestinatario').value;
+            
+            // Limpa os campos do destinatário
+            document.getElementById('destinatario-documento').value = '';
+            document.getElementById('destinatario-telefone').value = '';
+            document.getElementById('destinatario-email').value = '';
+            
+            // Guarda o nome da empresa
+            const selectEmpresa = document.getElementById('empresaDestinatario');
+            if (choicesEmpresa) {
+                const selected = choicesEmpresa.getValue();
+                if (selected) {
+                    selectEmpresa.dataset.nomeEmpresa = selected.label || '';
+                }
+            }
+
+            if (choicesPessoa) {
+                choicesPessoa.clearChoices();
+                choicesPessoa.setChoices([{ value: '', label: 'Nenhuma' }], 'value', 'label', true);
+            }
+            
+            if (!empresaId) return;
+            
+            try {
+                // Busca pessoas da empresa selecionada
+                const data = await api.request(`/persons?company_id=${empresaId}&limit=1000`);
+                if (data.success && data.data) {
+                    const options = [{ value: '', label: 'Nenhuma' }];
+                    data.data.forEach(pessoa => {
+                        options.push({ 
+                            value: pessoa.id, 
+                            label: pessoa.name,
+                            customProperties: {
+                                cpf: pessoa.cpf || '',
+                                phone: pessoa.cellphone || pessoa.phone || '',
+                                email: pessoa.email || ''
+                            }
+                        });
+                    });
+                    if (choicesPessoa) choicesPessoa.setChoices(options, 'value', 'label', true);
+                }
+            } catch (e) {
+                console.error('Erro ao carregar pessoas:', e);
+            }
+        }
+
+        // Função chamada quando muda a pessoa do destinatário
+        async function preencherDadosDestinatario() {
+            const pessoaId = document.getElementById('pessoaDestinatario').value;
+            if (!pessoaId || !choicesPessoa) return;
+            
+            // Obter a opção selecionada do Choices
+            const selectedItem = choicesPessoa.getValue(true);
+            const allChoices = choicesPessoa.config.choices;
+            const selectedChoice = allChoices.find(c => c.value == pessoaId);
+            
+            if (!selectedChoice) return;
+
+            const props = selectedChoice.customProperties || {};
+            
+            // Preenche os campos com os dados da pessoa
+            const docEl = document.getElementById('destinatario-documento');
+            if (docEl) docEl.value = props.cpf || '';
+            
+            const telEl = document.getElementById('destinatario-telefone');
+            if (telEl) telEl.value = props.phone || '';
+            
+            const emailEl = document.getElementById('destinatario-email');
+            if (emailEl) emailEl.value = props.email || '';
+            
+            // Guarda o nome da pessoa para enviar na API
+            const selectedChoiceValue = choicesPessoa.getValue();
+            if (selectedChoiceValue) {
+                document.getElementById('pessoaDestinatario').dataset.nomePessoa = selectedChoiceValue.label;
+            }
+        }
+
+        // Iniciar automaticamente
+        initEncomendas();
+
+        // Também carrega quando a página fica visível (volta do cache)
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden) {
+                carregarEncomendas();
+            }
+        });
+
+        async function carregarEncomendas() {
+            const tbody = document.getElementById('encomendas-table-body');
+            const countSpan = document.getElementById('encomendas-count');
+
+            try {
+                const search = document.getElementById('search-encomendas')?.value || '';
+                const status = document.getElementById('filter-status')?.value || '';
+                const dataInicio = document.getElementById('filter-data')?.value || '';
+
+                let url = '/encomendas?limit=100';
+                if (search) url += `&search=${encodeURIComponent(search)}`;
+                if (status) url += `&status=${encodeURIComponent(status)}`;
+                if (dataInicio) url += `&dataInicio=${encodeURIComponent(dataInicio)}`;
+
+                console.log('DEBUG: Carregando de', url);
+                const data = await api.request(url);
+                console.log('DEBUG: Response:', data);
+
+                if (data.success) {
+                    encomendas = data.data;
+                    console.log('DEBUG: Encomendas carregadas:', encomendas.length);
+                } else {
+                    console.error('DEBUG: Erro na response:', data);
+                    encomendas = [];
+                }
+            } catch (e) {
+                console.error('DEBUG: Erro ao carregar:', e);
+                encomendas = [];
+            }
+
+            renderizarLista();
+        }
+
+        function renderizarLista() {
+            const tbody = document.getElementById('encomendas-table-body');
+            const countSpan = document.getElementById('encomendas-count');
+
+            if (encomendas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">Nenhuma encomenda encontrada</td></tr>';
+                countSpan.textContent = '0';
+                return;
+            }
+
+            let html = '';
+            encomendas.forEach(enc => {
+                const statusClass = getStatusClass(enc.status);
+                const dataRetirada = enc.dataRetirada ? new Date(enc.dataRetirada).toLocaleString('pt-BR') : '-';
+                const dataChegada = new Date(enc.dataChegada).toLocaleString('pt-BR');
+
+                html += `
+                    <tr>
+                        <td><strong>${enc.codigo}</strong></td>
+                        <td>${enc.destinatario}</td>
+                        <td>${dataChegada}</td>
+                        <td>${dataRetirada}</td>
+                        <td><span class="status-badge ${statusClass}">${enc.status}</span></td>
+                        <td>
+                            <div class="actions">
+                                <button class="btn btn-sm btn-secondary btn-icon" onclick="editarEncomenda(${enc.id})" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-secondary btn-icon" onclick="registrarRetirada(${enc.id})" title="Registrar Retirada">
+                                    <i class="fas fa-check-circle"></i>
+                                </button>
+                                <button class="btn btn-sm btn-secondary btn-icon" onclick="excluirEncomenda(${enc.id})" title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+            countSpan.textContent = encomendas.length;
+        }
+
+        function getStatusClass(status) {
+            switch (status) {
+                case 'pendente': return 'status-pendente';
+                case 'entregue': return 'status-entregue';
+                case 'retirado': return 'status-retirado';
+                case 'atrasado': return 'status-atrasado';
+                default: return '';
+            }
+        }
+
+        function filtrarEncomendas() {
+            const searchTerm = document.getElementById('search-encomendas').value.toLowerCase();
+            const statusFilter = document.getElementById('filter-status').value;
+            const dataFilter = document.getElementById('filter-data').value;
+
+            const filtradas = encomendas.filter(enc => {
+                const matchSearch = enc.codigo.toLowerCase().includes(searchTerm) ||
+                    enc.destinatario.toLowerCase().includes(searchTerm) ||
+                    enc.remetente.toLowerCase().includes(searchTerm);
+
+                const matchStatus = !statusFilter || enc.status === statusFilter;
+
+                const matchData = !dataFilter || enc.dataChegada.startsWith(dataFilter);
+
+                return matchSearch && matchStatus && matchData;
+            });
+
+            // Atualizar tabela com resultados filtrados
+            const tbody = document.getElementById('encomendas-table-body');
+            const countSpan = document.getElementById('encomendas-count');
+
+            if (filtradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">Nenhuma encomenda encontrada</td></tr>';
+                countSpan.textContent = '0';
+                return;
+            }
+
+            let html = '';
+            filtradas.forEach(enc => {
+                const statusClass = getStatusClass(enc.status);
+                const dataRetirada = enc.dataRetirada ? new Date(enc.dataRetirada).toLocaleString('pt-BR') : '-';
+                const dataChegada = new Date(enc.dataChegada).toLocaleString('pt-BR');
+
+                html += `
+                    <tr>
+                        <td><strong>${enc.codigo}</strong></td>
+                        <td>${enc.destinatario}</td>
+                        <td>${enc.remetente}</td>
+                        <td>${dataChegada}</td>
+                        <td>${dataRetirada}</td>
+                        <td><span class="status-badge ${statusClass}">${enc.status}</span></td>
+                        <td>
+                            <div class="actions">
+                                <button class="btn btn-sm btn-secondary btn-icon" onclick="editarEncomenda(${enc.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-secondary btn-icon" onclick="registrarRetirada(${enc.id})">
+                                    <i class="fas fa-check-circle"></i>
+                                </button>
+                                <button class="btn btn-sm btn-secondary btn-icon" onclick="excluirEncomenda(${enc.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+            countSpan.textContent = filtradas.length;
+        }
+
+        function mostrarFormulario(limpar = true) {
+            document.getElementById('encomendas-list').classList.add('hidden');
+            document.getElementById('encomendas-form').classList.remove('hidden');
+
+            // Só limpa se for para criar novo
+            if (limpar) {
+                document.getElementById('form-encomenda').reset();
+                document.getElementById('encomenda-id').value = '';
+                encomendaEditando = null;
+                // Esconder a aba de assinatura ao criar nova encomenda
+                document.getElementById('tab-assinatura').classList.add('hidden');
+            }
+
+            // Voltar para primeira tab
+            switchTab('dados-encomenda-tab');
+        }
+
+        function mostrarLista() {
+            document.getElementById('encomendas-list').classList.remove('hidden');
+            document.getElementById('encomendas-form').classList.add('hidden');
+            // Limpar formulário ao voltar
+            document.getElementById('form-encomenda').reset();
+            document.getElementById('encomenda-id').value = '';
+            encomendaEditando = null;
+            // Esconder a aba de assinatura ao voltar para a lista
+            document.getElementById('tab-assinatura').classList.add('hidden');
+            carregarEncomendas();
+        }
+
+        function switchTab(tabId) {
+            // Remover active de todas as tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Ativar tab selecionada
+            document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function gerarCodigoBarras() {
+            const codigo = 'BR' + Math.floor(Math.random() * 1000000000).toString().padStart(9, '0');
+            document.getElementById('encomenda-codigo').value = codigo;
+        }
+
+        function atualizarDataRetirada() {
+            const status = document.getElementById('status-encomenda').value;
+            const dataRetiradaInput = document.getElementById('data-retirada');
+
+            if (status === 'retirado' || status === 'entregue') {
+                if (!dataRetiradaInput.value) {
+                    const agora = new Date();
+                    const ano = agora.getFullYear();
+                    const mes = String(agora.getMonth() + 1).padStart(2, '0');
+                    const dia = String(agora.getDate()).padStart(2, '0');
+                    const hora = String(agora.getHours()).padStart(2, '0');
+                    const minuto = String(agora.getMinutes()).padStart(2, '0');
+                    dataRetiradaInput.value = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
+                }
+            }
+        }
+
+        async function salvarEncomenda(event) {
+            event.preventDefault();
+
+            const getValue = (id) => {
+                const el = document.getElementById(id);
+                return el ? el.value : '';
+            };
+
+            const encomenda = {
+                codigo: getValue('encomenda-codigo'),
+                tipo: getValue('encomenda-tipo'),
+                categoria: getValue('encomenda-categoria'),
+                urgente: document.getElementById('encomenda-urgente')?.checked || false,
+                descricao: getValue('encomenda-descricao'),
+                observacoes: getValue('encomenda-observacoes'),
+                // Usa o nome da pessoa selecionada do componente Choices
+                destinatario: (choicesPessoa && choicesPessoa.getValue()?.value ? choicesPessoa.getValue().label : null) || 
+                               (choicesEmpresa && choicesEmpresa.getValue()?.value ? choicesEmpresa.getValue().label : null) || 
+                               'Encomenda',
+                documento: getValue('destinatario-documento'),
+                telefone: getValue('destinatario-telefone'),
+                email: getValue('destinatario-email'),
+                remetente: getValue('remetente-nome'),
+                remetenteDocumento: getValue('remetente-documento'),
+                remetenteTelefone: getValue('remetente-telefone'),
+                origem: getValue('remetente-origem'),
+                dataChegada: getValue('data-chegada'),
+                dataRetirada: getValue('data-retirada'),
+                status: getValue('status-encomenda'),
+                responsavel: getValue('responsavel'),
+                // Novos campos para destinatário vinculado a empresa/pessoa
+                companyId: getValue('empresaDestinatario'),
+                pessoaId: getValue('pessoaDestinatario')
+            };
+
+            console.log('[DEBUG] Enviando encomenda:', JSON.stringify(encomenda, null, 2));
+
+            try {
+                let response;
+                if (encomendaEditando && encomendaEditando.id) {
+                    // Editar existente
+                    response = await api.request(`/encomendas/${encomendaEditando.id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(encomenda)
+                    });
+                } else {
+                    // Nova encomenda
+                    response = await api.request('/encomendas', {
+                        method: 'POST',
+                        body: JSON.stringify(encomenda)
+                    });
+                }
+
+                if (response.success) {
+                    alert('Encomenda salva com sucesso!');
+                    mostrarLista();
+                    await carregarEncomendas();
+                } else {
+                    alert(response.message || 'Erro ao salvar encomenda');
+                }
+            } catch (e) {
+                console.error('Erro ao salvar:', e);
+                alert('Erro ao salvar encomenda');
+            }
+        }
+
+        async function editarEncomenda(id) {
+            const encomenda = encomendas.find(e => e.id === id);
+            if (!encomenda) return;
+
+            encomendaEditando = encomenda;
+
+            // Preencher formulário
+            const elId = document.getElementById('encomenda-id');
+            if (elId) elId.value = encomenda.id;
+            
+            const elCodigo = document.getElementById('encomenda-codigo');
+            if (elCodigo) elCodigo.value = encomenda.codigo || '';
+            
+            const elTipo = document.getElementById('encomenda-tipo');
+            if (elTipo) elTipo.value = encomenda.tipo || '';
+            
+            const elCategoria = document.getElementById('encomenda-categoria');
+            if (elCategoria) elCategoria.value = encomenda.categoria || '';
+            
+            const elDescricao = document.getElementById('encomenda-descricao');
+            if (elDescricao) elDescricao.value = encomenda.descricao || '';
+            
+            const elObservacoes = document.getElementById('encomenda-observacoes');
+            if (elObservacoes) elObservacoes.value = encomenda.observacoes || '';
+            
+            // Preencher empresa e pessoa do destinatário
+            const empresaSelect = document.getElementById('empresaDestinatario');
+            const pessoaSelect = document.getElementById('pessoaDestinatario');
+            
+            // Primeiro, garante que as empresas estão carregadas (se já não estiverem)
+            if (!choicesEmpresa || choicesEmpresa.config.choices.length <= 1) {
+                await carregarEmpresasDestinatario();
+            }
+            
+            // Se tem companyId, seleciona e carrega as pessoas
+            if (encomenda.companyId && choicesEmpresa) {
+                choicesEmpresa.setChoiceByValue(String(encomenda.companyId));
+                await preencherDadosEmpresa(); // Carrega as pessoas da empresa selecionada
+                
+                // Agora que as pessoas foram carregadas, seleciona a pessoa
+                if (encomenda.pessoaId && choicesPessoa) {
+                    setTimeout(() => {
+                        const val = String(encomenda.pessoaId);
+                        console.log('[DEBUG] Tentando selecionar pessoa ID:', val);
+                        choicesPessoa.setChoiceByValue(val);
+                        preencherDadosDestinatario();
+                    }, 400); // Aumentado para 400ms para garantir que Choices processou a lista
+                }
+            }
+            
+            // Preencher campos de documento, telefone, email quando não há pessoa vinculada
+            if (!encomenda.pessoaId) {
+                const docEl = document.getElementById('destinatario-documento');
+                if (docEl) docEl.value = encomenda.documento || '';
+                
+                const telEl = document.getElementById('destinatario-telefone');
+                if (telEl) telEl.value = encomenda.telefone || '';
+                
+                const emailEl = document.getElementById('destinatario-email');
+                if (emailEl) emailEl.value = encomenda.email || '';
+            }
+            
+            // Preencher campos do remetente (verificando se existem)
+            const elRemetenteNome = document.getElementById('remetente-nome');
+            if (elRemetenteNome) elRemetenteNome.value = encomenda.remetente || '';
+            
+            const elRemetenteDoc = document.getElementById('remetente-documento');
+            if (elRemetenteDoc) elRemetenteDoc.value = encomenda.remetenteDocumento || '';
+            
+            const elRemetenteTel = document.getElementById('remetente-telefone');
+            if (elRemetenteTel) elRemetenteTel.value = encomenda.remetenteTelefone || '';
+            
+            const elRemetenteOrigem = document.getElementById('remetente-origem');
+            if (elRemetenteOrigem) elRemetenteOrigem.value = encomenda.origem || '';
+            
+            // Preencher datas e status
+            const elDataC = document.getElementById('data-chegada');
+            if (elDataC) elDataC.value = (encomenda.dataChegada || '').slice(0, 16);
+
+            const elDataR = document.getElementById('data-retirada');
+            if (elDataR) elDataR.value = (encomenda.dataRetirada || '').slice(0, 16);
+
+            const elStatus = document.getElementById('status-encomenda');
+            if (elStatus) elStatus.value = encomenda.status || 'pendente';
+
+            const elResp = document.getElementById('responsavel');
+            if (elResp) elResp.value = encomenda.responsavel || '';
+
+            // Mostrar/Ocultar aba de assinatura
+            const tabAssinatura = document.getElementById('tab-assinatura');
+            if (encomenda.assinaturaApp) {
+                tabAssinatura.classList.remove('hidden');
+                document.getElementById('recebedor-nome').textContent = encomenda.responsavel || 'Não informado';
+                document.getElementById('recebedor-data').textContent = new Date(encomenda.dataEntregaApp).toLocaleString('pt-BR');
+                
+                // URL da assinatura - Remove /api da URL base se presente
+                const apiBaseURL = api.baseURL || api.baseUrl || '/api';
+                const baseUrl = apiBaseURL.endsWith('/') ? apiBaseURL.slice(0, -1) : apiBaseURL;
+                const staticBaseUrl = baseUrl.replace('/api', '');
+                document.getElementById('assinatura-imagem').src = staticBaseUrl + encomenda.assinaturaApp;
+            } else {
+                tabAssinatura.classList.add('hidden');
+            }
+
+            mostrarFormulario(false);
+        }
+
+        async function registrarRetirada(id) {
+            const encomenda = encomendas.find(e => e.id === id);
+            if (!encomenda) return;
+
+            if (encomenda.status === 'retirado' || encomenda.status === 'entregue') {
+                alert('Esta encomenda já foi retirada/entregue!');
+                return;
+            }
+
+            const responsavel = prompt('Nome do responsável pela retirada:') || 'Retirada presencial';
+
+            try {
+                const response = await api.request(`/encomendas/${id}/retirada`, {
+                    method: 'POST',
+                    body: JSON.stringify({ responsavel })
+                });
+
+                if (response.success) {
+                    await carregarEncomendas();
+                    alert('Retirada registrada com sucesso!');
+                } else {
+                    alert(response.message || 'Erro ao registrar retirada');
+                }
+            } catch (e) {
+                console.error('Erro ao registrar:', e);
+                alert('Erro ao registrar retirada');
+            }
+        }
+
+        async function excluirEncomenda(id) {
+            if (confirm('Tem certeza que deseja excluir esta encomenda?')) {
+                try {
+                    const response = await api.request(`/encomendas/${id}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.success) {
+                        await carregarEncomendas();
+                    } else {
+                        alert(response.message || 'Erro ao excluir');
+                    }
+                } catch (e) {
+                    console.error('Erro ao excluir:', e);
+                    alert('Erro ao excluir encomenda');
+                }
+            }
+        }
+
+        function configurarMascaras() {
+            // Máscara para telefone
+            const telefoneInput = document.getElementById('destinatario-telefone');
+            if (telefoneInput) {
+                telefoneInput.addEventListener('input', function (e) {
+                    let valor = e.target.value.replace(/\D/g, '');
+                    if (valor.length > 11) valor = valor.substr(0, 11);
+
+                    if (valor.length > 6) {
+                        valor = valor.replace(/^(\d{2})(\d{5})(\d{0,4}).*/, '($1) $2-$3');
+                    } else if (valor.length > 2) {
+                        valor = valor.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+                    } else if (valor.length > 0) {
+                        valor = valor.replace(/^(\d*)/, '($1');
+                    }
+
+                    e.target.value = valor;
+                });
+            }
+        }
+
+        function preencherDataAtual() {
+            const agora = new Date();
+
+            // Ajusta para o formato aceito pelo datetime-local (YYYY-MM-DDTHH:MM)
+            const ano = agora.getFullYear();
+            const mes = String(agora.getMonth() + 1).padStart(2, '0');
+            const dia = String(agora.getDate()).padStart(2, '0');
+            const horas = String(agora.getHours()).padStart(2, '0');
+            const minutos = String(agora.getMinutes()).padStart(2, '0');
+
+            const formato = `${ano}-${mes}-${dia}T${horas}:${minutos}`;
+
+            document.getElementById("data-chegada").value = formato;
+        }
+
+        // Executa quando a página carregar
+        window.onload = preencherDataAtual;
+    </script>
+    <!-- Choices.js JS movido para o head -->
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+    <script src="../../auth.js"></script>
+</body>
+
+</html>

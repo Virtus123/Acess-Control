@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Acess Control - Relatório de Encomendas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif; }
+
+        .content-box {
+            background: white; border-radius: 12px; padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
+        }
+        .section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+        .section-title h1 { font-size:1.8rem; color:#1e293b; margin-bottom:4px; }
+        .section-title p { color:#64748b; font-size:0.95rem; }
+
+        .filtros-container {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px;
+        }
+        .filtros-container.two { grid-template-columns: repeat(2, 1fr); }
+        .form-group { display:flex; flex-direction:column; gap:6px; }
+        .form-group label { font-size:0.82rem; font-weight:600; color:#475569; text-transform:uppercase; letter-spacing:.3px; }
+        .form-group input, .form-group select {
+            width:100%; padding:9px 12px; border:1.5px solid #e2e8f0; border-radius:8px;
+            font-size:0.95rem; background:#fff; font-family:inherit;
+        }
+        .form-group input:focus, .form-group select:focus { outline:none; border-color:#3b82f6; }
+
+        .actions-bar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:20px; }
+
+        .btn { display:inline-flex; align-items:center; gap:8px; padding:9px 18px; border:none; border-radius:8px; font-size:0.9rem; font-weight:500; cursor:pointer; transition:all .2s; }
+        .btn-primary { background:#3b82f6; color:#fff; }
+        .btn-primary:hover { background:#2563eb; }
+        .btn-secondary { background:#f1f5f9; color:#475569; border:1.5px solid #e2e8f0; }
+        .btn-secondary:hover { background:#e2e8f0; }
+        .btn-success { background:#22c55e; color:#fff; }
+        .btn-success:hover { background:#16a34a; }
+        .btn-sm { padding:6px 12px; font-size:0.82rem; }
+
+        .formatos { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+        .formato-option { display:flex; align-items:center; gap:6px; padding:8px 14px; border:1.5px solid #e2e8f0; border-radius:8px; cursor:pointer; font-size:0.9rem; transition:all .2s; }
+        .formato-option:has(input:checked) { border-color:#3b82f6; background:#eff6ff; color:#2563eb; }
+        .formato-option input { display:none; }
+
+        .stats-cards { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+        .stat-card { background:#fff; border-radius:12px; padding:18px 20px; border:1px solid #e2e8f0; display:flex; align-items:center; gap:16px; }
+        .stat-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0; }
+        .stat-icon.primary { background:#eff6ff; color:#3b82f6; }
+        .stat-icon.warning { background:#fffbeb; color:#f59e0b; }
+        .stat-icon.success { background:#f0fdf4; color:#22c55e; }
+        .stat-icon.danger  { background:#fef2f2; color:#ef4444; }
+        .stat-info h3 { font-size:1.5rem; font-weight:700; color:#1e293b; margin-bottom:2px; }
+        .stat-info p  { font-size:0.82rem; color:#64748b; }
+
+        /* Tabela */
+        .table-container { overflow-x:auto; }
+        .data-table { width:100%; border-collapse:collapse; }
+        .data-table th { background:#f8fafc; padding:10px 14px; text-align:left; font-size:0.82rem; font-weight:600; color:#475569; text-transform:uppercase; border-bottom:2px solid #e2e8f0; white-space:nowrap; }
+        .data-table td { padding:10px 14px; border-bottom:1px solid #f1f5f9; font-size:0.88rem; color:#374151; }
+        .data-table tbody tr:hover { background:#f8fafc; }
+        .badge { display:inline-flex; align-items:center; padding:3px 10px; border-radius:20px; font-size:0.78rem; font-weight:600; }
+        .badge-pendente  { background:#fffbeb; color:#f59e0b; }
+        .badge-retirada  { background:#f0fdf4; color:#22c55e; }
+        .badge-recebida  { background:#eff6ff; color:#3b82f6; }
+        .badge-extraviada{ background:#fef2f2; color:#ef4444; }
+        .badge-urgente   { background:#fef2f2; color:#ef4444; }
+        .empty-message { text-align:center; padding:40px 20px; color:#94a3b8; }
+        .empty-message i { font-size:2.5rem; margin-bottom:12px; display:block; }
+        .table-footer { display:flex; justify-content:space-between; align-items:center; padding-top:16px; }
+        .table-info { font-size:0.85rem; color:#64748b; }
+        .pagination { display:flex; align-items:center; gap:8px; }
+        .pagination span { font-size:0.85rem; color:#475569; }
+
+        /* Preview */
+        .preview-container { margin-top:20px; }
+        .preview-table-wrap { overflow-x:auto; max-height:400px; overflow-y:auto; }
+        table.preview-tbl { width:100%; border-collapse:collapse; font-size:0.85rem; }
+        table.preview-tbl th { background:#4a90d9; color:#fff; padding:8px 12px; text-align:left; white-space:nowrap; position:sticky; top:0; z-index:2; }
+        table.preview-tbl td { padding:8px 12px; border-bottom:1px solid #f1f5f9; }
+        table.preview-tbl tbody tr:nth-child(even) { background:#f8fafc; }
+
+        @media(max-width:768px) {
+            .filtros-container, .filtros-container.two { grid-template-columns:1fr; }
+            .stats-cards { grid-template-columns:repeat(2,1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section class="content-section active">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1><i class="fas fa-box" style="color:#3b82f6;margin-right:10px;"></i>Relatório de Encomendas</h1>
+                            <p>Encomendas recebidas, pendentes e retiradas</p>
+                        </div>
+                    </div>
+
+                    <!-- Cards de estatísticas -->
+                    <div class="stats-cards">
+                        <div class="stat-card">
+                            <div class="stat-icon primary"><i class="fas fa-box"></i></div>
+                            <div class="stat-info"><h3 id="stat-total">-</h3><p>Total no período</p></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon warning"><i class="fas fa-clock"></i></div>
+                            <div class="stat-info"><h3 id="stat-pendentes">-</h3><p>Pendentes</p></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon success"><i class="fas fa-check-circle"></i></div>
+                            <div class="stat-info"><h3 id="stat-retiradas">-</h3><p>Retiradas</p></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon danger"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="stat-info"><h3 id="stat-urgentes">-</h3><p>Urgentes pendentes</p></div>
+                        </div>
+                    </div>
+
+                    <div class="content-box">
+                        <h3 style="margin-bottom:18px;color:#1e293b;font-size:1rem;">Filtros</h3>
+
+                        <div class="filtros-container">
+                            <div class="form-group">
+                                <label>Data de Chegada — De</label>
+                                <input type="date" id="filtroDataInicio">
+                            </div>
+                            <div class="form-group">
+                                <label>Data de Chegada — Até</label>
+                                <input type="date" id="filtroDataFim">
+                            </div>
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select id="filtroStatus">
+                                    <option value="">Todos</option>
+                                    <option value="pendente">Pendente</option>
+                                    <option value="recebida">Recebida</option>
+                                    <option value="retirada">Retirada</option>
+                                    <option value="extraviada">Extraviada</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Busca (código, destinatário, remetente)</label>
+                                <input type="text" id="filtroBusca" placeholder="Digite para buscar...">
+                            </div>
+                            <div class="form-group">
+                                <label>Urgente</label>
+                                <select id="filtroUrgente">
+                                    <option value="">Todos</option>
+                                    <option value="1">Sim</option>
+                                    <option value="0">Não</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Formato e ações -->
+                        <div class="actions-bar">
+                            <div class="formatos">
+                                <label class="formato-option"><input type="radio" name="formato" value="pdf" checked><i class="fas fa-file-pdf"></i><span>PDF</span></label>
+                                <label class="formato-option"><input type="radio" name="formato" value="xlsx"><i class="fas fa-file-excel"></i><span>Excel</span></label>
+                                <label class="formato-option"><input type="radio" name="formato" value="csv"><i class="fas fa-file-csv"></i><span>CSV</span></label>
+                            </div>
+                            <!-- Orientação (só para PDF) -->
+                            <div id="opcaoOrientacao" class="formatos">
+                                <label class="formato-option"><input type="radio" name="orientacao" value="portrait" checked><i class="fas fa-file"></i><span>Retrato</span></label>
+                                <label class="formato-option"><input type="radio" name="orientacao" value="landscape"><i class="fas fa-file" style="transform:rotate(90deg)"></i><span>Paisagem</span></label>
+                            </div>
+                            <button class="btn btn-primary" onclick="gerarRelatorio()">
+                                <i class="fas fa-file-export"></i> Gerar Relatório
+                            </button>
+                            <button class="btn btn-secondary" onclick="visualizarPreview()">
+                                <i class="fas fa-eye"></i> Visualizar Relatório
+                            </button>
+                            <button class="btn btn-secondary" onclick="abrirHistorico()" title="Ver relatórios gerados anteriormente">
+                                <i class="fas fa-history"></i> Histórico
+                            </button>
+                            <!-- Status da fila de PDF -->
+                            <span id="pdfJobStatus" style="display:none; font-size:0.9rem; color:#64748b; align-self:center;"></span>
+                            <a id="pdfDownloadBtn" href="#" style="display:none;" class="btn btn-success">
+                                <i class="fas fa-download"></i> Baixar PDF
+                            </a>
+                        </div>
+
+                        <!-- Preview -->
+                        <div id="previewContainer" class="preview-container" style="display:none;">
+                            <hr style="margin:20px 0; border:none; border-top:1px solid #e2e8f0;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                                <h4 style="color:#1e293b;font-size:0.95rem;">Preview — <span id="previewCount">0</span> registros</h4>
+                                <button class="btn btn-sm btn-secondary" onclick="document.getElementById('previewContainer').style.display='none'">
+                                    <i class="fas fa-times"></i> Fechar
+                                </button>
+                            </div>
+                            <div class="preview-table-wrap">
+                                <table class="preview-tbl">
+                                    <thead id="previewThead"></thead>
+                                    <tbody id="previewTbody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabela principal -->
+                    <div class="content-box" style="margin-top:20px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                            <h3 style="color:#1e293b;font-size:1rem;">Encomendas</h3>
+                            <button class="btn btn-sm btn-secondary" onclick="carregarEncomendas()">
+                                <i class="fas fa-sync-alt"></i> Atualizar
+                            </button>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Tipo</th>
+                                        <th>Destinatário</th>
+                                        <th>Unidade</th>
+                                        <th>Remetente</th>
+                                        <th>Data Chegada</th>
+                                        <th>Data Retirada</th>
+                                        <th>Status</th>
+                                        <th>Urgente</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="encomendas-tbody">
+                                    <tr><td colspan="9"><div class="empty-message"><i class="fas fa-box"></i><p>Nenhuma encomenda encontrada</p></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="table-footer">
+                            <div class="table-info"><span id="enc-count">0</span> registros encontrados</div>
+                            <div class="pagination">
+                                <button class="btn btn-sm btn-secondary" onclick="mudarPagina(-1)" id="btn-anterior" disabled>
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span id="paginacao-label">Página 1 de 1</span>
+                                <button class="btn btn-sm btn-secondary" onclick="mudarPagina(1)" id="btn-proxima" disabled>
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+    <script src="../../auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+    <script>
+        let encomendasData = [];
+        let paginaAtual = 1;
+        const itensPorPagina = 50;
+
+        const COLUNAS = [
+            { key: 'codigo',       label: 'Código' },
+            { key: 'tipo',         label: 'Tipo' },
+            { key: 'destinatario', label: 'Destinatário' },
+            { key: 'unidade',      label: 'Unidade' },
+            { key: 'empresa',      label: 'Empresa' },
+            { key: 'remetente',    label: 'Remetente' },
+            { key: 'origem',       label: 'Origem' },
+            { key: 'dataChegada',  label: 'Data Chegada' },
+            { key: 'dataRetirada', label: 'Data Retirada' },
+            { key: 'status',       label: 'Status' },
+            { key: 'urgente',      label: 'Urgente' },
+            { key: 'responsavel',  label: 'Responsável Retirada' },
+        ];
+
+        function getFilters() {
+            return {
+                startDate: document.getElementById('filtroDataInicio').value || undefined,
+                endDate:   document.getElementById('filtroDataFim').value || undefined,
+                status:    document.getElementById('filtroStatus').value || undefined,
+                search:    document.getElementById('filtroBusca').value.trim() || undefined,
+                urgente:   document.getElementById('filtroUrgente').value || undefined,
+            };
+        }
+
+        async function carregarEncomendas() {
+            const filters = getFilters();
+            const params = new URLSearchParams();
+            if (filters.startDate) params.set('dataInicio', filters.startDate);
+            if (filters.endDate)   params.set('dataFim',    filters.endDate);
+            if (filters.status)    params.set('status',     filters.status);
+            if (filters.search)    params.set('search',     filters.search);
+            params.set('limit', 1000);
+
+            try {
+                const data = await api.request(`/encomendas?${params}`);
+                let rows = data?.success ? (data.data || []) : [];
+
+                // Filtro urgente client-side (API não suporta diretamente)
+                if (filters.urgente !== undefined && filters.urgente !== '') {
+                    const urgFlag = filters.urgente === '1';
+                    rows = rows.filter(r => Boolean(r.urgente) === urgFlag);
+                }
+
+                encomendasData = rows;
+                atualizarStats(rows);
+                renderTabela(rows, 1);
+                document.getElementById('enc-count').textContent = rows.length;
+            } catch(e) {
+                console.error('Erro ao carregar encomendas:', e);
+            }
+        }
+
+        function atualizarStats(rows) {
+            document.getElementById('stat-total').textContent     = rows.length;
+            document.getElementById('stat-pendentes').textContent = rows.filter(r => r.status === 'pendente').length;
+            document.getElementById('stat-retiradas').textContent = rows.filter(r => r.status === 'retirada').length;
+            document.getElementById('stat-urgentes').textContent  = rows.filter(r => r.urgente && r.status === 'pendente').length;
+        }
+
+        function renderTabela(rows, pagina) {
+            paginaAtual = pagina;
+            const tbody = document.getElementById('encomendas-tbody');
+            const total = rows.length;
+            const totalPages = Math.max(1, Math.ceil(total / itensPorPagina));
+            const inicio = (pagina - 1) * itensPorPagina;
+            const slice = rows.slice(inicio, inicio + itensPorPagina);
+
+            if (slice.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9"><div class="empty-message"><i class="fas fa-box"></i><p>Nenhuma encomenda encontrada</p></div></td></tr>';
+            } else {
+                tbody.innerHTML = slice.map(r => {
+                    const statusMap = { pendente:'badge-pendente', retirada:'badge-retirada', recebida:'badge-recebida', extraviada:'badge-extraviada' };
+                    const badgeClass = statusMap[r.status] || '';
+                    const statusLabel = { pendente:'Pendente', recebida:'Recebida', retirada:'Retirada', extraviada:'Extraviada' }[r.status] || r.status || '-';
+                    const dataChegada  = r.dataChegada  ? new Date(r.dataChegada).toLocaleString('pt-BR')  : '-';
+                    const dataRetirada = r.dataRetirada ? new Date(r.dataRetirada).toLocaleString('pt-BR') : '-';
+                    return `<tr>
+                        <td><strong>${r.codigo || '-'}</strong></td>
+                        <td>${r.tipo || '-'}</td>
+                        <td>${r.destinatario || '-'}</td>
+                        <td>${r.unidade || '-'}</td>
+                        <td>${r.remetente || '-'}</td>
+                        <td>${dataChegada}</td>
+                        <td>${dataRetirada}</td>
+                        <td><span class="badge ${badgeClass}">${statusLabel}</span></td>
+                        <td>${r.urgente ? '<span class="badge badge-urgente">SIM</span>' : '-'}</td>
+                    </tr>`;
+                }).join('');
+            }
+
+            document.getElementById('paginacao-label').textContent = `Página ${pagina} de ${totalPages}`;
+            document.getElementById('btn-anterior').disabled = pagina <= 1;
+            document.getElementById('btn-proxima').disabled  = pagina >= totalPages;
+        }
+
+        function mudarPagina(delta) {
+            const totalPages = Math.max(1, Math.ceil(encomendasData.length / itensPorPagina));
+            const nova = Math.max(1, Math.min(totalPages, paginaAtual + delta));
+            renderTabela(encomendasData, nova);
+        }
+
+        // ── Gerar Relatório ──────────────────────────────────────────────────
+        async function gerarRelatorio() {
+            const formato = document.querySelector('input[name="formato"]:checked')?.value || 'pdf';
+            const orientacao = document.querySelector('input[name="orientacao"]:checked')?.value || 'portrait';
+
+            if (formato === 'pdf') {
+                await gerarPDFAsync(orientacao);
+            } else {
+                const filters = getFilters();
+                const params = new URLSearchParams();
+                if (filters.startDate) params.set('dataInicio', filters.startDate);
+                if (filters.endDate)   params.set('dataFim',    filters.endDate);
+                if (filters.status)    params.set('status',     filters.status);
+                if (filters.search)    params.set('search',     filters.search);
+                params.set('limit', 100000);
+                try {
+                    const data = await api.request(`/encomendas?${params}`);
+                    let rows = data?.success ? (data.data || []) : [];
+                    if (filters.urgente !== undefined && filters.urgente !== '') {
+                        const urgFlag = filters.urgente === '1';
+                        rows = rows.filter(r => Boolean(r.urgente) === urgFlag);
+                    }
+                    if (formato === 'xlsx') gerarExcel(rows);
+                    else gerarCSV(rows);
+                } catch(e) { alert('Erro ao gerar relatório: ' + e.message); }
+            }
+        }
+
+        async function gerarPDFAsync(orientacao) {
+            const statusEl = document.getElementById('pdfJobStatus');
+            const downloadBtn = document.getElementById('pdfDownloadBtn');
+            statusEl.style.display = 'inline';
+            statusEl.textContent = '⏳ Enviando para geração...';
+            downloadBtn.style.display = 'none';
+
+            const filters = getFilters();
+            let jobId;
+            try {
+                const resp = await api.request('/report-jobs', {
+                    method: 'POST',
+                    body: JSON.stringify({ report_type: 'encomendas', orientation: orientacao, filters })
+                });
+                if (!resp || !resp.success) throw new Error(resp?.message || 'Erro ao criar job');
+                jobId = resp.data.id;
+                statusEl.textContent = '⏳ Relatório em processamento... (aguarde)';
+            } catch(e) {
+                statusEl.textContent = `❌ Erro: ${e.message}`;
+                return;
+            }
+
+            let tentativas = 0;
+            const intervalo = setInterval(async () => {
+                tentativas++;
+                if (tentativas > 60) { clearInterval(intervalo); statusEl.textContent = '❌ Tempo esgotado.'; return; }
+                try {
+                    const s = await api.request(`/report-jobs/${jobId}`);
+                    const job = s?.data;
+                    if (!job) return;
+                    if (job.status === 'completed') {
+                        clearInterval(intervalo);
+                        statusEl.textContent = `✅ PDF pronto! (${job.total_records || 0} registros)`;
+                        downloadBtn.onclick = () => baixarPDFJob(jobId, job.filename);
+                        downloadBtn.href = '#';
+                        downloadBtn.style.display = 'inline-flex';
+                    } else if (job.status === 'failed') {
+                        clearInterval(intervalo);
+                        statusEl.textContent = `❌ Erro: ${job.error_message || 'Falha na geração'}`;
+                    } else {
+                        statusEl.textContent = `⏳ Processando... (${tentativas * 3}s)`;
+                    }
+                } catch(e) {}
+            }, 3000);
+        }
+
+        async function baixarPDFJob(jobId, filename) {
+            try { await api.downloadReportFile(jobId, filename); }
+            catch(e) { alert('Erro ao baixar PDF: ' + e.message); }
+        }
+
+        function abrirHistorico() {
+            RelatorioHistorico.abrir((novoJobId) => {
+                const statusEl = document.getElementById('pdfJobStatus');
+                const downloadBtn = document.getElementById('pdfDownloadBtn');
+                statusEl.style.display = 'inline';
+                statusEl.textContent = '⏳ Regenerando...';
+                downloadBtn.style.display = 'none';
+                let tentativas = 0;
+                const intervalo = setInterval(async () => {
+                    tentativas++;
+                    if (tentativas > 60) { clearInterval(intervalo); statusEl.textContent = '❌ Tempo esgotado.'; return; }
+                    try {
+                        const s = await api.request(`/report-jobs/${novoJobId}`);
+                        const job = s?.data;
+                        if (!job) return;
+                        if (job.status === 'completed') {
+                            clearInterval(intervalo);
+                            statusEl.textContent = `✅ PDF pronto! (${job.total_records || 0} registros)`;
+                            downloadBtn.onclick = () => baixarPDFJob(novoJobId, job.filename);
+                            downloadBtn.href = '#';
+                            downloadBtn.style.display = 'inline-flex';
+                        } else if (job.status === 'failed') {
+                            clearInterval(intervalo);
+                            statusEl.textContent = `❌ Erro: ${job.error_message || 'Falha'}`;
+                        }
+                    } catch(e) {}
+                }, 3000);
+            });
+        }
+
+        // ── Preview ──────────────────────────────────────────────────────────
+        async function visualizarPreview() {
+            if (encomendasData.length === 0) {
+                await carregarEncomendas();
+                if (encomendasData.length === 0) { alert('Nenhum dado para visualizar.'); return; }
+            }
+            const colunas = COLUNAS.filter(c => !['observacoes','descricao','responsavel'].includes(c.key));
+            const thead = document.getElementById('previewThead');
+            const tbody = document.getElementById('previewTbody');
+            thead.innerHTML = '<tr>' + colunas.map(c => `<th>${c.label}</th>`).join('') + '</tr>';
+            const slice = encomendasData.slice(0, 200);
+            tbody.innerHTML = slice.map(r => '<tr>' + colunas.map(c => {
+                let v = r[c.key] ?? '-';
+                if (c.key === 'dataChegada'  && v && v !== '-') { try { v = new Date(v).toLocaleString('pt-BR'); } catch(e){} }
+                if (c.key === 'dataRetirada' && v && v !== '-') { try { v = new Date(v).toLocaleString('pt-BR'); } catch(e){} }
+                if (c.key === 'urgente') v = r.urgente ? 'SIM' : 'NÃO';
+                if (c.key === 'status')  v = { pendente:'Pendente', recebida:'Recebida', retirada:'Retirada', extraviada:'Extraviada' }[v] || v;
+                return `<td>${v}</td>`;
+            }).join('') + '</tr>').join('');
+            document.getElementById('previewCount').textContent = encomendasData.length;
+            document.getElementById('previewContainer').style.display = 'block';
+        }
+
+        // ── XLSX ─────────────────────────────────────────────────────────────
+        function gerarExcel(rows) {
+            const headers = COLUNAS.map(c => c.label);
+            const data = rows.map(r => COLUNAS.map(c => {
+                let v = r[c.key] ?? '-';
+                if (c.key === 'dataChegada'  && v && v !== '-') { try { v = new Date(v).toLocaleString('pt-BR'); } catch(e){} }
+                if (c.key === 'dataRetirada' && v && v !== '-') { try { v = new Date(v).toLocaleString('pt-BR'); } catch(e){} }
+                if (c.key === 'urgente') v = r.urgente ? 'SIM' : 'NÃO';
+                if (c.key === 'status')  v = { pendente:'Pendente', recebida:'Recebida', retirada:'Retirada', extraviada:'Extraviada' }[v] || String(v);
+                return String(v);
+            }));
+            const wsData = [
+                ['Acess Control - Relatório de Encomendas'],
+                [`Gerado em: ${new Date().toLocaleString('pt-BR')}`],
+                [],
+                headers,
+                ...data,
+                [],
+                [`Total de registros: ${rows.length}`]
+            ];
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            ws['!cols'] = headers.map(() => ({ wch: 22 }));
+            XLSX.utils.book_append_sheet(wb, ws, 'Encomendas');
+            XLSX.writeFile(wb, `relatorio_encomendas_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
+        // ── CSV ──────────────────────────────────────────────────────────────
+        function gerarCSV(rows) {
+            const headers = COLUNAS.map(c => c.label);
+            const data = rows.map(r => COLUNAS.map(c => {
+                let v = r[c.key] ?? '-';
+                if (c.key === 'dataChegada'  && v && v !== '-') { try { v = new Date(v).toLocaleString('pt-BR'); } catch(e){} }
+                if (c.key === 'dataRetirada' && v && v !== '-') { try { v = new Date(v).toLocaleString('pt-BR'); } catch(e){} }
+                if (c.key === 'urgente') v = r.urgente ? 'SIM' : 'NÃO';
+                if (c.key === 'status')  v = { pendente:'Pendente', recebida:'Recebida', retirada:'Retirada', extraviada:'Extraviada' }[v] || String(v);
+                return `"${String(v).replace(/"/g,'""')}"`;
+            }));
+            const csv = [headers.map(h => `"${h}"`).join(','), ...data.map(r => r.join(','))].join('\n');
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `relatorio_encomendas_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click(); URL.revokeObjectURL(url);
+        }
+
+        // ── Inicialização ────────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', () => {
+            // Datas padrão: últimos 30 dias
+            const hoje = new Date();
+            const inicio = new Date(hoje); inicio.setDate(hoje.getDate() - 30);
+            document.getElementById('filtroDataFim').value   = hoje.toISOString().split('T')[0];
+            document.getElementById('filtroDataInicio').value = inicio.toISOString().split('T')[0];
+
+            // Mostrar/esconder orientação conforme formato
+            document.querySelectorAll('input[name="formato"]').forEach(r => {
+                r.addEventListener('change', () => {
+                    document.getElementById('opcaoOrientacao').style.display =
+                        r.value === 'pdf' && r.checked ? 'flex' : 'none';
+                    if (r.value !== 'pdf') document.getElementById('opcaoOrientacao').style.display = 'none';
+                });
+            });
+
+            carregarEncomendas();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>Acess Control - Admin Master</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="favicon.png">
+    <style>
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .admin-header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+        
+        .admin-header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0;
+        }
+        
+        .tab-btn {
+            padding: 15px 30px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #64748b;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn:hover {
+            color: #667eea;
+        }
+        
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        .btn-warning:hover { background: #d97706; }
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        .btn-success:hover { background: #059669; }
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        .btn-secondary:hover { background: #4b5563; }
+        .btn-dark {
+            background: #1f2937;
+            color: white;
+        }
+        .btn-dark:hover { background: #111827; }
+        .btn-info {
+            background: #7c3aed;
+            color: white;
+        }
+        .btn-info:hover { background: #6d28d9; }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .search-bar input, .search-bar select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            min-width: 160px;
+            flex: 1;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        tr:hover {
+            background: #f9fafb;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #d1d5db;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #111827;
+        }
+        
+        .card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 2rem;
+            margin: 0;
+            color: #667eea;
+        }
+        
+        .stat-card p {
+            margin: 5px 0 0 0;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1><i class="fas fa-crown"></i> Admin Master</h1>
+                <p>Gerencie revendas e tenants do sistema</p>
+            </div>
+            <button class="btn btn-danger" onclick="logout()" style="padding: 10px 20px;">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </button>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('revendas')">
+                <i class="fas fa-store"></i> Revendas
+            </button>
+            <button class="tab-btn" onclick="switchTab('tenants')">
+                <i class="fas fa-building"></i> Tenants
+            </button>
+            <button class="tab-btn" onclick="switchTab('precos')">
+                <i class="fas fa-dollar-sign"></i> Tabela de Preços
+            </button>
+            <button class="tab-btn" onclick="switchTab('notificacoes')">
+                <i class="fas fa-bell"></i> Notificações
+            </button>
+            <button class="tab-btn" onclick="switchTab('faturamento')">
+                <i class="fas fa-file-invoice-dollar"></i> Faturamento
+            </button>
+            <button class="tab-btn" onclick="switchTab('configuracoes')">
+                <i class="fas fa-cog"></i> Configurações
+            </button>
+        </div>
+        
+        <!-- Tab Revendas -->
+        <div id="revendas" class="tab-content active">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 class="section-title">Revendas Cadastradas</h2>
+                <button class="btn btn-primary" onclick="openRevendaModal()">
+                    <i class="fas fa-plus"></i> Nova Revenda
+                </button>
+            </div>
+            
+            <div class="table-container">
+                <table id="revendas-table">
+                    <thead>
+                        <tr>
+                            <th>Empresa</th>
+                            <th>CNPJ</th>
+                            <th>Representante</th>
+                            <th>Email Admin</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="revendas-tbody">
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                <i class="fas fa-store"></i>
+                                <p>Nenhuma revenda cadastrada</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Tab Tenants -->
+        <div id="tenants" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 class="section-title">Tenants Cadastrados</h2>
+                <button class="btn btn-primary" onclick="openTenantModal()">
+                    <i class="fas fa-plus"></i> Novo Tenant
+                </button>
+            </div>
+
+            <!-- Barra de busca/filtros -->
+            <div class="search-bar">
+                <input type="text" id="filter-tenant-id" placeholder="🔍 Tenant ID" oninput="filterTenants()">
+                <input type="text" id="filter-cnpj" placeholder="🔍 CNPJ" oninput="filterTenants()">
+                <input type="text" id="filter-razao" placeholder="🔍 Razão Social" oninput="filterTenants()">
+                <input type="text" id="filter-revenda" placeholder="🔍 Revenda" oninput="filterTenants()">
+                <button class="btn btn-secondary btn-sm" onclick="clearFilters()"><i class="fas fa-times"></i> Limpar</button>
+            </div>
+            
+            <div class="stats-grid" id="tenant-stats"></div>
+            
+            <div class="table-container">
+                <table id="tenants-table">
+                    <thead>
+                        <tr>
+                            <th>Tenant ID</th>
+                            <th>Empresa</th>
+                            <th>CNPJ</th>
+                            <th>Admin</th>
+                            <th>Pessoas</th>
+                            <th>Equip.</th>
+                            <th>Revenda</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tenants-tbody">
+                        <tr><td colspan="9" class="empty-state"><i class="fas fa-building"></i><p>Carregando tenants...</p></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Tab Tabela de Preços -->
+        <div id="precos" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 class="section-title">Tabela de Preços</h2>
+                <button class="btn btn-primary" onclick="openPrecoModal()">
+                    <i class="fas fa-plus"></i> Nova Tabela
+                </button>
+            </div>
+            <div id="prices-list" class="stats-grid"></div>
+            
+            <div class="table-container">
+                <table id="precos-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Descrição</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="precos-tbody">
+                        <tr>
+                            <td colspan="5" class="empty-state">
+                                <i class="fas fa-dollar-sign"></i>
+                                <p>Carregando tabelas de preços...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Tab Faturamento -->
+        <div id="faturamento" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 class="section-title">Relatório de Faturamento Consolidado</h2>
+            </div>
+            
+            <div class="card">
+                <div style="display: flex; gap: 15px; align-items: flex-end; margin-bottom: 20px;">
+                    <div class="form-group" style="flex: 1; margin: 0;">
+                        <label>Selecione a Tabela de Preços para Comparação</label>
+                        <select id="billing-plan-select">
+                            <option value="">Carregando planos...</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="generateBillingReport()">
+                        <i class="fas fa-sync"></i> Gerar Relatório
+                    </button>
+                </div>
+                
+                <div id="billing-report-result" style="display: none;">
+                    <div style="margin-top: 30px; border-top: 2px solid #e2e8f0; padding-top: 20px;">
+                        <h3 id="report-title" style="margin-bottom: 20px; color: #1e293b;"></h3>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Revenda</th>
+                                        <th>Pessoas</th>
+                                        <th>Equip.</th>
+                                        <th>Detalhamento</th>
+                                        <th>Total Mensal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="billing-report-tbody"></tbody>
+                                <tfoot>
+                                    <tr style="background: #f1f5f9; font-weight: bold;">
+                                        <td colspan="4" style="text-align: right;">TOTAL GERAL:</td>
+                                        <td id="report-total-geral">R$ 0,00</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="configuracoes" class="tab-content">
+            <h2 class="section-title">Configurações do Admin Master</h2>
+            
+            <div class="card">
+                <h3>Alterar Senha</h3>
+                <form id="password-form">
+                    <div class="form-group">
+                        <label>Senha Atual</label>
+                        <input type="password" id="current-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nova Senha</label>
+                        <input type="password" id="new-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmar Nova Senha</label>
+                        <input type="password" id="confirm-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Alterar Senha</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Tab Notificações -->
+        <div id="notificacoes" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 class="section-title">Notificações Globais</h2>
+                <button class="btn btn-primary" onclick="openNotificacaoModal()">
+                    <i class="fas fa-plus"></i> Nova Notificação
+                </button>
+            </div>
+            <p style="color: #6b7280; margin-bottom: 20px;">
+                <i class="fas fa-info-circle"></i> As notificações criadas aqui serão exibidas em todos os tenants do sistema.
+            </p>
+            
+            <div class="table-container">
+                <table id="notificacoes-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Mensagem</th>
+                            <th>Data de Criação</th>
+                            <th>Expira em</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="notificacoes-tbody">
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <i class="fas fa-bell"></i>
+                                <p>Carregando notificações...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- Modal Preços -->
+    <div id="preco-modal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2>Nova Tabela de Preços</h2>
+                <button class="modal-close" onclick="closePrecoModal()">&times;</button>
+            </div>
+            <form id="preco-form">
+                <input type="hidden" id="preco-id">
+                <div class="form-group">
+                    <label>Nome da Tabela</label>
+                    <input type="text" id="preco-name" required placeholder="Ex: Plano Básico">
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <input type="text" id="preco-description" placeholder="Descrição opcional">
+                </div>
+                
+                <h4 style="margin: 20px 0 10px;">Faixas de Preço - Pessoas</h4>
+                <div id="pessoas-ranges">
+                    <div class="range-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <input type="number" placeholder="Min" class="pessoas-min" value="0" style="width: 80px;">
+                        <input type="number" placeholder="Max" class="pessoas-max" value="500" style="width: 80px;">
+                        <input type="number" placeholder="Preço" class="pessoas-price" value="100" style="width: 100px;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="addRangeRow('pessoas')">+</button>
+                    </div>
+                </div>
+                
+                <h4 style="margin: 20px 0 10px;">Faixas de Preço - Equipamentos</h4>
+                <div id="equipamentos-ranges">
+                    <div class="range-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <input type="number" placeholder="Min" class="equipamentos-min" value="0" style="width: 80px;">
+                        <input type="number" placeholder="Max" class="equipamentos-max" value="5" style="width: 80px;">
+                        <input type="number" placeholder="Preço" class="equipamentos-price" value="50" style="width: 100px;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="addRangeRow('equipamentos')">+</button>
+                    </div>
+                </div>
+                
+                <button type="submit" id="preco-btn" class="btn btn-primary">Salvar Tabela</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Revenda -->
+    <div id="revenda-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nova Revenda</h2>
+                <button class="modal-close" onclick="closeRevendaModal()">&times;</button>
+            </div>
+            <form id="revenda-form">
+                <h3 class="section-title">Dados da Empresa</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>CNPJ</label>
+                        <input type="text" id="revenda-cnpj" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Razão Social</label>
+                        <input type="text" id="revenda-corporate-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nome Fantasia</label>
+                        <input type="text" id="revenda-trading-name">
+                    </div>
+                </div>
+                
+                <h3 class="section-title">Dados do Representante</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nome do Representante</label>
+                        <input type="text" id="revenda-rep-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CPF</label>
+                        <input type="text" id="revenda-rep-cpf" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="revenda-rep-email" required>
+                    </div>
+                </div>
+                
+                <h3 class="section-title">Acesso ao Sistema</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Tenant ID</label>
+                        <input type="text" id="revenda-tenant-id" required placeholder="ex: minhaempresa">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Admin</label>
+                        <input type="email" id="revenda-admin-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Senha Admin</label>
+                        <input type="password" id="revenda-admin-password" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Criar Revenda</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal Tenant -->
+    <div id="tenant-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Novo Tenant</h2>
+                <button class="modal-close" onclick="closeTenantModal()">&times;</button>
+            </div>
+            <form id="tenant-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Tenant ID</label>
+                        <input type="text" id="tenant-id" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nome da Empresa</label>
+                        <input type="text" id="tenant-company-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CNPJ</label>
+                        <input type="text" id="tenant-cnpj" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Admin</label>
+                        <input type="email" id="tenant-admin-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Senha Admin</label>
+                        <input type="password" id="tenant-admin-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nome Admin</label>
+                        <input type="text" id="tenant-admin-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="text" id="tenant-phone">
+                    </div>
+                    <div class="form-group">
+                        <label>Cidade</label>
+                        <input type="text" id="tenant-city">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <input type="text" id="tenant-state">
+                    </div>
+                    <div class="form-group">
+                        <label>Revenda (opcional)</label>
+                        <select id="tenant-revenda">
+                            <option value="">Nenhuma</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Limites do Tenant -->
+                <div class="form-section" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                    <h4 style="margin-bottom: 15px; color: #1e293b;"><i class="fas fa-layer-group"></i> Limites de Cadastro</h4>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Limite de Pessoas</label>
+                            <input type="number" id="tenant-max-pessoas" value="1000" min="1">
+                            <small style="color: #64748b;">Quantidade máxima de pessoas que podem ser cadastradas</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Limite de Equipamentos</label>
+                            <input type="number" id="tenant-max-equipamentos" value="50" min="1">
+                            <small style="color: #64748b;">Quantidade máxima de equipamentos que podem ser cadastrados</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Criar Tenant</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="auth.js"></script>
+    <script src="components.js"></script>
+    <script>
+        const API_URL = '';
+        
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            
+            if (tabId === 'revendas') loadRevendas();
+            if (tabId === 'tenants') loadTenants();
+            if (tabId === 'precos') loadPrecos();
+            if (tabId === 'notificacoes') loadNotificacoes();
+            if (tabId === 'faturamento') loadFaturamentoPlans();
+        }
+        
+        async function loadRevendas() {
+            const tbody = document.getElementById('revendas-tbody');
+            const token = localStorage.getItem('acesscontrol_accessToken');
+            try {
+                const response = await fetch(`${API_URL}/api/revendas`, {
+                    headers: { 
+                        'X-Tenant-ID': 'acesscontrolmaster',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success && data.data.length > 0) {
+                    tbody.innerHTML = data.data.map(r => `
+                        <tr>
+                            <td>${r.corporate_name}</td>
+                            <td>${r.cnpj}</td>
+                            <td>${r.representative_name}</td>
+                            <td>${r.admin_email}</td>
+                            <td><span class="badge ${r.active ? 'badge-active' : 'badge-inactive'}">${r.active ? 'Ativo' : 'Inativo'}</span></td>
+                            <td class="actions">
+                                <button class="btn btn-warning btn-sm" onclick="editRevenda(${r.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteRevenda(${r.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fas fa-store"></i><p>Nenhuma revenda cadastrada</p></td></tr>`;
+                }
+            } catch (e) {
+                console.error('Erro ao carregar revendas:', e);
+                tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fas fa-store"></i><p>Erro ao carregar revendas</p></td></tr>`;
+            }
+        }
+        
+        let _allTenants = [];
+
+        async function loadTenants() {
+            const tbody = document.getElementById('tenants-tbody');
+            const token = localStorage.getItem('acesscontrol_accessToken');
+            try {
+                const response = await fetch(`${API_URL}/api/admin/tenants`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    _allTenants = data.data;
+                    renderTenants(_allTenants);
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="9" class="empty-state"><i class="fas fa-building"></i><p>Nenhum tenant encontrado</p></td></tr>`;
+                }
+            } catch (e) {
+                console.error('Erro ao carregar tenants:', e);
+                tbody.innerHTML = `<tr><td colspan="9" class="empty-state"><i class="fas fa-building"></i><p>Erro ao carregar tenants</p></td></tr>`;
+            }
+        }
+
+        function renderTenants(list) {
+            const tbody = document.getElementById('tenants-tbody');
+            if (!list.length) {
+                tbody.innerHTML = `<tr><td colspan="9" class="empty-state"><i class="fas fa-building"></i><p>Nenhum tenant encontrado</p></td></tr>`;
+                return;
+            }
+            tbody.innerHTML = list.map(t => `
+                <tr>
+                    <td><strong>${t.tenant_id}</strong></td>
+                    <td>${t.company_name}</td>
+                    <td>${t.cnpj || '-'}</td>
+                    <td>${t.admin_email}</td>
+                    <td>${t.pessoas_count || 0}/${t.max_pessoas || 1000}</td>
+                    <td>${t.equipamentos_count || 0}/${t.max_equipamentos || 50}</td>
+                    <td>${t.revenda_name ? `<span class="badge" style="background:#e0e7ff;color:#3730a3">${t.revenda_name}</span>` : '<span style="color:#9ca3af">—</span>'}</td>
+                    <td><span class="badge ${t.status === 'active' ? 'badge-active' : 'badge-inactive'}">${t.status === 'active' ? 'Ativo' : 'Bloqueado'}</span></td>
+                    <td class="actions">
+                        <button class="btn btn-info btn-sm" onclick="enterTenant('${t.tenant_id}')" title="Entrar na base">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </button>
+                        <button class="btn btn-warning btn-sm" onclick="openEditTenantModal('${t.tenant_id}','${(t.company_name||'').replace(/'/g,'\\&apos;')}','${t.cnpj||''}',${t.max_pessoas||1000},${t.max_equipamentos||50})" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="resetTenantPassword('${t.tenant_id}')" title="Resetar Senha">
+                            <i class="fas fa-key"></i>
+                        </button>
+                        <button class="btn ${t.status === 'active' ? 'btn-danger' : 'btn-success'} btn-sm" onclick="blockTenant('${t.tenant_id}')" title="${t.status === 'active' ? 'Bloquear' : 'Desbloquear'}">
+                            <i class="fas ${t.status === 'active' ? 'fa-ban' : 'fa-check'}"></i>
+                        </button>
+                        <button class="btn btn-dark btn-sm" onclick="deleteTenant('${t.tenant_id}')" title="Excluir">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterTenants() {
+            const fId = document.getElementById('filter-tenant-id').value.toLowerCase();
+            const fCnpj = document.getElementById('filter-cnpj').value.toLowerCase();
+            const fRazao = document.getElementById('filter-razao').value.toLowerCase();
+            const fRevenda = document.getElementById('filter-revenda').value.toLowerCase();
+            const filtered = _allTenants.filter(t =>
+                (!fId || t.tenant_id.toLowerCase().includes(fId)) &&
+                (!fCnpj || (t.cnpj||'').toLowerCase().includes(fCnpj)) &&
+                (!fRazao || (t.company_name||'').toLowerCase().includes(fRazao)) &&
+                (!fRevenda || (t.revenda_name||'').toLowerCase().includes(fRevenda))
+            );
+            renderTenants(filtered);
+        }
+
+        function clearFilters() {
+            ['filter-tenant-id','filter-cnpj','filter-razao','filter-revenda'].forEach(id => document.getElementById(id).value = '');
+            renderTenants(_allTenants);
+        }
+
+        async function enterTenant(tenantId) {
+            const token = localStorage.getItem('acesscontrol_accessToken');
+            try {
+                const response = await fetch(`${API_URL}/api/admin/tenants/${tenantId}/impersonate`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    // Prepara o handshake para a nova aba
+                    localStorage.setItem('acesscontrol_impersonate_token', data.data.accessToken);
+                    localStorage.setItem('acesscontrol_impersonate_tenant', tenantId);
+                    
+                    // Abre o dashboard em uma nova aba
+                    window.open('./dashboard.html', '_blank');
+                    
+                    console.log(`[Impersonation] Iniciando acesso à base ${tenantId}`);
+                } else {
+                    alert('Erro ao acessar base: ' + data.message);
+                }
+            } catch (e) {
+                alert('Erro ao acessar base: ' + e.message);
+            }
+        }
+        
+        function openRevendaModal() {
+            document.getElementById('revenda-modal').classList.add('active');
+        }
+        
+        function closeRevendaModal() {
+            document.getElementById('revenda-modal').classList.remove('active');
+        }
+        
+        function openTenantModal() {
+            document.getElementById('tenant-modal').classList.add('active');
+            loadRevendasForSelect();
+        }
+        
+        function closeTenantModal() {
+            document.getElementById('tenant-modal').classList.remove('active');
+        }
+        
+        async function loadRevendasForSelect() {
+            const token = localStorage.getItem('acesscontrol_accessToken');
+            try {
+                const response = await fetch(`${API_URL}/api/revendas`, {
+                    headers: { 
+                        'X-Tenant-ID': 'acesscontrolmaster',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                const select = document.getElementById('tenant-revenda');
+                select.innerHTML = '<option value="">Nenhuma</option>';
+                
+                if (data.success) {
+                    data.data.forEach(r => {
+                        select.innerHTML += `<option value="${r.id}">${r.corporate_name}</option>`;
+                    });
+                }
+            } catch (e) {
+                console.error('Erro ao carregar revendas:', e);
+            }
+        }
+        
+        document.getElementById('revenda-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const revendaData = {
+                tenant_id: document.getElementById('revenda-tenant-id').value,
+                cnpj: document.getElementById('revenda-cnpj').value,
+                corporate_name: document.getElementById('revenda-corporate-name').value,
+                trading_name: document.getElementById('revenda-trading-name').value,
+                representative_name: document.getElementById('revenda-rep-name').value,
+                representative_cpf: document.getElementById('revenda-rep-cpf').value,
+                representative_email: document.getElementById('revenda-rep-email').value,
+                admin_email: document.getElementById('revenda-admin-email').value,
+                admin_password: document.getElementById('revenda-admin-password').value
+            };
+            
+            try {
+                const token = localStorage.getItem('acesscontrol_accessToken');
+                const response = await fetch(`${API_URL}/api/revendas`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Tenant-ID': 'acesscontrolmaster',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(revendaData)
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert('Revenda criada com sucesso!');
+                    closeRevendaModal();
+                    loadRevendas();
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            } catch (e) {
+                alert('Erro ao criar revenda: ' + e.message);
+            }
+        });
+        
+        document.getElementById('tenant-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const tenantData = {
+                tenant_id: document.getElementById('tenant-id').value,
+                company_name: document.getElementById('tenant-company-name').value,
+                cnpj: document.getElementById('tenant-cnpj').value,
+                admin_email: document.getElementById('tenant-admin-email').value,
+                admin_password: document.getElementById('tenant-admin-password').value,
+                admin_name: document.getElementById('tenant-admin-name').value,
+                phone: document.getElementById('tenant-phone').value,
+                city: document.getElementById('tenant-city').value,
+                state: document.getElementById('tenant-state').value,
+                revenda_id: document.getElementById('tenant-revenda').value || null,
+                max_pessoas: parseInt(document.getElementById('tenant-max-pessoas').value) || 1000,
+                max_equipamentos: parseInt(document.getElementById('tenant-max-equipamentos').value) || 50
+            };
+            
+            try {
+                const token = localStorage.getItem('acesscontrol_accessToken');
+                const response = await fetch(`${API_URL}/api/admin/tenants`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(tenantData)
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert('Tenant criado com sucesso!');
+                    closeTenantModal();
+                    loadTenants();
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            } catch (e) {
+                alert('Erro ao criar tenant: ' + e.message);
+            }
+        });
+        
+        // Carregar dados iniciais
+        loadRevendas();
+        
+        // Funções para gerenciar tabela de preços
+        async function loadPrecos() {
+            const tbody = document.getElementById('precos-tbody');
+            const token = localStorage.getItem('acesscontrol_accessToken');
+            try {
+                const response = await fetch(`${API_URL}/api/prices`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success && data.data.length > 0) {
+                    tbody.innerHTML = data.data.map(p => `
+                        <tr>
+                            <td>${p.id}</td>
+                            <td>${p.name}</td>
+                            <td>${p.description || '-'}</td>
+                            <td><span class="badge ${p.is_active ? 'badge-active' : 'badge-inactive'}">${p.is_active ? 'Ativo' : 'Inativo'}</span></td>
+                            <td class="actions">
+                                <button class="btn btn-primary btn-sm" onclick="editPreco(${p.id})"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-danger btn-sm" onclick="deletePreco(${p.id})"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="5" class="empty-state"><i class="fas fa-dollar-sign"></i><p>Nenhuma tabela de preços encontrada</p></td></tr>`;
+                }
+            } catch (e) {
+                console.error('Erro ao carregar preços:', e);
+                tbody.innerHTML = `<tr><td colspan="5" class="empty-state"><i class="fas fa-dollar-sign"></i><p>Erro ao carregar preços</p></td></tr>`;
+            }
+        }
+        
+        function openPrecoModal(isEdit = false) {
+            document.getElementById('preco-modal').classList.add('active');
+            document.getElementById('preco-form').reset();
+            document.getElementById('preco-id').value = '';
+            document.getElementById('preco-btn').innerText = isEdit ? 'Salvar Alterações' : 'Criar Tabela';
+            
+            if (!isEdit) {
+                document.getElementById('pessoas-ranges').innerHTML = `
+                    <div class="range-row" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
+                        <input type="number" placeholder="Min" class="pessoas-min" value="0" style="width: 80px;">
+                        <input type="number" placeholder="Max" class="pessoas-max" value="100" style="width: 80px;">
+                        <input type="number" placeholder="Preço" class="pessoas-price" value="45" style="width: 100px;">
+                        <label style="font-size: 11px; display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" class="pessoas-incremental"> Incremental
+                        </label>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="addRangeRow('pessoas')">+</button>
+                    </div>`;
+                document.getElementById('equipamentos-ranges').innerHTML = `
+                    <div class="range-row" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
+                        <input type="number" placeholder="Min" class="equipamentos-min" value="0" style="width: 80px;">
+                        <input type="number" placeholder="Max" class="equipamentos-max" value="1" style="width: 80px;">
+                        <input type="number" placeholder="Preço" class="equipamentos-price" value="10" style="width: 100px;">
+                        <label style="font-size: 11px; display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" class="equipamentos-incremental"> Incremental
+                        </label>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="addRangeRow('equipamentos')">+</button>
+                    </div>`;
+            }
+        }
+        
+        function closePrecoModal() {
+            document.getElementById('preco-modal').classList.remove('active');
+        }
+        
+        function addRangeRow(type) {
+            const container = document.getElementById(`${type}-ranges`);
+            const div = document.createElement('div');
+            div.className = 'range-row';
+            div.style = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: center;';
+            div.innerHTML = `
+                <input type="number" placeholder="Min" class="${type}-min" style="width: 80px;">
+                <input type="number" placeholder="Max" class="${type}-max" style="width: 80px;">
+                <input type="number" placeholder="Preço" class="${type}-price" style="width: 100px;">
+                <label style="font-size: 12px; display: flex; align-items: center; gap: 4px;">
+                    <input type="checkbox" class="${type}-incremental"> Incremental
+                </label>
+                <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">×</button>
+            `;
+            container.appendChild(div);
+        }
+        
+        // Listener para formulário de preços
+        document.getElementById('preco-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('preco-id').value;
+            const precoData = {
+                name: document.getElementById('preco-name').value,
+                description: document.getElementById('preco-description').value,
+                ranges: []
+            };
+            
+            // Coletar Pessoas
+            document.querySelectorAll('#pessoas-ranges .range-row').forEach(row => {
+                precoData.ranges.push({
+                    entity_type: 'pessoas',
+                    min_quantity: parseInt(row.querySelector('.pessoas-min').value) || 0,
+                    max_quantity: parseInt(row.querySelector('.pessoas-max').value) || null,
+                    price: parseFloat(row.querySelector('.pessoas-price').value) || 0,
+                    is_incremental: row.querySelector('.pessoas-incremental').checked
+                });
+            });
+
+            // Coletar Equipamentos
+            document.querySelectorAll('#equipamentos-ranges .range-row').forEach(row => {
+                precoData.ranges.push({
+                    entity_type: 'equipamentos',
+                    min_quantity: parseInt(row.querySelector('.equipamentos-min').value) || 0,
+                    max_quantity: parseInt(row.querySelector('.equipamentos-max').value) || null,
+                    price: parseFloat(row.querySelector('.equipamentos-price').value) || 0,
+                    is_incremental: row.querySelector('.equipamentos-incremental').checked
+                });
+            });
+            
+            try {
+                const token = localStorage.getItem('acesscontrol_accessToken');
+                const url = id ? `${API_URL}/api/prices/${id}` : `${API_URL}/api/prices`;
+                const method = id ? 'PATCH' : 'POST';
+
+                const response = await fetch(url, {
+                    method,
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(precoData)
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert(id ? 'Tabela atualizada!' : 'Tabela criada!');
+                    closePrecoModal();
+                    loadPrecos();
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            } catch (e) {
+                alert('Erro ao salvar tabela de preços');
+            }
+        });
+        
+        async function editPreco(id) {
+            const token = localStorage.getItem('acesscontrol_accessToken');
+            try {
+                const response = await fetch(`${API_URL}/api/prices/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    const t = data.data;
+                    openPrecoModal(true);
+                    document.getElementById('preco-id').value = t.id;
+                    document.getElementById('preco-name').value = t.name;
+                    document.getElementById('preco-description').value = t.description || '';
+                    
+                    // Renderizar Faixas
+                    document.getElementById('pessoas-ranges').innerHTML = '';
+                    document.getElementById('equipamentos-ranges').innerHTML = '';
+                    
+                    const pRanges = t.ranges.filter(r => r.entity_type === 'pessoas');
+                    const eRanges = t.ranges.filter(r => r.entity_type === 'equipamentos');
+                    
+                    const renderRows = (ranges, type) => {
+                        const container = document.getElementById(`${type}-ranges`);
+                        if (ranges.length === 0) {
+                            addRangeRow(type); // Adiciona uma limpa se não tiver
+                            return;
+                        }
+                        ranges.forEach((r, idx) => {
+                            const div = document.createElement('div');
+                            div.className = 'range-row';
+                            div.style = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: center;';
+                            div.innerHTML = `
+                                <input type="number" placeholder="Min" class="${type}-min" value="${r.min_quantity}" style="width: 80px;">
+                                <input type="number" placeholder="Max" class="${type}-max" value="${r.max_quantity || ''}" style="width: 80px;">
+                                <input type="number" placeholder="Preço" class="${type}-price" value="${r.price}" style="width: 100px;">
+                                <label style="font-size: 11px; display: flex; align-items: center; gap: 4px;">
+                                    <input type="checkbox" class="${type}-incremental" ${r.is_incremental ? 'checked' : ''}> Incremental
+                                </label>
+                                ${idx === 0 ? `<button type="button" class="btn btn-secondary btn-sm" onclick="addRangeRow('${type}')">+</button>` : `<button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">×</button>`}
+                            `;
+                            container.appendChild(div);
+                        });
+                    };
+                    
+                    renderRows(pRanges, 'pessoas');
+                    renderRows(eRanges, 'equipamentos');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Erro ao carregar dados para edição');
+            }
+        }
+        
+        async function deletePreco(id) {
+            if (!confirm('Tem certeza que deseja excluir esta tabela de preços?')) return;
+            
+            try {
+                const token = localStorage.getItem('acesscontrol_accessToken');
+                const response = await fetch(`${API_URL}/api/prices/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Tabela de preços excluída com sucesso!');
+                    loadPrecos();
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            } catch (e) {
+                alert('Erro ao excluir tabela de preços');
+            }
+        }
+        
+        // Funções para gerenciar tenants
+        async function resetTenantPassword(tenantId) {
+            const newPassword = prompt('Digite a nova senha para o admin do tenant:');
+            if (!newPassword) return;
+            
+            try {
+                const token = localStorage.getItem('acesscontrol_accessToken');
+                const response = await fetch(`${API_URL}/api/admin/tenants/${tenantId}/reset-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ password: newPassword })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert('Senha resetada com sucesso!');
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            } catch (e) {
+                alert('Erro: ' + e.message);
+            }
+        }
+        
+        async function blockTenant(tenantId) {
+            // Primeiro busca o status atual do tenant
+            const tbody = document.getElementById('tenants-tbody');
+            const rows = tbody.querySelectorAll('tr');
+            let isCurrentlyActive = true;
+            
+            for (const row of rows) {
+                if (row.innerHTML.includes(tenantId)) {
+                    isCurrentlyActive = row.innerHTML.includes('badge-active') || row.innerHTML.includes('>Ativo<');
+                    break;
+                }
+            }
+            
+            const newStatus = isCurrentlyActive ? 0 : 1; // Se está ativo, vai desativar (0), se está inativo, vai ativar (1)
+            const action = isCurrentlyActive ? 'bloquear' : 'desbloquear';
+            
+            if (!confirm(`Tem certeza que deseja ${action} este tenant?`)) return;
+            
+            try {
+                const token = localStorage.getItem('acesscontrol_accessToken');
+                const response = await fetch(`${API_URL}/api/admin/tenants/${tenantId}/toggle-status`, {
+                    method: 'PATCH',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ active: newStatus })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert(`Tenant ${action}do com sucesso!`);
+                    loadTenants();
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            } catch (e) {
+                alert('Erro: ' + e.message);
+            }
+        }
+        
+        async function deleteTenant(tenantId) {
+            if (!confirm('TEM CERTEZA QUE DESEJA EXCLUIR DEFINITIVAMENTE ESTE TENANT? Esta ação não pode ser desfeita!')) return;
+            if (!confirm('Isso irá excluir TODOS os dados deste tenant. Continuar?')) return;
+            
+            try {
+                const token = localStorage.getItem('acesscontrol_accessToken');
+                const response = await fetch(`${API_URL}/api/admin/tenants/${tenantId}`, {
+                    method: 'DELETE',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert('Tenant excluído com sucesso!');
+                    loadTenants();
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            } catch (e) {
+                alert('Erro: ' + e.message);
+            }
+        }
+        
+        function editRevenda(id) {
+            alert('Funcionalidade de edição de revenda em desenvolvimento');
+        }
+
+        // ===== EDIT TENANT MODAL =====
+        let _editingTenantId = null;
+
+        function openEditTenantModal(tenantId, companyName, cnpj, maxPessoas, maxEquipamentos) {
+            _editingTenantId = tenantId;
+            document.getElementById('edit-tenant-id-display').textContent = tenantId;
+            document.getElementById('edit-tenant-company-name').value = companyName || '';
+            document.getElementById('edit-tenant-cnpj').value = cnpj || '';
+            document.getElementById('edit-tenant-max-pessoas').value = maxPessoas || 1000;
+            document.getElementById('edit-tenant-max-equipamentos').value = maxEquipamentos || 50;
+            document.getElementById('edit-tenant-modal').classList.add('active');
+        }
+
+        function closeEditTenantModal() {
+            document.getElementById('edit-tenant-modal').classList.remove('active');
+            _editingTenantId = null;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('edit-tenant-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!_editingTenantId) return;
+                const token = localStorage.getItem('acesscontrol_accessToken');
+                const body = {
+                    company_name: document.getElementById('edit-tenant-company-name').value,
+                    cnpj: document.getElementById('edit-tenant-cnpj').value,
+                    max_pessoas: parseInt(document.getElementById('edit-tenant-max-pessoas').value) || 1000,
+                    max_equipamentos: parseInt(document.getElementById('edit-tenant-max-equipamentos').value) || 50
+                };
+                try {
+                    const res = await fetch(`${API_URL}/api/admin/tenants/${_editingTenantId}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify(body)
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        alert('Tenant atualizado com sucesso!');
+                        closeEditTenantModal();
+                        loadTenants();
+                    } else {
+                        alert('Erro: ' + data.message);
+                    }
+                } catch (err) {
+                    alert('Erro ao atualizar tenant: ' + err.message);
+                }
+            });
+        });
+        
+        async function deleteRevenda(id) {
+            if (!confirm('Tem certeza que deseja EXCLUIR esta revenda? Esta ação não pode ser desfeita!')) return;
+            
+            try {
+                const token = localStorage.getItem('acesscontrol_accessToken');
+                const response = await fetch(`${API_URL}/api/revendas/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert('Revenda excluída com sucesso!');
+                    loadRevendas();
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            } catch (e) {
+                alert('Erro: ' + e.message);
+            }
+        }
+        
+        async function loadFaturamentoPlans() {
+            const select = document.getElementById('billing-plan-select');
+            const token = localStorage.getItem('acesscontrol_accessToken');
+            try {
+                const response = await fetch(`${API_URL}/api/prices`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    select.innerHTML = data.data.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+                } else {
+                    select.innerHTML = '<option value="">Erro ao carregar</option>';
+                }
+            } catch (e) {
+                select.innerHTML = '<option value="">Erro de conexão</option>';
+            }
+        }
+
+        async function generateBillingReport() {
+            const planId = document.getElementById('billing-plan-select').value;
+            if (!planId) return alert('Selecione um plano primeiro');
+
+            const tbody = document.getElementById('billing-report-tbody');
+            const resultDiv = document.getElementById('billing-report-result');
+            const title = document.getElementById('report-title');
+            const totalGeralEl = document.getElementById('report-total-geral');
+            const token = localStorage.getItem('acesscontrol_accessToken');
+
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Processando revendas...</td></tr>';
+            resultDiv.style.display = 'block';
+
+            try {
+                const response = await fetch(`${API_URL}/api/admin/billing/report?priceTableId=${planId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    title.innerText = `Plano: ${data.data.table_name} - Gerado em ${new Date(data.data.generated_at).toLocaleString()}`;
+                    let totalGlobal = 0;
+
+                    tbody.innerHTML = data.data.revendas.map(r => {
+                        totalGlobal += r.total_to_pay;
+                        const breakdownHtml = r.breakdown.map(b => 
+                            `<div style="font-size: 11px; color: #64748b;">• ${b.description}: R$ ${b.value.toFixed(2)}</div>`
+                        ).join('');
+
+                        return `
+                            <tr>
+                                <td><strong>${r.revenda_name}</strong></td>
+                                <td>${r.qty_pessoas}</td>
+                                <td>${r.qty_equipamentos}</td>
+                                <td>${breakdownHtml}</td>
+                                <td style="font-weight: 600; color: #059669;">R$ ${r.total_to_pay.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    }).join('');
+
+                    totalGeralEl.innerText = `R$ ${totalGlobal.toFixed(2)}`;
+                } else {
+                    alert('Erro ao gerar relatório: ' + data.message);
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Erro na requisição do relatório');
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+        
+        // ========== FUNÇÕES DE NOTIFICAÇÕES ==========
+        
+        // Carregar notificações
+        async function loadNotificacoes() {
+            try {
+                const response = await fetch('/api/notifications/all');
+                const notifications = await response.json();
+                
+                const tbody = document.getElementById('notificacoes-tbody');
+                
+                if (notifications.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <i class="fas fa-bell-slash"></i>
+                                <p>Nenhuma notificação cadastrada</p>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                tbody.innerHTML = notifications.map(n => {
+                    const createdDate = new Date(n.created_at).toLocaleString('pt-BR');
+                    const expiresDate = n.expires_at ? new Date(n.expires_at).toLocaleString('pt-BR') : 'Nunca';
+                    const isActive = n.is_active === 1;
+                    
+                    return `
+                        <tr>
+                            <td>${n.id}</td>
+                            <td><strong>${n.title}</strong></td>
+                            <td>${n.message.substring(0, 50)}${n.message.length > 50 ? '...' : ''}</td>
+                            <td>${createdDate}</td>
+                            <td>${expiresDate}</td>
+                            <td>
+                                <span class="badge ${isActive ? 'badge-success' : 'badge-danger'}">
+                                    ${isActive ? 'Ativa' : 'Inativa'}
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary" onclick="toggleNotificacao(${n.id}, ${isActive ? 0 : 1})" title="${isActive ? 'Desativar' : 'Ativar'}">
+                                    <i class="fas fa-${isActive ? 'eye-slash' : 'eye'}"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteNotificacao(${n.id})" title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Erro ao carregar notificações:', error);
+            }
+        }
+        
+        // Abrir modal de notificação
+        function openNotificacaoModal() {
+            document.getElementById('notificacao-modal').classList.add('active');
+        }
+        
+        // Fechar modal de notificação
+        function closeNotificacaoModal() {
+            document.getElementById('notificacao-modal').classList.remove('active');
+            document.getElementById('notificacao-form').reset();
+        }
+        
+        // Salvar notificação
+        async function saveNotificacao(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('notificacao-title').value;
+            const message = document.getElementById('notificacao-message').value;
+            const expires_at = document.getElementById('notificacao-expires').value || null;
+            const is_prioritary = document.getElementById('notificacao-prioritaria').checked;
+            
+            try {
+                const response = await fetch('/api/notifications', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title, message, expires_at, is_prioritary })
+                });
+                
+                if (response.ok) {
+                    alert('Notificação criada com sucesso!\nEla será exibida em todos os tenants.');
+                    closeNotificacaoModal();
+                    loadNotificacoes();
+                } else {
+                    const data = await response.json();
+                    alert('Erro: ' + (data.error || 'Erro ao criar notificação'));
+                }
+            } catch (error) {
+                console.error('Erro ao criar notificação:', error);
+                alert('Erro ao criar notificação');
+            }
+        }
+        
+        // Alternar status da notificação
+        async function toggleNotificacao(id, newStatus) {
+            try {
+                const response = await fetch(`/api/notifications/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ is_active: newStatus })
+                });
+                
+                if (response.ok) {
+                    alert('Notificação atualizada com sucesso!');
+                    loadNotificacoes();
+                } else {
+                    alert('Erro ao atualizar notificação');
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar notificação:', error);
+                alert('Erro ao atualizar notificação');
+            }
+        }
+        
+        // Excluir notificação
+        async function deleteNotificacao(id) {
+            if (!confirm('Tem certeza que deseja excluir esta notificação?')) return;
+            
+            try {
+                const response = await fetch(`/api/notifications/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    alert('Notificação excluída com sucesso!');
+                    loadNotificacoes();
+                } else {
+                    alert('Erro ao excluir notificação');
+                }
+            } catch (error) {
+                console.error('Erro ao excluir notificação:', error);
+                alert('Erro ao excluir notificação');
+            }
+        }
+
+        async function loadFaturamentoPlans() {
+            const select = document.getElementById('billing-plan-select');
+            const token = localStorage.getItem('acesscontrol_accessToken');
+            try {
+                const response = await fetch(`${API_URL}/api/prices`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    select.innerHTML = data.data.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+                } else {
+                    select.innerHTML = '<option value="">Erro ao carregar</option>';
+                }
+            } catch (e) {
+                console.error(e);
+                select.innerHTML = '<option value="">Erro de conexão</option>';
+            }
+        }
+
+        async function generateBillingReport() {
+            const planId = document.getElementById('billing-plan-select').value;
+            if (!planId) return alert('Selecione um plano primeiro');
+
+            const tbody = document.getElementById('billing-report-tbody');
+            const resultDiv = document.getElementById('billing-report-result');
+            const title = document.getElementById('report-title');
+            const totalGeralEl = document.getElementById('report-total-geral');
+            const token = localStorage.getItem('acesscontrol_accessToken');
+
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Processando revendas...</td></tr>';
+            resultDiv.style.display = 'block';
+
+            try {
+                const response = await fetch(`${API_URL}/api/admin/billing/report?priceTableId=${planId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    title.innerText = `Plano: ${data.data.table_name} - Gerado em ${new Date(data.data.generated_at).toLocaleString()}`;
+                    let totalGlobal = 0;
+
+                    tbody.innerHTML = data.data.revendas.map(r => {
+                        totalGlobal += r.total_to_pay;
+                        const breakdownHtml = r.breakdown.map(b => 
+                            `<div style="font-size: 11px; color: #64748b;">• ${b.description}: R$ ${b.value.toFixed(2)}</div>`
+                        ).join('');
+
+                        return `
+                            <tr>
+                                <td><strong>${r.revenda_name}</strong></td>
+                                <td>${r.qty_pessoas}</td>
+                                <td>${r.qty_equipamentos}</td>
+                                <td>${breakdownHtml}</td>
+                                <td style="font-weight: 600; color: #059669;">R$ ${r.total_to_pay.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    }).join('');
+
+                    totalGeralEl.innerText = `R$ ${totalGlobal.toFixed(2)}`;
+                } else {
+                    alert('Erro ao gerar relatório: ' + data.message);
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Erro na requisição do relatório');
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+    </script>
+    
+    <!-- Modal Notificação -->
+    <div id="notificacao-modal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-bell"></i> Nova Notificação</h2>
+                <button class="modal-close" onclick="closeNotificacaoModal()">&times;</button>
+            </div>
+            <form id="notificacao-form" onsubmit="saveNotificacao(event)">
+                <div class="form-group">
+                    <label>Título da Notificação</label>
+                    <input type="text" id="notificacao-title" required placeholder="Ex: Manutenção Programada">
+                </div>
+                <div class="form-group">
+                    <label>Mensagem</label>
+                    <textarea id="notificacao-message" required rows="5" placeholder="Ex: Amanhã às 09:00 será realizada uma atualização no sistema e poderá causar lentidão."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Data de Expiração (opcional)</label>
+                    <input type="datetime-local" id="notificacao-expires">
+                    <small style="color: #6b7280;">Deixe vazio para não expirar</small>
+                </div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="notificacao-prioritaria" style="width: 18px; height: 18px;">
+                        <span style="font-weight: 600; color: #dc2626;"><i class="fas fa-exclamation-triangle"></i> Notificação Prioritária</span>
+                    </label>
+                    <small style="color: #6b7280;">Notificações prioritárias aparecem automaticamente ao fazer login</small>
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: #fef3c7; border-radius: 8px;">
+                    <i class="fas fa-info-circle" style="color: #f59e0b;"></i>
+                    <strong>Atenção:</strong> Esta notificação será exibida em <strong>todos os tenants</strong> do sistema.
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 20px; width: 100%;">
+                    <i class="fas fa-bell"></i> Criar Notificação
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Editar Tenant -->
+    <div id="edit-tenant-modal" class="modal">
+        <div class="modal-content" style="max-width: 520px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit"></i> Editar Tenant — <span id="edit-tenant-id-display"></span></h2>
+                <button class="modal-close" onclick="closeEditTenantModal()">&times;</button>
+            </div>
+            <form id="edit-tenant-form">
+                <div class="form-group">
+                    <label>Razão Social</label>
+                    <input type="text" id="edit-tenant-company-name" placeholder="Nome da empresa">
+                </div>
+                <div class="form-group">
+                    <label>CNPJ</label>
+                    <input type="text" id="edit-tenant-cnpj" placeholder="00.000.000/0000-00">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Limite de Pessoas</label>
+                        <input type="number" id="edit-tenant-max-pessoas" min="1" placeholder="1000">
+                    </div>
+                    <div class="form-group">
+                        <label>Limite de Equipamentos</label>
+                        <input type="number" id="edit-tenant-max-equipamentos" min="1" placeholder="50">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 10px; width: 100%;">
+                    <i class="fas fa-save"></i> Salvar Alterações
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

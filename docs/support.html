@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Acess Control - Suporte Técnico</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="./favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #00d2ff;
+            --accent: #6a11cb;
+            --bg-dark: #0f0c29;
+            --glass: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0f0c29;
+            color: var(--text);
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* Animação Background com Círculos */
+        .bg-animate {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--accent), var(--primary));
+            filter: blur(80px);
+            animation: move 20s infinite alternate;
+            opacity: 0.3;
+        }
+
+        @keyframes move {
+            from { transform: translate(-10%, -10%); }
+            to { transform: translate(20%, 20%); }
+        }
+
+        /* Container Principal */
+        .support-screen {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .container {
+            width: 800px;
+            max-width: 100%;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+            padding: 40px;
+        }
+
+        /* Header */
+        .support-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .support-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ffffff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 210, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .support-header h1 i {
+            color: var(--primary);
+            -webkit-text-fill-color: initial;
+        }
+
+        .support-header p {
+            font-size: 1rem;
+            color: #f0f0f0;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Botão Voltar */
+        .back-button {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .back-button:hover {
+            background: rgba(0, 210, 255, 0.15);
+            border-color: rgba(0, 210, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .back-button i {
+            color: var(--primary);
+        }
+
+        /* Formulário */
+        .support-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 5px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            color: #00d2ff;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 16px 18px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            outline: none;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .input-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .input-group input:hover,
+        .input-group textarea:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(0, 210, 255, 0.5);
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            border-color: var(--primary);
+            background: rgba(0, 210, 255, 0.1);
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.3);
+        }
+
+        .input-group input::placeholder,
+        .input-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.95rem;
+        }
+
+        /* Input row para dois campos */
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Botão de enviar */
+        .btn-submit {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(45deg, var(--accent), var(--primary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.3);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-submit::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-submit:hover::before {
+            left: 100%;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(106, 17, 203, 0.5);
+        }
+
+        .btn-submit i {
+            margin-right: 8px;
+        }
+
+        /* Mensagens de status */
+        .alert {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin: 20px 0;
+            backdrop-filter: blur(5px);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #d1fae5;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fee2e2;
+        }
+
+        .alert-info {
+            background: rgba(0, 210, 255, 0.2);
+            border: 1px solid rgba(0, 210, 255, 0.4);
+            color: #e0f2fe;
+        }
+
+        .alert i {
+            font-size: 1.1rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Loading state */
+        .btn-submit.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .btn-submit.loading::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border: 3px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Footer */
+        .support-footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .protocolo-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .support-header h1 {
+                font-size: 2rem;
+            }
+
+            .input-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .back-button {
+                top: 15px;
+                left: 15px;
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px 15px;
+            }
+
+            .support-header h1 {
+                font-size: 1.6rem;
+            }
+
+            .input-group input,
+            .input-group textarea {
+                padding: 14px 16px;
+            }
+
+            .btn-submit {
+                padding: 16px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animate">
+        <div class="circle" style="width: 400px; height: 400px; top: -100px; left: -100px;"></div>
+        <div class="circle" style="width: 300px; height: 300px; bottom: -50px; right: -50px; animation-delay: -5s;"></div>
+    </div>
+
+    <a href="javascript:history.back()" class="back-button">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+
+    <div class="support-screen">
+        <div class="container">
+            <div class="support-header">
+                <h1>
+                    <i class="fas fa-headset"></i>
+                    Suporte Técnico
+                </h1>
+                <p>Entre em contato com nossa equipe. Responderemos em até 24h.</p>
+            </div>
+
+            <!-- Mensagens de feedback -->
+            <div id="alert-success" class="alert alert-success hidden">
+                <i class="fas fa-check-circle"></i>
+                <span id="success-message"></span>
+            </div>
+
+            <div id="alert-error" class="alert alert-error hidden">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="error-message"></span>
+            </div>
+
+            <div id="alert-info" class="alert alert-info hidden">
+                <i class="fas fa-info-circle"></i>
+                <span id="info-message">Enviando sua solicitação...</span>
+            </div>
+
+            <form id="support-form" class="support-form" onsubmit="enviarContato(event)">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Nome Completo *</label>
+                        <input type="text" id="nome" placeholder="Digite seu nome completo" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>CNPJ</label>
+                        <input type="text" id="cnpj" placeholder="00.000.000/0000-00">
+                    </div>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>E-mail *</label>
+                        <input type="email" id="email" placeholder="seu@email.com" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Celular *</label>
+                        <input type="tel" id="celular" placeholder="(41) 99999-9999" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Motivo do Contato *</label>
+                    <textarea id="motivo" placeholder="Descreva detalhadamente o motivo do seu contato..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submit-button">
+                    <i class="fas fa-paper-plane"></i>
+                    Enviar Mensagem
+                </button>
+            </form>
+
+            <div class="support-footer">
+                <div class="version-info">
+                    <i class="fas fa-clock"></i>
+                    <span>Tempo médio de resposta: 24h</span>
+                </div>
+                <div class="protocolo-info" id="protocolo-info">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Seus dados estão seguros conosco</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Função para gerar número de protocolo
+        function gerarProtocolo() {
+            const data = new Date();
+            const ano = data.getFullYear().toString().slice(-2);
+            const mes = (data.getMonth() + 1).toString().padStart(2, '0');
+            const dia = data.getDate().toString().padStart(2, '0');
+            const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            return `#SUP-${ano}${mes}${dia}-${random}`;
+        }
+
+        // Formatar CNPJ enquanto digita
+        document.getElementById('cnpj').addEventListener('input', function(e) {
+            let valor = e.target.value.replace(/\D/g, '');
+            if (valor.length > 14) valor = valor.slice(0, 14);
+            
+            if (valor.length > 12) {
+                valor = valor.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+            } else if (valor.length > 8) {
+                valor = valor.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4})/, '$1.$2.$3/$4');
+            } else if (valor.length > 5) {
+                valor = valor.replace(/^(\d{2})(\d{3})(\d{0,3})/, '$1.$2.$3');
+            } else if (valor.length > 2) {
+                valor = valor.replace(/^(\d{2})(\d{0,3})/, '$1.$2');
+            }
+            
+            e.target.value = valor;
+        });
+
+        // Formatar celular enquanto digita
+        document.getElementById('celular').addEventListener('input', function(e) {
+            let valor = e.target.value.replace(/\D/g, '');
+            if (valor.length > 11) valor = valor.slice(0, 11);
+            
+            if (valor.length > 7) {
+                valor = valor.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+            } else if (valor.length > 2) {
+                valor = valor.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+            } else if (valor.length > 0) {
+                valor = valor.replace(/^(\d*)/, '($1');
+            }
+            
+            e.target.value = valor;
+        });
+
+        // Funções de UI
+        function mostrarAlerta(tipo, mensagem) {
+            document.getElementById('alert-success').classList.add('hidden');
+            document.getElementById('alert-error').classList.add('hidden');
+            document.getElementById('alert-info').classList.add('hidden');
+            
+            if (tipo === 'success') {
+                document.getElementById('success-message').textContent = mensagem;
+                document.getElementById('alert-success').classList.remove('hidden');
+            } else if (tipo === 'error') {
+                document.getElementById('error-message').textContent = mensagem;
+                document.getElementById('alert-error').classList.remove('hidden');
+            } else if (tipo === 'info') {
+                document.getElementById('info-message').textContent = mensagem;
+                document.getElementById('alert-info').classList.remove('hidden');
+            }
+        }
+
+        function setLoading(isLoading) {
+            const button = document.getElementById('submit-button');
+            if (isLoading) {
+                button.classList.add('loading');
+                button.disabled = true;
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
+        }
+
+        // Enviar formulário
+        async function enviarContato(event) {
+            event.preventDefault();
+
+            // Coletar dados
+            const dados = {
+                nome: document.getElementById('nome').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                cnpj: document.getElementById('cnpj').value.trim(),
+                celular: document.getElementById('celular').value.trim(),
+                motivo: document.getElementById('motivo').value.trim()
+            };
+
+            // Validar campos obrigatórios
+            if (!dados.nome || !dados.email || !dados.celular || !dados.motivo) {
+                mostrarAlerta('error', 'Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+
+            // Validar formato do email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(dados.email)) {
+                mostrarAlerta('error', 'Por favor, insira um e-mail válido.');
+                return;
+            }
+            
+            // Mostrar loading
+            setLoading(true);
+            mostrarAlerta('info', 'Enviando sua solicitação...');
+
+            try {
+                // Chamada REAL para o backend
+                const response = await fetch('/api/contato', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(dados)
+                });
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.message || 'Erro ao enviar');
+                }
+
+                // Sucesso
+                setLoading(false);
+                mostrarAlerta('success', `Solicitação enviada com sucesso! Protocolo: ${result.protocolo}`);
+                
+                // Atualizar rodapé com protocolo
+                document.getElementById('protocolo-info').innerHTML = `
+                    <i class="fas fa-tag"></i>
+                    <span>Protocolo: ${result.protocolo}</span>
+                `;
+                
+                // Limpar formulário
+                document.getElementById('support-form').reset();
+                
+            } catch (error) {
+                setLoading(false);
+                mostrarAlerta('error', error.message || 'Erro ao enviar solicitação. Tente novamente mais tarde.');
+                console.error('Erro:', error);
+            }
+        }
+
+        // Exemplo de como seria o backend (Node.js/Express) - COMENTADO
+        /*
+        // backend/routes/contato.js
+        import { Resend } from 'resend';
+        import express from 'express';
+        
+        const router = express.Router();
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        
+        router.post('/api/contato', async (req, res) => {
+            try {
+                const { nome, email, cnpj, celular, motivo } = req.body;
+                
+                // Gerar protocolo
+                const protocolo = gerarProtocolo();
+                
+                // Email 1 - Notificação para o suporte
+                await resend.emails.send({
+                    from: 'contato@example.com',
+                    to: 'suporte' + '@' + 'example.com', // Email de destino ofuscado
+                    subject: `Novo contato de suporte - ${protocolo}`,
+                    html: `
+                        <h2>Novo contato recebido</h2>
+                        
+                        <p><strong>Protocolo:</strong> ${protocolo}</p>
+                        <p><strong>Data/Hora:</strong> ${new Date().toLocaleString('pt-BR')}</p>
+                        
+                        <h3>Dados do solicitante:</h3>
+                        <p><strong>Nome:</strong> ${nome}</p>
+                        <p><strong>Email:</strong> ${email}</p>
+                        <p><strong>CNPJ:</strong> ${cnpj || 'Não informado'}</p>
+                        <p><strong>Celular:</strong> ${celular}</p>
+                        
+                        <h3>Motivo do contato:</h3>
+                        <p>${motivo.replace(/\n/g, '<br>')}</p>
+                        
+                        <hr>
+                        <p style="color: #666; font-size: 12px;">
+                            Este é um email automático. Por favor, não responda.
+                        </p>
+                    `
+                });
+                
+                // Email 2 - Confirmação para o cliente
+                await resend.emails.send({
+                    from: 'contato@example.com',
+                    to: email,
+                    subject: 'Recebemos seu contato - Acess Control',
+                    html: `
+                        <h2>Olá, ${nome}!</h2>
+                        
+                        <p>Recebemos sua solicitação de contato com sucesso.</p>
+                        
+                        <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <p><strong>Protocolo:</strong> ${protocolo}</p>
+                            <p><strong>Data/Hora:</strong> ${new Date().toLocaleString('pt-BR')}</p>
+                            <p><strong>Motivo:</strong> ${motivo}</p>
+                        </div>
+                        
+                        <p>Nossa equipe de suporte analisará sua solicitação e retornará o contato em até 24 horas úteis.</p>
+                        
+                        <p>Para acompanhar o status da sua solicitação, guarde o número de protocolo acima.</p>
+                        
+                        <hr>
+                        
+                        <p style="color: #666; font-size: 14px;">
+                            <strong>Acess Control</strong><br>
+                            Sistema de Controle de Acesso
+                        </p>
+                        
+                        <p style="color: #999; font-size: 12px;">
+                            Este é um email automático. Por favor, não responda.
+                        </p>
+                    `
+                });
+                
+                res.json({ 
+                    success: true, 
+                    protocolo,
+                    message: 'Contato enviado com sucesso'
+                });
+                
+            } catch (error) {
+                console.error('Erro ao enviar email:', error);
+                res.status(500).json({ 
+                    success: false, 
+                    message: 'Erro ao processar solicitação'
+                });
+            }
+        });
+        
+        export default router;
+        */
+    </script>
+</body>
+</html>

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claviculário - Acess Control</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <script src="../../auth.js"></script>
+    
+    <!-- Styles específicos da página - mesmo estilo das outras -->
+    <style>
+        /* Reset e estilos base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+        /* Cards */
+        .content-box {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Grid de formulário - 3 colunas */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .grid-col-full {
+            grid-column: 1 / -1;
+        }
+
+        /* Form groups */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #ffffff;
+            font-family: inherit;
+        }
+
+        .form-group input:hover,
+        .form-group select:hover,
+        .form-group textarea:hover {
+            border-color: #94a3b8;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .required:after {
+            content: " *";
+            color: #e53e3e;
+        }
+
+        /* Botões */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.2);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Section header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-header-compact {
+            margin-bottom: 20px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title h2 {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Tabela */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            color: #1e293b;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* Ações do formulário */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .data-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        /* Texto centralizado */
+        .text-center {
+            text-align: center;
+        }
+
+        /* Mensagem vazia */
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+
+        .empty-message i {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="claviculario" class="content-section active">
+                    <!-- CLAVICULARIO LIST VIEW -->
+                    <div id="chaves-list">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <h1>Claviculário</h1>
+                                <p>Controle de chaves e objetos de valor</p>
+                            </div>
+                            <div class="section-actions">
+                                <button class="btn btn-primary" onclick="showChaveForm()">
+                                    <i class="fas fa-plus"></i> Registrar Chave
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="content-box">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Identificador</th>
+                                        <th>Descrição</th>
+                                        <th>Local</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-chaves">
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="empty-message">
+                                                <i class="fas fa-key"></i>
+                                                <p>Nenhuma chave registrada</p>
+                                                <button class="btn btn-primary btn-sm" onclick="showChaveForm()" style="margin-top: 12px;">
+                                                    <i class="fas fa-plus"></i> Registrar primeira chave
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- CLAVICULARIO FORM VIEW -->
+                    <div id="chaves-form" class="hidden">
+                        <div class="section-header section-header-compact">
+                            <div class="section-title">
+                                <h2 id="chave-form-title">Registrar Chave</h2>
+                                <p>Preencha os dados da chave</p>
+                            </div>
+                            <div class="section-actions">
+                                <button class="btn btn-secondary" onclick="showChaveList()">
+                                    <i class="fas fa-times"></i> Fechar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="content-box">
+                            <form id="chaveForm" onsubmit="saveChave(event)">
+                                <input type="hidden" id="chave-id">
+
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="identificador" class="required">Identificador</label>
+                                        <input type="text" id="identificador" required placeholder="Ex: CH-001, Sala 201">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="descricao" class="required">Descrição</label>
+                                        <input type="text" id="descricao" required placeholder="Ex: Chave da sala de reuniões">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="local" class="required">Local/Setor</label>
+                                        <select id="local" required>
+                                            <option value="">Selecione...</option>
+                                            <option value="administrativo">Administrativo</option>
+                                            <option value="producao">Produção</option>
+                                            <option value="almoxarifado">Almoxarifado</option>
+                                            <option value="ti">TI</option>
+                                            <option value="rh">RH</option>
+                                            <option value="financeiro">Financeiro</option>
+                                            <option value="portaria">Portaria</option>
+                                            <option value="outros">Outros</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="tipo">Tipo</label>
+                                        <select id="tipo">
+                                            <option value="chave">Chave</option>
+                                            <option value="chaveiro">Chaveiro</option>
+                                            <option value="cartao">Cartão de Acesso</option>
+                                            <option value="outro">Outro</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group grid-col-full">
+                                        <label for="observacoes">Observações</label>
+                                        <textarea id="observacoes" rows="3" placeholder="Informações adicionais sobre a chave (opcional)"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-secondary" onclick="showChaveList()">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Salvar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+
+    <script>
+        let chaves = [];
+        let editandoId = null;
+
+        function showChaveForm() {
+            try {
+                const listView = document.getElementById('chaves-list');
+                const formView = document.getElementById('chaves-form');
+                if (listView) listView.classList.add('hidden');
+                if (formView) formView.classList.remove('hidden');
+                const title = document.getElementById('chave-form-title');
+                if (title) title.textContent = 'Registrar Chave';
+                const formEl = document.getElementById('chaveForm');
+                if (formEl) {
+                    formEl.reset();
+                    document.getElementById('chave-id').value = '';
+                }
+                editandoId = null;
+            } catch (e) {
+                console.error('Erro em showChaveForm:', e);
+            }
+        }
+
+        function showChaveList() {
+            try {
+                const listView = document.getElementById('chaves-list');
+                const formView = document.getElementById('chaves-form');
+                if (listView) listView.classList.remove('hidden');
+                if (formView) formView.classList.add('hidden');
+                const formEl = document.getElementById('chaveForm');
+                if (formEl) formEl.reset();
+                editandoId = null;
+            } catch (e) {
+                console.error('Erro em showChaveList:', e);
+            }
+        }
+
+        function saveChave(e) {
+            e.preventDefault();
+
+            const identificador = document.getElementById('identificador').value;
+            
+            // Verificar duplicata
+            if (!editandoId) {
+                const existe = chaves.some(c => c.identificador === identificador);
+                if (existe) {
+                    alert('Já existe uma chave com este identificador!');
+                    return;
+                }
+            }
+
+            const chave = {
+                id: editandoId || Date.now(),
+                identificador: identificador,
+                descricao: document.getElementById('descricao').value,
+                local: document.getElementById('local').value,
+                tipo: document.getElementById('tipo').value,
+                observacoes: document.getElementById('observacoes').value,
+                status: 'disponivel'
+            };
+
+            if (editandoId) {
+                const index = chaves.findIndex(c => c.id === editandoId);
+                if (index !== -1) {
+                    chaves[index] = { ...chaves[index], ...chave };
+                    alert('Chave atualizada com sucesso!');
+                }
+            } else {
+                chaves.push(chave);
+                alert('Chave registrada com sucesso!');
+            }
+
+            showChaveList();
+            renderizarLista();
+        }
+
+        function editarChave(id) {
+            const chave = chaves.find(c => c.id === id);
+            if (!chave) return;
+
+            editandoId = id;
+            document.getElementById('identificador').value = chave.identificador;
+            document.getElementById('descricao').value = chave.descricao;
+            document.getElementById('local').value = chave.local;
+            document.getElementById('tipo').value = chave.tipo;
+            document.getElementById('observacoes').value = chave.observacoes || '';
+            document.getElementById('chave-id').value = id;
+            document.getElementById('chave-form-title').textContent = 'Editar Chave';
+            showChaveForm();
+        }
+
+        function excluirChave(id) {
+            if (confirm('Deseja realmente excluir este registro?')) {
+                chaves = chaves.filter(c => c.id !== id);
+                alert('Chave excluída com sucesso!');
+                renderizarLista();
+            }
+        }
+
+        function renderizarLista() {
+            const tbody = document.getElementById('tbody-chaves');
+            
+            if (!tbody) return;
+            
+            if (chaves.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-message">
+                                <i class="fas fa-key"></i>
+                                <p>Nenhuma chave registrada</p>
+                                <button class="btn btn-primary btn-sm" onclick="showChaveForm()" style="margin-top: 12px;">
+                                    <i class="fas fa-plus"></i> Registrar primeira chave
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const localLabel = {
+                'administrativo': 'Administrativo',
+                'producao': 'Produção',
+                'almoxarifado': 'Almoxarifado',
+                'ti': 'TI',
+                'rh': 'RH',
+                'financeiro': 'Financeiro',
+                'portaria': 'Portaria',
+                'outros': 'Outros'
+            };
+
+            tbody.innerHTML = chaves.map(c => {
+                const statusClass = c.status === 'disponivel' ? 'badge-success' : 'badge-warning';
+                const statusText = c.status === 'disponivel' ? 'Disponível' : 'Em Uso';
+
+                return `
+                    <tr>
+                        <td><strong>${c.identificador}</strong></td>
+                        <td>${c.descricao}</td>
+                        <td>${localLabel[c.local] || c.local}</td>
+                        <td><span class="badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="editarChave(${c.id})" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="excluirChave(${c.id})" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Adicionar alguns dados de exemplo
+        document.addEventListener('DOMContentLoaded', () => {
+            // Dados mockados para teste
+            chaves = [];
+            
+            renderizarLista();
+        });
+    </script>
+</body>
+</html>

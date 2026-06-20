@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Acess Control - Relatórios</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+        .content-box {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.2);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .filtros-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .filtro-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filtro-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .filtro-group input,
+        .filtro-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #ffffff;
+        }
+
+        .filtro-group input:focus,
+        .filtro-group select:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .colunas-container {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 24px;
+        }
+
+        .colunas-container h3 {
+            margin-bottom: 16px;
+            color: #1e293b;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .colunas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .coluna-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .coluna-item:hover {
+            border-color: #4a90d9;
+            background: #ebf5ff;
+        }
+
+        .coluna-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #4a90d9;
+        }
+
+        .coluna-item span {
+            font-size: 0.9rem;
+            color: #1e293b;
+        }
+
+        .preview-container {
+            margin-top: 24px;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            color: #1e293b;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .formatos {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .formato-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .formato-option:hover {
+            border-color: #4a90d9;
+            background: #ebf5ff;
+        }
+
+        .formato-option input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #4a90d9;
+        }
+
+        .formato-option i {
+            color: #4a90d9;
+            font-size: 1.1rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .filtros-container {
+                grid-template-columns: 1fr;
+            }
+
+            .colunas-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .formatos {
+                flex-direction: column;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="relatorios" class="content-section active">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1>Relatórios</h1>
+                            <p>Exporte relatórios de cadastros do sistema</p>
+                        </div>
+                    </div>
+
+                    <div class="content-box">
+                        <!-- Seleção do Tipo de Relatório -->
+                        <div class="filtros-container">
+                            <div class="filtro-group">
+                                <label>Tipo de Relatório</label>
+                                <select id="tipoRelatorio" onchange="carregarFiltros()">
+                                    <option value="">Selecione...</option>
+                                    <option value="pessoas">Pessoas</option>
+                                    <option value="visitantes">Visitantes</option>
+                                    <option value="empresas">Empresas</option>
+                                    <option value="veiculos">Veículos</option>
+                                    <option value="estacionamentos">Estacionamentos</option>
+                                    <option value="refeicoes">Refeitório/Refeições</option>
+                                    <option value="horarios">Horários</option>
+                                    <option value="claviculario">Claviculário</option>
+                                    <option value="niveis-acesso-pessoa">Níveis de Acesso - Pessoa</option>
+                                    <option value="niveis-acesso-veiculo">Níveis de Acesso - Veículo</option>
+                                    <option value="niveis-acesso-refeicao">Níveis de Acesso - Refeição</option>
+                                    <option value="aniversariantes">Aniversariantes</option>
+                                </select>
+                            </div>
+
+                            <!-- Período -->
+                            <div class="filtro-group">
+                                <label>Período</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="date" id="dataInicio" value="2026-01-01">
+                                    <span style="align-self: center;">até</span>
+                                    <input type="date" id="dataFim" value="2026-01-31">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filtros Dinâmicos -->
+                        <div id="filtrosDinamicos" class="filtros-container"></div>
+
+                        <!-- Seleção de Colunas -->
+                        <div id="colunasContainer" class="colunas-container hidden">
+                            <h3><i class="fas fa-columns"></i> Selecione as colunas para exibir</h3>
+                            <div id="colunasGrid" class="colunas-grid"></div>
+                        </div>
+
+                        <!-- Formato de Exportação -->
+                        <div class="formatos">
+                            <label class="formato-option">
+                                <input type="radio" name="formato" value="pdf" checked>
+                                <i class="fas fa-file-pdf"></i>
+                                <span>PDF</span>
+                            </label>
+                            <label class="formato-option">
+                                <input type="radio" name="formato" value="xlsx">
+                                <i class="fas fa-file-excel"></i>
+                                <span>Excel (XLSX)</span>
+                            </label>
+                            <label class="formato-option">
+                                <input type="radio" name="formato" value="csv">
+                                <i class="fas fa-file-csv"></i>
+                                <span>CSV</span>
+                            </label>
+                        </div>
+
+                        <!-- Botões -->
+                        <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+                            <button class="btn btn-primary" onclick="gerarRelatorio()">
+                                <i class="fas fa-file-export"></i> Gerar Relatório
+                            </button>
+                            <button class="btn btn-secondary" onclick="visualizarPreview()">
+                                <i class="fas fa-eye"></i> Visualizar Preview
+                            </button>
+                        </div>
+
+                        <!-- Preview da Tabela -->
+                        <div id="previewContainer" class="preview-container hidden">
+                            <h3 style="margin-bottom: 16px; color: #1e293b;">Preview do Relatório</h3>
+                            <table class="data-table" id="previewTable">
+                                <thead id="previewThead">
+                                    <tr></tr>
+                                </thead>
+                                <tbody id="previewTbody"></tbody>
+                            </table>
+                            <div id="previewPagination" class="pagination" style="display: flex; justify-content: center; gap: 8px; margin-top: 15px; align-items: center;"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+    <script src="../../auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+    <script>
+        // ── Estado global ─────────────────────────────────────────────────────
+        let reportData = [];          // dados carregados da API
+        let empresaInfo = { razao: 'Acess Control', cnpj: '', endereco: '', telefone: '', email: '' };
+        let logoBase64 = null;        // logo convertida para base64
+
+        // ── Tradução de status ────────────────────────────────────────────────
+        const translateStatus = v => {
+            if (!v && v !== 0) return '-';
+            const map = { 'active': 'ATIVO', 'inactive': 'INATIVO', 'true': 'ATIVO', 'false': 'INATIVO', 1: 'ATIVO', 0: 'INATIVO' };
+            return map[String(v).toLowerCase()] || String(v).toUpperCase();
+        };
+
+        const DATE_COLUMNS = new Set([
+            'dataCadastro', 'dataCriacao', 'dataEntrada', 'dataSaida', 'dataAdmissao', 'dataNascimento'
+        ]);
+
+        function formatCellValue(col, val) {
+            if (val === null || val === undefined || val === '') return '-';
+            if (col === 'status') return translateStatus(val);
+            if (DATE_COLUMNS.has(col)) {
+                try {
+                    const d = new Date(val);
+                    if (!Number.isNaN(d.getTime())) {
+                        return d.toLocaleString('pt-BR', {
+                            day: '2-digit', month: '2-digit', year: 'numeric',
+                            hour: '2-digit', minute: '2-digit'
+                        });
+                    }
+                } catch (e) { /* mantém valor original */ }
+            }
+            return String(val);
+        }
+
+        function buildReportFilters(tipo) {
+            const dataInicio = document.getElementById('filtroDataInicio')?.value || '';
+            const dataFim    = document.getElementById('filtroDataFim')?.value || '';
+            const busca      = document.getElementById('filtroBusca')?.value?.trim() || '';
+            const status     = document.getElementById('filtroStatus')?.value || '';
+            const empresa    = document.getElementById('filtroEmpresa')?.value || '';
+            const grupo      = document.getElementById('filtroGrupo')?.value || '';
+            const placa      = document.getElementById('filtroPlaca')?.value?.trim() || '';
+
+            const filters = { limit: 10000 };
+            if (dataInicio) filters.startDate = dataInicio;
+            if (dataFim)    filters.endDate   = dataFim;
+            if (busca)      filters.search    = busca;
+            if (empresa)    filters.companyId = empresa;
+            if (grupo)      filters.groupName = grupo;
+
+            if (status) {
+                if (['pessoas', 'visitantes'].includes(tipo)) {
+                    filters.status = status === 'ATIVO' ? 'active' : 'inactive';
+                } else {
+                    filters.active = status === 'ATIVO' ? 'true' : 'false';
+                }
+            }
+            if (placa && tipo === 'veiculos') {
+                filters.search = placa;
+            }
+            return filters;
+        }
+
+        // ── Configuração de colunas por tipo ──────────────────────────────────
+        const colunasConfig = {
+            pessoas: [
+                { id: 'nome', label: 'NOME' },
+                { id: 'email', label: 'EMAIL' },
+                { id: 'telefone', label: 'TELEFONE' },
+                { id: 'dataCadastro', label: 'DATA CADASTRO' },
+                { id: 'status', label: 'STATUS' },
+                { id: 'matricula', label: 'MATRÍCULA' },
+                { id: 'empresa', label: 'EMPRESA' },
+                { id: 'grupo', label: 'GRUPO' }
+            ],
+            visitantes: [
+                { id: 'nome', label: 'NOME DO VISITANTE' },
+                { id: 'email', label: 'EMAIL' },
+                { id: 'telefone', label: 'TELEFONE' },
+                { id: 'cpf', label: 'CPF' },
+                { id: 'dataCadastro', label: 'DATA CADASTRO' },
+                { id: 'status', label: 'STATUS' },
+                { id: 'empresaVisitada', label: 'EMPRESA VISITADA' }
+            ],
+            empresas: [
+                { id: 'nome', label: 'NOME DA EMPRESA' },
+                { id: 'cnpj', label: 'CNPJ' },
+                { id: 'telefone', label: 'TELEFONE' },
+                { id: 'email', label: 'EMAIL' },
+                { id: 'endereco', label: 'ENDEREÇO' },
+                { id: 'dataCriacao', label: 'DATA CRIAÇÃO' },
+                { id: 'status', label: 'STATUS' },
+                { id: 'pessoasVinculadas', label: 'PESSOAS VINCULADAS' }
+            ],
+            veiculos: [
+                { id: 'placa', label: 'PLACA' },
+                { id: 'marca', label: 'MARCA' },
+                { id: 'modelo', label: 'MODELO' },
+                { id: 'cor', label: 'COR' },
+                { id: 'ano', label: 'ANO' },
+                { id: 'pessoaVinculada', label: 'PESSOA VINCULADA' },
+                { id: 'empresa', label: 'EMPRESA' }
+            ],
+            estacionamentos: [
+                { id: 'nome', label: 'NOME' },
+                { id: 'vagas', label: 'VAGAS' },
+                { id: 'tipo', label: 'TIPO' },
+                { id: 'status', label: 'STATUS' }
+            ],
+            refeicoes: [
+                { id: 'refeitorio', label: 'REFEITÓRIO' },
+                { id: 'localizacao', label: 'LOCALIZAÇÃO' },
+                { id: 'regrasVinculadas', label: 'REGRAS VINCULADAS' }
+            ],
+            horarios: [
+                { id: 'nome', label: 'NOME DO HORÁRIO' },
+                { id: 'horario', label: 'HORÁRIO' },
+                { id: 'nivelVinculado', label: 'NÍVEL VINCULADO' }
+            ],
+            claviculario: [
+                { id: 'claviculario', label: 'CLAVICULÁRIO' },
+                { id: 'localizacao', label: 'LOCALIZAÇÃO' },
+                { id: 'pessoaVinculada', label: 'PESSOA VINCULADA' },
+                { id: 'status', label: 'STATUS' },
+                { id: 'grupo', label: 'GRUPO' }
+            ],
+            'niveis-acesso-pessoa': [
+                { id: 'nome', label: 'NOME' },
+                { id: 'descricao', label: 'DESCRIÇÃO' }
+            ],
+            aniversariantes: [
+                { id: 'nome', label: 'NOME' },
+                { id: 'dataNascimento', label: 'DATA NASCIMENTO' },
+                { id: 'email', label: 'EMAIL' },
+                { id: 'telefone', label: 'TELEFONE' },
+                { id: 'empresa', label: 'EMPRESA' }
+            ]
+        };
+
+        // ── Choices.js instances ──────────────────────────────────────────────
+        let choicesStatus = null, choicesGrupo = null, choicesEmpresa = null;
+
+        function destroyChoices() {
+            [choicesStatus, choicesGrupo, choicesEmpresa].forEach(c => { try { c && c.destroy(); } catch(e){} });
+            choicesStatus = choicesGrupo = choicesEmpresa = null;
+        }
+
+        function initChoice(id, placeholder = 'Todos') {
+            const el = document.getElementById(id);
+            if (!el) return null;
+            return new Choices(el, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: placeholder,
+                noResultsText: 'Nenhum resultado',
+                noChoicesText: 'Nenhuma opção',
+                shouldSort: false
+            });
+        }
+
+        // ── Carregar filtros dinâmicos (empresas, grupos) ─────────────────────
+        async function carregarFiltros() {
+            const tipo = document.getElementById('tipoRelatorio').value;
+            const filtrosDiv = document.getElementById('filtrosDinamicos');
+            const colunasContainer = document.getElementById('colunasContainer');
+            const colunasGrid = document.getElementById('colunasGrid');
+
+            destroyChoices();
+            filtrosDiv.innerHTML = '';
+            reportData = [];
+            document.getElementById('previewContainer').classList.add('hidden');
+
+            if (!tipo || !colunasConfig[tipo]) {
+                colunasContainer.classList.add('hidden');
+                return;
+            }
+
+            // Colunas
+            colunasContainer.classList.remove('hidden');
+            colunasGrid.innerHTML = colunasConfig[tipo].map(col => `
+                <label class="coluna-item">
+                    <input type="checkbox" value="${col.id}" checked onchange="atualizarPreview()">
+                    <span>${col.label}</span>
+                </label>
+            `).join('');
+
+            // Filtros por tipo
+            const showStatus   = ['pessoas','visitantes','empresas','veiculos','estacionamentos','claviculario'].includes(tipo);
+            const showEmpresa  = ['pessoas','visitantes','veiculos'].includes(tipo);
+            const showGrupo    = ['pessoas','claviculario'].includes(tipo);
+            const showPlaca    = tipo === 'veiculos';
+            const showBusca    = ['pessoas','visitantes','empresas','veiculos'].includes(tipo);
+
+            let html = `<div class="filtro-group" style="min-width:200px;">
+                <label>Data Início</label>
+                <input type="date" id="filtroDataInicio">
+            </div>
+            <div class="filtro-group" style="min-width:200px;">
+                <label>Data Fim</label>
+                <input type="date" id="filtroDataFim">
+            </div>`;
+
+            if (showBusca) html += `<div class="filtro-group" style="min-width:200px;">
+                <label>Busca</label>
+                <input type="text" id="filtroBusca" placeholder="Nome, placa, e-mail...">
+            </div>`;
+
+            if (showStatus) html += `<div class="filtro-group" style="min-width:180px;">
+                <label>Status</label>
+                <select id="filtroStatus"><option value="">Todos</option><option value="ATIVO">Ativo</option><option value="INATIVO">Inativo</option></select>
+            </div>`;
+
+            if (showEmpresa) html += `<div class="filtro-group" style="min-width:220px;">
+                <label>Empresa</label>
+                <select id="filtroEmpresa"><option value="">Todas</option></select>
+            </div>`;
+
+            if (showGrupo) html += `<div class="filtro-group" style="min-width:220px;">
+                <label>Grupo</label>
+                <select id="filtroGrupo"><option value="">Todos</option></select>
+            </div>`;
+
+            if (showPlaca) html += `<div class="filtro-group" style="min-width:180px;">
+                <label>Placa</label>
+                <input type="text" id="filtroPlaca" placeholder="Ex: ABC1234">
+            </div>`;
+
+            filtrosDiv.innerHTML = html;
+
+            // Inicializar Choices.js
+            if (showStatus) choicesStatus = initChoice('filtroStatus', 'Todos');
+            if (showEmpresa) {
+                choicesEmpresa = initChoice('filtroEmpresa', 'Todas');
+                carregarEmpresas();
+            }
+            if (showGrupo) {
+                choicesGrupo = initChoice('filtroGrupo', 'Todos');
+                carregarGrupos();
+            }
+        }
+
+        async function carregarEmpresas() {
+            try {
+                const dados = await api.getCompaniesReport();
+                const sel = document.getElementById('filtroEmpresa');
+                if (!sel || !dados || !dados.length) return;
+                dados.forEach(e => {
+                    const opt = document.createElement('option');
+                    opt.value = e.id; // Usar ID em vez do nome
+                    opt.textContent = e.nome;
+                    sel.appendChild(opt);
+                });
+                if (choicesEmpresa) { choicesEmpresa.destroy(); }
+                choicesEmpresa = initChoice('filtroEmpresa', 'Todas');
+            } catch(e) { console.error('Erro ao carregar empresas:', e); }
+        }
+
+        async function carregarGrupos() {
+            try {
+                const result = await api.request('/reports/filters');
+                const sel = document.getElementById('filtroGrupo');
+                if (!sel || !result || !result.data) return;
+                (result.data.groups || []).forEach(g => {
+                    const opt = document.createElement('option');
+                    opt.value = g.name;
+                    opt.textContent = g.name;
+                    sel.appendChild(opt);
+                });
+                if (choicesGrupo) { choicesGrupo.destroy(); }
+                choicesGrupo = initChoice('filtroGrupo', 'Todos');
+            } catch(e) { console.error('Erro ao carregar grupos:', e); }
+        }
+
+        // ── Buscar dados da API ─────────────────────────────────────────────
+        async function getDadosFiltrados() {
+            const tipo = document.getElementById('tipoRelatorio').value;
+            if (!tipo) return [];
+
+            const status     = document.getElementById('filtroStatus')?.value || '';
+            const grupo      = document.getElementById('filtroGrupo')?.value || '';
+            const filters = buildReportFilters(tipo);
+
+            let dados = [];
+            try {
+                switch (tipo) {
+                    case 'pessoas':
+                        dados = await api.getPersonsReport(filters);
+                        break;
+                    case 'visitantes':
+                        dados = await api.getVisitorsReport(filters);
+                        break;
+                    case 'empresas':
+                        dados = await api.getCompaniesReport(filters);
+                        break;
+                    case 'veiculos':
+                        dados = await api.getVehiclesReport(filters);
+                        break;
+                    case 'estacionamentos':
+                        dados = await api.getParkingsReport(filters);
+                        break;
+                    case 'refeicoes':
+                        dados = await api.getCafeteriasReport(filters);
+                        break;
+                    case 'horarios':
+                        dados = await api.getSchedulesReport(filters);
+                        break;
+                    case 'claviculario':
+                        dados = await api.getKeyholdersReport(filters);
+                        break;
+                    default:
+                        dados = [];
+                }
+            } catch (err) {
+                console.error('Erro ao buscar dados:', err);
+                dados = [];
+            }
+
+            if (!Array.isArray(dados)) dados = [];
+
+            // Garantir tradução de status em todos os dados
+            dados = dados.map(d => {
+                const copy = { ...d };
+                if ('status' in copy) copy.status = translateStatus(copy.status);
+                return copy;
+            });
+
+            // Filtro client-side de empresa (REMOVIDO: agora o backend já filtra)
+            /*
+            if (empresa) {
+                dados = dados.filter(d =>
+                    (d.empresa || '').toLowerCase().includes(empresa.toLowerCase()) ||
+                    (d.empresaVisitada || '').toLowerCase().includes(empresa.toLowerCase())
+                );
+            }
+            */
+            // Filtro de grupo (client-side)
+            if (grupo) {
+                dados = dados.filter(d => (d.grupo || '') === grupo);
+            }
+            // Filtro de status client-side (caso o backend não filtre)
+            if (status) {
+                dados = dados.filter(d => (d.status || '').toUpperCase() === status);
+            }
+
+            reportData = dados;
+            return dados;
+        }
+
+        function getColunasSelecionadas() {
+            const tipo = document.getElementById('tipoRelatorio').value;
+            const checkboxes = document.querySelectorAll('#colunasGrid input[type="checkbox"]:checked');
+            const ids = Array.from(checkboxes).map(cb => cb.value);
+            return ids.length ? ids : (colunasConfig[tipo] || []).map(c => c.id);
+        }
+
+        // ── Preview ───────────────────────────────────────────────────────────
+        async function visualizarPreview() {
+            const tipo = document.getElementById('tipoRelatorio').value;
+            if (!tipo) { alert('Selecione um tipo de relatório!'); return; }
+
+            const colunasSelecionadas = getColunasSelecionadas();
+            if (!colunasSelecionadas.length) { alert('Selecione pelo menos uma coluna!'); return; }
+
+            const dados = await getDadosFiltrados();
+            const thead = document.getElementById('previewThead');
+            const tbody = document.getElementById('previewTbody');
+
+            thead.innerHTML = '<tr>' + colunasSelecionadas.map(col => {
+                const cfg = (colunasConfig[tipo] || []).find(c => c.id === col);
+                return `<th>${cfg?.label || col}</th>`;
+            }).join('') + '</tr>';
+
+            window.previewDataGlobal = dados;
+            window.previewColunasGlobais = colunasSelecionadas;
+            renderPreviewPage(1);
+
+            document.getElementById('previewContainer').classList.remove('hidden');
+        }
+
+        window.previewCurrentPage = 1;
+        window.previewItemsPerPage = 100;
+
+        function renderPreviewPage(page) {
+            window.previewCurrentPage = page;
+            const start = (page - 1) * window.previewItemsPerPage;
+            const end = start + window.previewItemsPerPage;
+            const paginatedItems = window.previewDataGlobal.slice(start, end);
+
+            const tbody = document.getElementById('previewTbody');
+            const colunasSelecionadas = window.previewColunasGlobais;
+
+            if (paginatedItems.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${colunasSelecionadas.length}" style="text-align:center; color:#64748b; padding:24px;">Nenhum dado encontrado para os filtros selecionados.</td></tr>`;
+            } else {
+                tbody.innerHTML = paginatedItems.map(item =>
+                    '<tr>' + colunasSelecionadas.map(col => `<td>${formatCellValue(col, item[col])}</td>`).join('') + '</tr>'
+                ).join('');
+            }
+
+            renderPaginationControls();
+        }
+
+        function renderPaginationControls() {
+            const totalPages = Math.ceil(window.previewDataGlobal.length / window.previewItemsPerPage);
+            const container = document.getElementById('previewPagination');
+            container.innerHTML = '';
+            
+            if (totalPages <= 1) return;
+            
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'btn btn-secondary btn-sm';
+            prevBtn.innerText = 'Anterior';
+            prevBtn.disabled = window.previewCurrentPage === 1;
+            prevBtn.onclick = () => renderPreviewPage(window.previewCurrentPage - 1);
+            container.appendChild(prevBtn);
+            
+            const info = document.createElement('span');
+            info.style.fontSize = '14px';
+            info.style.fontWeight = '500';
+            info.innerText = `Pág. ${window.previewCurrentPage} de ${totalPages}`;
+            container.appendChild(info);
+            
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'btn btn-secondary btn-sm';
+            nextBtn.innerText = 'Próximo';
+            nextBtn.disabled = window.previewCurrentPage === totalPages;
+            nextBtn.onclick = () => renderPreviewPage(window.previewCurrentPage + 1);
+            container.appendChild(nextBtn);
+        }
+
+        function atualizarPreview() {
+            if (!document.getElementById('previewContainer').classList.contains('hidden')) {
+                visualizarPreview();
+            }
+        }
+
+        // ── Gerar relatório ───────────────────────────────────────────────────
+        async function gerarRelatorio() {
+            const tipo    = document.getElementById('tipoRelatorio').value;
+            const formato = document.querySelector('input[name="formato"]:checked').value;
+            const colunas = getColunasSelecionadas();
+
+            if (!tipo)         { alert('Selecione um tipo de relatório!'); return; }
+            if (!colunas.length) { alert('Selecione pelo menos uma coluna!'); return; }
+
+            const dados  = await getDadosFiltrados();
+            const titulo = `RELATÓRIO DE CADASTRO — ${tipo.toUpperCase()}`;
+
+            if (!dados.length) { alert('Não há dados para gerar o relatório com os filtros selecionados.'); return; }
+
+            if (dados.length >= 2000) {
+                showWarningToast('Relatórios grandes podem demorar um pouco para ser gerados. Limitado aos últimos 100000 registros. Gerando em 10 segundos...', 10000);
+                await new Promise(resolve => setTimeout(resolve, 10000));
+            }
+
+            switch (formato) {
+                case 'pdf':  await gerarPDF(dados, colunas, tipo, titulo);   break;
+                case 'xlsx': gerarExcel(dados, colunas, tipo, titulo);        break;
+                case 'csv':  gerarCSV(dados, colunas, tipo, titulo);          break;
+            }
+        }
+
+        // ── Funções de geração ────────────────────────────────────────────────
+        async function gerarPDF(dados, colunasSelecionadas, tipo, titulo) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('portrait');
+            const pageW = doc.internal.pageSize.getWidth();
+
+            const dataInicio = document.getElementById('filtroDataInicio')?.value || document.getElementById('dataInicio')?.value || '';
+            const dataFim    = document.getElementById('filtroDataFim')?.value    || document.getElementById('dataFim')?.value    || '';
+
+            // Logo no canto superior direito
+            if (logoBase64) {
+                try {
+                    doc.addImage(logoBase64, 'JPEG', pageW - 45, 5, 35, 18);
+                } catch(e) { console.warn('Erro ao adicionar logo:', e); }
+            } else {
+                doc.setFontSize(10);
+                doc.setTextColor(74, 144, 217);
+                doc.text('Acess Control', pageW - 15, 15, { align: 'right' });
+            }
+
+            // Título
+            doc.setFontSize(14);
+            doc.setTextColor(30, 41, 59);
+            doc.text(titulo, 15, 18);
+
+            // Dados da empresa
+            doc.setFontSize(8);
+            doc.setTextColor(100);
+            const linhasEmpresa = [empresaInfo.razao];
+            if (empresaInfo.cnpj)     linhasEmpresa.push(`CNPJ: ${empresaInfo.cnpj}`);
+            if (empresaInfo.endereco) linhasEmpresa.push(empresaInfo.endereco);
+            if (empresaInfo.telefone) linhasEmpresa.push(`Tel: ${empresaInfo.telefone}`);
+            doc.text(linhasEmpresa, 15, 26);
+
+            const startY = 26 + linhasEmpresa.length * 5;
+
+            // Período e Data de Emissão
+            let tableStartY = startY;
+            if (dataInicio || dataFim) {
+                doc.setFontSize(8);
+                doc.text(`Período: ${dataInicio || '—'} a ${dataFim || '—'}`, 15, startY + 2);
+                doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 15, startY + 6);
+                tableStartY = startY + 10;
+            } else {
+                doc.setFontSize(8);
+                doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 15, startY + 2);
+                tableStartY = startY + 6;
+            }
+
+            // Tabela
+            const headers = colunasSelecionadas.map(col => {
+                const cfg = (colunasConfig[tipo] || []).find(c => c.id === col);
+                return cfg?.label || col;
+            });
+            const body = dados.map(item => colunasSelecionadas.map(col => formatCellValue(col, item[col])));
+
+            doc.autoTable({
+                startY: tableStartY,
+                head: [headers],
+                body: body,
+                theme: 'striped',
+                headStyles: { fillColor: [74, 144, 217], textColor: 255, fontStyle: 'bold', fontSize: 8 },
+                bodyStyles: { fontSize: 8 },
+                alternateRowStyles: { fillColor: [245, 247, 250] },
+                margin: { left: 15, right: 15 }
+            });
+
+            const finalY = doc.lastAutoTable.finalY || startY + 10;
+            doc.setFontSize(8);
+            doc.setTextColor(100);
+            doc.text(`Total de registros: ${dados.length}`, 15, finalY + 8);
+
+            doc.save(`relatorio_${tipo}_${new Date().toISOString().split('T')[0]}.pdf`);
+        }
+
+        function gerarExcel(dados, colunasSelecionadas, tipo, titulo) {
+            const dataInicio = document.getElementById('filtroDataInicio')?.value || '';
+            const dataFim    = document.getElementById('filtroDataFim')?.value    || '';
+            const headers    = colunasSelecionadas.map(col => (colunasConfig[tipo] || []).find(c => c.id === col)?.label || col);
+            const rows       = dados.map(item => colunasSelecionadas.map(col => formatCellValue(col, item[col])));
+
+            const wsData = [
+                [empresaInfo.razao || 'Acess Control'],
+                empresaInfo.cnpj     ? [`CNPJ: ${empresaInfo.cnpj}`]     : [],
+                empresaInfo.endereco ? [empresaInfo.endereco]             : [],
+                [titulo],
+                [`Período: ${dataInicio || '—'} a ${dataFim || '—'}`],
+                [],
+                headers,
+                ...rows,
+                [],
+                [`Total de registros: ${dados.length}`]
+            ].filter(r => r.length > 0 || true);
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            ws['!cols'] = headers.map(() => ({ wch: 22 }));
+            XLSX.utils.book_append_sheet(wb, ws, 'Relatório');
+            XLSX.writeFile(wb, `relatorio_${tipo}_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
+        function gerarCSV(dados, colunasSelecionadas, tipo, titulo) {
+            const dataInicio = document.getElementById('filtroDataInicio')?.value || '';
+            const dataFim    = document.getElementById('filtroDataFim')?.value    || '';
+            const headers    = colunasSelecionadas.map(col => (colunasConfig[tipo] || []).find(c => c.id === col)?.label || col);
+            const rows       = dados.map(item => colunasSelecionadas.map(col => {
+                const val = formatCellValue(col, item[col]);
+                return `"${String(val).replace(/"/g, '""')}"`;
+            }));
+
+            const csv = [
+                [empresaInfo.razao || 'Acess Control'],
+                empresaInfo.cnpj ? [`CNPJ: ${empresaInfo.cnpj}`] : null,
+                [titulo],
+                [`Período: ${dataInicio || '—'} a ${dataFim || '—'}`],
+                [],
+                headers,
+                ...rows,
+                [],
+                [`Total de registros: ${dados.length}`]
+            ].filter(Boolean).map(r => r.join(';')).join('\n');
+
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            saveAs(blob, `relatorio_${tipo}_${new Date().toISOString().split('T')[0]}.csv`);
+        }
+
+        // ── Carregar logo como base64 ─────────────────────────────────────────
+        async function carregarLogo() {
+            try {
+                const resp = await fetch('../../logo.jpg');
+                if (!resp.ok) return;
+                const blob = await resp.blob();
+                const reader = new FileReader();
+                reader.onloadend = () => { logoBase64 = reader.result; };
+                reader.readAsDataURL(blob);
+            } catch (e) { console.warn('Logo não encontrada:', e); }
+        }
+
+        // ── Carregar dados da empresa do banco ────────────────────────────────
+        async function carregarEmpresaInfo() {
+            try {
+                if (typeof api === 'undefined') return;
+                const data = await api.getReportCompany();
+                if (data && (data.razao || data.cnpj)) {
+                    empresaInfo = {
+                        razao:    data.razao    || 'Acess Control',
+                        cnpj:     data.cnpj     || '',
+                        endereco: data.endereco || '',
+                        telefone: data.telefone || '',
+                        email:    data.email    || ''
+                    };
+                }
+            } catch (e) { console.warn('Não foi possível carregar info da empresa:', e); }
+        }
+
+        // ── Inicialização ─────────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', function () {
+            // Datas padrão (mês atual)
+            const hoje = new Date();
+            const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString().split('T')[0];
+            const ultimoDia   = hoje.toISOString().split('T')[0];
+            const di = document.getElementById('dataInicio');
+            const df = document.getElementById('dataFim');
+            if (di) di.value = primeiroDia;
+            if (df) df.value = ultimoDia;
+
+            // Carregar logo e dados da empresa em paralelo
+            carregarLogo();
+            setTimeout(() => carregarEmpresaInfo(), 600);
+        });
+    </script>
+</body>
+</html>

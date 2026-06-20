@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Acess Control - Status da Comunicação</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <style>
+        /* Reset e estilos base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+        /* Cards */
+        .content-box {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Section header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Botões */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.2);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        .btn-icon {
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        /* Cards de estatísticas */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            border-color: #4a90d9;
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.1);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.primary {
+            background: #dbeafe;
+            color: #4a90d9;
+        }
+
+        .stat-icon.success {
+            background: #d1fae5;
+            color: #10b981;
+        }
+
+        .stat-icon.warning {
+            background: #fef3c7;
+            color: #f59e0b;
+        }
+
+        .stat-icon.danger {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .stat-info h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1.2;
+        }
+
+        .stat-info p {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        /* Filtros */
+        .filters-bar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        /* Tabela */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: auto;
+            margin-bottom: 20px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            color: #1e293b;
+            vertical-align: middle;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Status indicators */
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-dot.online {
+            background: #10b981;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+            animation: pulse-online 2s infinite;
+        }
+
+        .status-dot.offline {
+            background: #ef4444;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+        }
+
+        .status-dot.updating {
+            background: #f59e0b;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+            animation: pulse-updating 1.5s infinite;
+        }
+
+        @keyframes pulse-online {
+            0% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        @keyframes pulse-updating {
+            0% {
+                opacity: 1;
+                box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+            }
+            50% {
+                opacity: 0.5;
+                box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.2);
+            }
+            100% {
+                opacity: 1;
+                box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+            }
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* Sentido */
+        .sentido-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .sentido-entrada {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .sentido-saida {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .sentido-entrada i {
+            color: #3b82f6;
+        }
+
+        .sentido-saida i {
+            color: #ef4444;
+        }
+
+        /* Informações adicionais */
+        .equipamento-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .equipamento-nome {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .equipamento-local {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .ultimo-contato {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        /* Ações */
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Paginação */
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .table-info {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination span {
+            padding: 0 8px;
+            color: #475569;
+        }
+
+        /* Banner comunicador offline */
+        .comunicador-offline-banner {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            background: #fef2f2;
+            border: 1.5px solid #fca5a5;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            color: #991b1b;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .comunicador-offline-banner.visible {
+            display: flex;
+        }
+
+        .comunicador-offline-banner i {
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Texto centralizado */
+        .text-center {
+            text-align: center;
+        }
+
+        /* Mensagem vazia */
+        .empty-message {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-message i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .filters-bar {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="status-comunicacao" class="content-section active">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1>Status da Comunicação</h1>
+                            <p>Monitore em tempo real a conexão com os equipamentos</p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary" onclick="atualizarStatus()">
+                                <i class="fas fa-sync-alt"></i> Atualizar
+                            </button>
+                            <button class="btn btn-primary" onclick="testarComunicacao()">
+                                <i class="fas fa-bolt"></i> Testar Todos
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Banner: comunicador sem resposta -->
+                    <div class="comunicador-offline-banner" id="comunicador-offline-banner">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="comunicador-offline-msg">Comunicador sem resposta há mais de 3 minutos — todos os equipamentos exibidos como offline.</span>
+                    </div>
+
+                    <!-- Cards de Estatísticas -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon primary">
+                                <i class="fas fa-microchip"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-equipamentos">12</h3>
+                                <p>Total de Equipamentos</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon success">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="online-count">8</h3>
+                                <p>Online</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon danger">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="offline-count">2</h3>
+                                <p>Offline</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon warning">
+                                <i class="fas fa-sync-alt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="updating-count">2</h3>
+                                <p>Atualizando</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtros -->
+                    <div class="filters-bar">
+                        <div class="filter-group">
+                            <label>Equipamento</label>
+                            <select id="filtro-equipamento" onchange="filtrarStatus()">
+                                <option value="">Todos</option>
+                                <option value="catraca">Catracas</option>
+                                <option value="facial">Equipamentos Faciais</option>
+                                <option value="controle">Controladoras</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Status</label>
+                            <select id="filtro-status" onchange="filtrarStatus()">
+                                <option value="">Todos</option>
+                                <option value="online">Online</option>
+                                <option value="offline">Offline</option>
+                                <option value="updating">Atualizando</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Sentido</label>
+                            <select id="filtro-sentido" onchange="filtrarStatus()">
+                                <option value="">Todos</option>
+                                <option value="entrada">Entrada</option>
+                                <option value="saida">Saída</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Local</label>
+                            <select id="filtro-local" onchange="filtrarStatus()">
+                                <option value="">Todos</option>
+                                <option value="principal">Entrada Principal</option>
+                                <option value="administrativo">Administrativo</option>
+                                <option value="producao">Produção</option>
+                                <option value="estacionamento">Estacionamento</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Tabela de Status -->
+                    <div class="content-box">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Equipamento</th>
+                                        <th>Local</th>
+                                        <th>Modelo</th>
+                                        <th>Sentido</th>
+                                        <th>Status</th>
+                                        <th>Último Contato</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="status-table-body">
+                                    <!-- Dados serão inseridos via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="table-footer">
+                            <div class="table-info">
+                                <span id="status-count">12</span> equipamentos encontrados
+                            </div>
+                            <div class="pagination">
+                                <button class="btn btn-sm btn-secondary" onclick="mudarPagina('anterior')">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span>Página 1 de 1</span>
+                                <button class="btn btn-sm btn-secondary" onclick="mudarPagina('proxima')">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados reais de equipamentos
+        let equipamentos = [];
+        const API_URL = '/api';
+
+        function getAuthHeader() {
+            const token = localStorage.getItem('acesscontrol_accessToken');
+            const tenantId = localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id') || 'default';
+            const headers = {
+                'X-Tenant-ID': tenantId
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            return headers;
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarEquipamentos();
+            
+            // Iniciar polling a cada 30 segundos
+            setInterval(carregarEquipamentos, 30000);
+        });
+
+        const COMUNICADOR_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutos
+
+        function checarComunicador(dados) {
+            const banner = document.getElementById('comunicador-offline-banner');
+            const msg = document.getElementById('comunicador-offline-msg');
+            if (!banner) return false;
+
+            // Equipamentos sem nenhum lastConnection => comunicador nunca conectou, não ativa o banner
+            const comContato = dados.filter(eq => eq.lastConnection);
+            if (comContato.length === 0) {
+                banner.classList.remove('visible');
+                return false;
+            }
+
+            // Pega o lastConnection mais recente entre todos
+            const maisRecente = Math.max(...comContato.map(eq => new Date(eq.lastConnection).getTime()));
+            const diffMs = Date.now() - maisRecente;
+
+            if (diffMs > COMUNICADOR_TIMEOUT_MS) {
+                const diffMin = Math.floor(diffMs / 60000);
+                msg.textContent = `Comunicador sem resposta há ${diffMin} minuto${diffMin !== 1 ? 's' : ''} — todos os equipamentos exibidos como offline.`;
+                banner.classList.add('visible');
+                return true; // comunicador offline
+            }
+
+            banner.classList.remove('visible');
+            return false;
+        }
+
+        async function carregarEquipamentos() {
+            try {
+                const response = await fetch(`${API_URL}/equipments`, {
+                    headers: getAuthHeader()
+                });
+
+                if (!response.ok) throw new Error('Erro ao buscar equipamentos');
+
+                const result = await response.json();
+                if (result.success) {
+                    equipamentos = result.data;
+                    filtrarStatus(); // Renderiza e aplica filtros
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        }
+
+        function renderizarTabela(dados) {
+            const tbody = document.getElementById('status-table-body');
+            
+            if (!tbody) return;
+
+            if (dados.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center">Nenhum equipamento encontrado</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = dados.map(eq => {
+                const isOnline = eq.online === true || eq.online === 1;
+                const statusClass = isOnline ? 'online' : 'offline';
+                const statusText = isOnline ? 'Online' : 'Offline';
+                const statusBadgeClass = isOnline ? 'badge-success' : 'badge-danger';
+                
+                // Determinar sentido predominante ou padrão
+                let sentido = 'entrada';
+                if (eq.equipamentoSaida || eq.direction_saida) sentido = 'saida';
+                
+                const sentidoClass = sentido === 'entrada' ? 'sentido-entrada' : 'sentido-saida';
+                const sentidoIcon = sentido === 'entrada' ? 'fa-arrow-right' : 'fa-arrow-left';
+                const sentidoText = sentido === 'entrada' ? 'Entrada' : 'Saída';
+
+                // Formatar data de último contato
+                let ultimoContatoText = 'Nunca';
+                if (eq.lastConnection) {
+                    const data = new Date(eq.lastConnection);
+                    const agora = new Date();
+                    const diffMs = agora - data;
+                    const diffMin = Math.floor(diffMs / 60000);
+                    
+                    if (diffMin < 1) {
+                        ultimoContatoText = 'Agora mesmo';
+                    } else if (diffMin < 60) {
+                        ultimoContatoText = `${diffMin} min atrás`;
+                    } else if (diffMin < 1440) {
+                        ultimoContatoText = `${Math.floor(diffMin / 60)}h atrás`;
+                    } else {
+                        ultimoContatoText = data.toLocaleString('pt-BR');
+                    }
+                }
+
+                return `
+                    <tr>
+                        <td>
+                            <div class="equipamento-info">
+                                <span class="equipamento-nome">${eq.name}</span>
+                                <span class="ultimo-contato">${eq.ipAddress || eq.validador || '-'}</span>
+                            </div>
+                        </td>
+                        <td>${eq.localizacao || 'Não informada'}</td>
+                        <td>${eq.modelo || eq.tipo || '-'}</td>
+                        <td>
+                            <span class="sentido-badge ${sentidoClass}">
+                                <i class="fas ${sentidoIcon}"></i>
+                                ${sentidoText}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="status-indicator">
+                                <span class="status-dot ${statusClass}"></span>
+                                <span class="badge ${statusBadgeClass}">${statusText}</span>
+                                ${eq.syncStatus ? `<span class="badge ${eq.syncStatus === 'syncing' ? 'badge-warning' : 'badge-secondary'}" style="margin-left:8px;">${eq.syncStatus === 'syncing' ? 'Atualizando' : 'Fila de sincronização'}</span>` : ''}
+                            </div>
+                        </td>
+                        <td>${ultimoContatoText}</td>
+                        <td>
+                            <div class="actions">
+                                <button class="btn btn-sm btn-secondary btn-icon" onclick="liberarAcesso('${eq.validador}')" title="Liberar acesso">
+                                    <i class="fas fa-unlock"></i>
+                                </button>
+                                <button class="btn btn-sm btn-secondary btn-icon" onclick="verDetalhes(${eq.id})" title="Detalhes">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('status-count').textContent = dados.length;
+        }
+
+        function atualizarEstatisticas(dados) {
+            const total = dados.length;
+            const online = dados.filter(eq => eq.online === true || eq.online === 1).length;
+            const offline = total - online;
+            const updating = dados.filter(eq => eq.syncStatus === 'pending' || eq.syncStatus === 'syncing').length;
+
+            document.getElementById('total-equipamentos').textContent = total;
+            document.getElementById('online-count').textContent = online;
+            document.getElementById('offline-count').textContent = offline;
+            document.getElementById('updating-count').textContent = updating;
+        }
+
+        function filtrarStatus() {
+            const filtroEquipamento = document.getElementById('filtro-equipamento').value;
+            const filtroStatus = document.getElementById('filtro-status').value;
+            const filtroSentido = document.getElementById('filtro-sentido').value;
+            const filtroLocal = document.getElementById('filtro-local').value.toLowerCase();
+
+            const comunicadorOffline = checarComunicador(equipamentos);
+
+            // Se comunicador offline, todos ficam offline visualmente (sem alterar os dados originais)
+            let dadosFiltrados = comunicadorOffline
+                ? equipamentos.map(eq => ({ ...eq, online: false }))
+                : [...equipamentos];
+
+            if (filtroEquipamento) {
+                dadosFiltrados = dadosFiltrados.filter(eq => {
+                    const modelo = (eq.modelo || '').toLowerCase();
+                    const tipo = (eq.tipo || '').toLowerCase();
+                    if (filtroEquipamento === 'catraca') return modelo.includes('block') || modelo.includes('flex');
+                    if (filtroEquipamento === 'facial') return modelo.includes('face') || tipo.includes('facial');
+                    if (filtroEquipamento === 'controle') return modelo.includes('uhf') || tipo.includes('controle');
+                    return true;
+                });
+            }
+
+            if (filtroStatus) {
+                dadosFiltrados = dadosFiltrados.filter(eq => {
+                    const isOnline = eq.online === true || eq.online === 1;
+                    if (filtroStatus === 'online') return isOnline;
+                    if (filtroStatus === 'offline') return !isOnline;
+                    if (filtroStatus === 'updating') return eq.syncStatus === 'pending' || eq.syncStatus === 'syncing';
+                    return true;
+                });
+            }
+
+            if (filtroSentido) {
+                dadosFiltrados = dadosFiltrados.filter(eq => {
+                    const isSaida = eq.equipamentoSaida || eq.direction_saida;
+                    if (filtroSentido === 'entrada') return !isSaida;
+                    if (filtroSentido === 'saida') return isSaida;
+                    return true;
+                });
+            }
+
+            if (filtroLocal) {
+                dadosFiltrados = dadosFiltrados.filter(eq => (eq.localizacao || '').toLowerCase().includes(filtroLocal));
+            }
+
+            renderizarTabela(dadosFiltrados);
+            atualizarEstatisticas(dadosFiltrados);
+        }
+
+        function atualizarStatus() {
+            carregarEquipamentos();
+        }
+
+        async function liberarAcesso(validador) {
+            if (!validador) return alert('Equipamento sem validador configurado');
+            
+            try {
+                const tenantId = localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id') || 'default';
+                const response = await fetch(`${API_URL}/access-tasks`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAuthHeader()
+                    },
+                    body: JSON.stringify({
+                        tenant_id: tenantId,
+                        equip_validator: validador,
+                        task_type: 'liberar_acesso'
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    alert('Comando enviado com sucesso!');
+                } else {
+                    alert('Erro: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Erro ao liberar acesso:', error);
+                alert('Erro ao enviar comando');
+            }
+        }
+
+        function verDetalhes(id) {
+            const eq = equipamentos.find(e => e.id === id);
+            if (eq) {
+                alert(`Detalhes do Equipamento:\n\nNome: ${eq.name}\nModelo: ${eq.modelo || eq.tipo}\nValidador: ${eq.validador}\nIP: ${eq.ipAddress || '-'}\nLocal: ${eq.localizacao || '-'}\nÚltimo Contato: ${eq.lastConnection || 'N/A'}`);
+            }
+        }
+
+        function mudarPagina(direcao) {
+            // Implementar se houver paginação no backend, por enquanto lista completa
+            console.log('Navegação não implementada (lista completa)');
+        }
+    </script>
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+    <script src="../../auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+</body>
+</html>

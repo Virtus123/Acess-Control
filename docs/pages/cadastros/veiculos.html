@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veículos - Acess Control</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <script src="../../auth.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+        .content-box {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .grid-col-full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #ffffff;
+            font-family: inherit;
+        }
+
+        .form-group input:hover,
+        .form-group select:hover,
+        .form-group textarea:hover {
+            border-color: #94a3b8;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .form-group input[disabled],
+        .form-group select[disabled] {
+            background: #f1f5f9;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .required:after {
+            content: " *";
+            color: #e53e3e;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.2);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-header-compact {
+            margin-bottom: 20px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title h2 {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .search-filter {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0 12px;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box i {
+            color: #94a3b8;
+            margin-right: 8px;
+        }
+
+        .search-box input {
+            border: none;
+            padding: 10px 0;
+            flex: 1;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            color: #1e293b;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .tag-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            margin-top: 20px;
+        }
+
+        .tag-section h3 {
+            margin-bottom: 16px;
+            color: #1e293b;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tag-section h3 i {
+            color: #4a90d9;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #4a90d9;
+        }
+
+        .tag-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .tag-input-group input {
+            flex: 1;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .data-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .search-filter {
+                flex-direction: column;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .tag-input-group {
+                flex-direction: column;
+            }
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+
+        .empty-message i {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .badge-placa {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: #e2e8f0;
+            color: #1e293b;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        .badge-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .form-hint {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .cor-preview {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            margin-right: 6px;
+            vertical-align: middle;
+            border: 1px solid #e2e8f0;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transform: scale(0.95);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.2rem;
+            color: #1e293b;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #ef4444;
+        }
+
+        .modal-body {
+            padding: 24px;
+            text-align: center;
+        }
+
+        .modal-body i {
+            font-size: 3rem;
+            color: #4a90d9;
+            margin-bottom: 16px;
+        }
+
+        .modal-body p {
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .modal-body small {
+            color: #64748b;
+        }
+
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .table-info {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .table-scroll-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .colunas-dropdown {
+            position: relative;
+        }
+
+        .colunas-panel {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 280px;
+            max-height: 360px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+            z-index: 200;
+            padding: 14px;
+        }
+
+        .colunas-panel.open {
+            display: block;
+        }
+
+        .colunas-panel h4 {
+            font-size: 0.85rem;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .colunas-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .coluna-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #1e293b;
+        }
+
+        .coluna-toggle:hover {
+            border-color: #4a90d9;
+            background: #ebf5ff;
+        }
+
+        .coluna-toggle.locked {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .coluna-toggle input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #4a90d9;
+        }
+
+        .colunas-panel-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .colunas-panel-actions .btn {
+            flex: 1;
+            justify-content: center;
+            padding: 8px 10px;
+            font-size: 0.82rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="veiculos" class="content-section active">
+                    <div id="veiculos-list">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <h1>Veículos</h1>
+                                <p>Gerenciamento de veículos cadastrados</p>
+                            </div>
+                            <div class="section-actions">
+                                <button class="btn btn-primary" onclick="showVeiculoForm()">
+                                    <i class="fas fa-plus"></i> Novo Veículo
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="search-filter">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="search-veiculos"
+                                    placeholder="Buscar por placa, nome, marca, modelo, observação ou empresa..."
+                                    oninput="filtrarVeiculos()">
+                            </div>
+                            <div class="colunas-dropdown">
+                                <button type="button" class="btn btn-secondary" onclick="toggleColunasPanel(event)">
+                                    <i class="fas fa-columns"></i> Colunas
+                                </button>
+                                <div id="colunas-panel" class="colunas-panel">
+                                    <h4><i class="fas fa-sliders-h"></i> Exibir colunas</h4>
+                                    <div id="colunas-list" class="colunas-list"></div>
+                                    <div class="colunas-panel-actions">
+                                        <button type="button" class="btn btn-secondary" onclick="restaurarColunasPadrao()">
+                                            Padrão
+                                        </button>
+                                        <button type="button" class="btn btn-primary" onclick="fecharColunasPanel()">
+                                            Fechar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="content-box table-scroll-wrapper">
+                            <table class="data-table">
+                                <thead id="thead-veiculos">
+                                    <tr></tr>
+                                </thead>
+                                <tbody id="tbody-veiculos">
+                                    <tr>
+                                        <td class="text-center">Carregando...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="table-footer">
+                            <div class="table-info">
+                                <span id="veiculos-count">0</span> veículos encontrados
+                            </div>
+                            <div class="pagination">
+                                <button class="btn btn-sm btn-secondary" id="btn-prev-page" onclick="changePage(-1)"
+                                    disabled>
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span id="page-indicator">Página 1 de 1</span>
+                                <button class="btn btn-sm btn-secondary" id="btn-next-page" onclick="changePage(1)">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="veiculos-form" class="hidden">
+                        <div class="section-header section-header-compact">
+                            <div class="section-title">
+                                <h2 id="veiculo-form-title">Novo Veículo</h2>
+                                <p>Preencha os dados do veículo</p>
+                            </div>
+                            <div class="section-actions">
+                                <button class="btn btn-secondary" onclick="showVeiculoList()">
+                                    <i class="fas fa-times"></i> Fechar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="content-box">
+                            <form id="veiculoForm" onsubmit="saveVeiculo(event)">
+                                <input type="hidden" id="veiculo-id">
+
+                                <div class="form-grid">
+                                    <div class="form-group grid-col-full">
+                                        <label>Pessoa Vinculada</label>
+                                        <div style="position:relative;">
+                                            <input type="text" id="pessoa-search-input"
+                                                placeholder="Digite o nome ou CPF para buscar..." autocomplete="off"
+                                                oninput="buscarPessoas(this.value)"
+                                                onfocus="this.value === '' ? carregarTodasPessoas() : (this.value.length >= 2 ? buscarPessoas(this.value) : null)"
+                                                style="width:100%; padding:10px 12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:0.95rem; font-family:inherit;">
+                                            <input type="hidden" id="pessoa-vinculada">
+                                            <div id="pessoa-dropdown" style="
+                                                display:none; position:absolute; top:100%; left:0; right:0;
+                                                background:white; border:1.5px solid #e2e8f0; border-top:none;
+                                                border-radius:0 0 8px 8px; max-height:220px; overflow-y:auto;
+                                                z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                                            </div>
+                                        </div>
+                                        <div class="form-hint">Proprietário do veículo — digite ao menos 2 caracteres
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="placa" class="required">Placa</label>
+                                        <input type="text" id="placa" required placeholder="ABC1234 ou ABC1D23"
+                                            maxlength="8" style="text-transform: uppercase; font-family: monospace;">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="marca" class="required">Marca</label>
+                                        <input type="text" id="marca" required placeholder="Ex: Toyota, Ford">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="modelo" class="required">Modelo</label>
+                                        <input type="text" id="modelo" required placeholder="Ex: Corolla, Fiesta">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cor" class="required">Cor</label>
+                                        <input type="text" id="cor" required placeholder="Ex: Prata, Preto">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="tipoVaga">Tipo de Vaga</label>
+                                        <!-- FIX: passa true para indicar que foi o usuário que mudou -->
+                                        <select id="tipoVaga" onchange="toggleVagaVeiculoFields(true)">
+                                            <option value="">Selecione...</option>
+                                            <option value="fixa">Vaga Fixa</option>
+                                            <option value="rotativa">Vaga Rotativa</option>
+                                        </select>
+                                        <div class="form-hint">Associar a uma vaga de estacionamento</div>
+                                    </div>
+
+                                    <div class="form-group" id="vaga-fixa-container" style="display: none;">
+                                        <label for="veiculo-vaga">Vaga</label>
+                                        <select id="veiculo-vaga">
+                                            <option value="">Carregando...</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group" id="vaga-rotativa-container" style="display: none;">
+                                        <label>Empresa</label>
+                                        <div style="position:relative;">
+                                            <input type="text" id="empresa-search-input"
+                                                placeholder="Digite o nome da empresa para buscar..." autocomplete="off"
+                                                oninput="buscarEmpresas(this.value)"
+                                                onfocus="this.value === '' ? carregarTodasEmpresas() : (this.value.length >= 2 ? buscarEmpresas(this.value) : null)"
+                                                style="width:100%; padding:10px 12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:0.95rem; font-family:inherit;">
+                                            <input type="hidden" id="veiculo-empresa">
+                                            <div id="empresa-dropdown" style="
+                                                display:none; position:absolute; top:100%; left:0; right:0;
+                                                background:white; border:1.5px solid #e2e8f0; border-top:none;
+                                                border-radius:0 0 8px 8px; max-height:220px; overflow-y:auto;
+                                                z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                                            </div>
+                                        </div>
+                                        <div class="form-hint">Selecione a empresa — digite ao menos 2 caracteres</div>
+                                    </div>
+
+                                    <div class="form-group grid-col-full">
+                                        <label for="observacao">Observação</label>
+                                        <textarea id="observacao" rows="3"
+                                            placeholder="Anotações sobre o veículo (opcional)"></textarea>
+                                        <div class="form-hint">Informações adicionais visíveis na listagem</div>
+                                    </div>
+                                </div>
+
+                                <div class="tag-section">
+                                    <h3><i class="fas fa-tag"></i> Tag Veicular / Cadastramento Remoto</h3>
+
+                                    <div class="radio-group">
+                                        <label class="radio-option">
+                                            <input type="radio" name="tipo-tag" value="manual" checked
+                                                onchange="toggleTagFields()">
+                                            <span>Número da Tag (RFID/Cartão)</span>
+                                        </label>
+                                        <label class="radio-option">
+                                            <input type="radio" name="tipo-tag" value="remoto"
+                                                onchange="toggleTagFields()">
+                                            <span>Cadastramento Remoto</span>
+                                        </label>
+                                    </div>
+
+                                    <div id="tag-manual-container">
+                                        <div class="tag-input-group">
+                                            <input type="text" id="tag-numero"
+                                                placeholder="Digite o número da tag veicular (RFID/Cartão)">
+                                            <button type="button" class="btn btn-sm btn-secondary"
+                                                onclick="gerarTagAleatoria()">
+                                                <i class="fas fa-random"></i> Gerar
+                                            </button>
+                                        </div>
+                                        <div class="form-hint"><i class="fas fa-info-circle"></i> Número da tag RFID ou cartão de acesso</div>
+                                    </div>
+
+                                    <div id="tag-remoto-container" class="hidden">
+                                        <div style="text-align: center; padding: 10px;">
+                                            <button type="button" class="btn btn-primary"
+                                                onclick="iniciarCadastramentoRemoto()">
+                                                <i class="fas fa-wifi"></i> Iniciar Cadastramento Remoto
+                                            </button>
+                                            <div class="form-hint" style="margin-top: 10px;"><i
+                                                    class="fas fa-info-circle"></i> Aproxime-se do equipamento para ler
+                                                a tag.</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tag UHF (IDUHF) -->
+                                    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
+                                        <h3 style="margin-bottom: 12px;"><i class="fas fa-broadcast-tower" style="color:#7c3aed;"></i> Tag UHF (IDUHF)</h3>
+                                        <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: end;">
+                                            <div class="form-group" style="margin: 0;">
+                                                <label for="uhf-tag-input">Tag UHF</label>
+                                                <input type="text" id="uhf-tag-input"
+                                                    placeholder="Ex: 123,4567"
+                                                    oninput="atualizarPreviewUhf()">
+                                            </div>
+                                            <div class="form-group" style="margin: 0;">
+                                                <label for="uhf-tag-format">Formato</label>
+                                                <select id="uhf-tag-format" onchange="atualizarPreviewUhf()">
+                                                    <option value="padrao">Padrão (123,4567)</option>
+                                                    <option value="decimal">Decimal (1234567)</option>
+                                                    <option value="hex">Hexadecimal (1E2407)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div id="uhf-preview" style="display:none; margin-top:10px; background:#f0f4ff; border:1px solid #c7d7f9; border-radius:8px; padding:10px; font-size:0.85rem;">
+                                            <div style="font-weight:600; color:#3730a3; margin-bottom:6px;"><i class="fas fa-exchange-alt"></i> Equivalências da tag:</div>
+                                            <div style="display:flex; gap:16px; flex-wrap:wrap;">
+                                                <span>Padrão: <code id="uhf-prev-padrao" style="background:#e0e7ff;padding:2px 6px;border-radius:4px;">-</code></span>
+                                                <span>Decimal: <code id="uhf-prev-decimal" style="background:#e0e7ff;padding:2px 6px;border-radius:4px;">-</code></span>
+                                                <span>Hex: <code id="uhf-prev-hex" style="background:#e0e7ff;padding:2px 6px;border-radius:4px;">-</code></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-hint" style="margin-top:6px;"><i class="fas fa-info-circle"></i> Tag UHF para leitura pelo equipamento IDUHF no estacionamento. Aceita qualquer formato.</div>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-secondary"
+                                        onclick="showVeiculoList()">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>
+                                        Salvar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div id="tagRemotoModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-wifi"></i> Cadastramento Remoto</h3>
+                <button class="modal-close" onclick="fecharModalRemoto()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <i class="fas fa-sync-alt fa-spin"></i>
+                <p>Aguardando leitura da tag...</p>
+                <small>Aproxime o equipamento de cadastramento</small>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModalRemoto()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+
+    <script>
+        // =============================================
+        // ESTADO
+        // =============================================
+        let veiculos = [];
+        let estacionamentos = [];
+        let empresas = [];
+        let editandoId = null;
+
+        const ITEMS_PER_PAGE = 20;
+        let currentPage = 1;
+        let totalPages = 1;
+        let totalVeiculos = 0;
+
+        let searchTimeout = null;
+        let pessoaEmpresaSearchTimeout = null;
+
+        const VEICULOS_COLUNAS = [
+            { id: 'placa', label: 'Placa', locked: true, default: true },
+            { id: 'marca', label: 'Marca', default: true },
+            { id: 'modelo', label: 'Modelo', default: true },
+            { id: 'cor', label: 'Cor', default: false },
+            { id: 'tag_rfid', label: 'Tag RFID', default: false },
+            { id: 'tag_uhf', label: 'Tag UHF', default: false },
+            { id: 'pessoa', label: 'Pessoa Vinculada', default: true },
+            { id: 'tipo_vaga', label: 'Tipo Vaga', default: false },
+            { id: 'vaga_empresa', label: 'Vaga/Empresa', default: true },
+            { id: 'observacao', label: 'Observação', default: false },
+            { id: 'acoes', label: 'Ações', locked: true, default: true }
+        ];
+
+        let colunasVisiveis = [];
+
+        function getColunasStorageKey() {
+            const tenantId = localStorage.getItem('tenant_id')
+                || localStorage.getItem('acesscontrol_tenant') || 'default';
+            let userId = 'anon';
+            try {
+                const u = JSON.parse(localStorage.getItem('acesscontrol_user') || '{}');
+                userId = u.id || u.user_id || u.email || 'anon';
+            } catch (_) {}
+            return `veiculos_colunas_${tenantId}_${userId}`;
+        }
+
+        function getColunasPadrao() {
+            return VEICULOS_COLUNAS.filter(c => c.default || c.locked).map(c => c.id);
+        }
+
+        function normalizarOrdemColunas(ids) {
+            return VEICULOS_COLUNAS.map(c => c.id).filter(id => ids.includes(id));
+        }
+
+        function carregarColunasVisiveis() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(getColunasStorageKey()) || 'null');
+                if (Array.isArray(saved) && saved.length) {
+                    const valid = saved.filter(id => VEICULOS_COLUNAS.some(c => c.id === id));
+                    VEICULOS_COLUNAS.filter(c => c.locked).forEach(c => {
+                        if (!valid.includes(c.id)) valid.push(c.id);
+                    });
+                    return normalizarOrdemColunas(valid);
+                }
+            } catch (_) {}
+            return getColunasPadrao();
+        }
+
+        function salvarColunasVisiveis(ids) {
+            localStorage.setItem(getColunasStorageKey(), JSON.stringify(ids));
+        }
+
+        function getColunaCount() {
+            return colunasVisiveis.length || getColunasPadrao().length;
+        }
+
+        function renderColunasPanel() {
+            const list = document.getElementById('colunas-list');
+            if (!list) return;
+
+            list.innerHTML = VEICULOS_COLUNAS.map(col => {
+                const checked = colunasVisiveis.includes(col.id);
+                const locked = !!col.locked;
+                return `
+                    <label class="coluna-toggle${locked ? ' locked' : ''}">
+                        <input type="checkbox" value="${col.id}" ${checked ? 'checked' : ''} ${locked ? 'disabled' : ''}
+                            onchange="alterarColunaVisivel('${col.id}', this.checked)">
+                        <span>${col.label}${locked ? ' (fixa)' : ''}</span>
+                    </label>`;
+            }).join('');
+        }
+
+        function alterarColunaVisivel(colId, visible) {
+            const col = VEICULOS_COLUNAS.find(c => c.id === colId);
+            if (!col || col.locked) return;
+
+            if (visible) {
+                if (!colunasVisiveis.includes(colId)) colunasVisiveis.push(colId);
+            } else {
+                const opcionais = colunasVisiveis.filter(id => {
+                    const c = VEICULOS_COLUNAS.find(x => x.id === id);
+                    return c && !c.locked;
+                });
+                if (opcionais.length <= 1 && opcionais[0] === colId) {
+                    alert('Mantenha ao menos uma coluna de dados além de Placa e Ações.');
+                    renderColunasPanel();
+                    return;
+                }
+                colunasVisiveis = colunasVisiveis.filter(id => id !== colId);
+            }
+
+            colunasVisiveis = normalizarOrdemColunas(colunasVisiveis);
+            salvarColunasVisiveis(colunasVisiveis);
+            renderizarCabecalho();
+            renderizarLista();
+            renderColunasPanel();
+        }
+
+        function restaurarColunasPadrao() {
+            colunasVisiveis = getColunasPadrao();
+            salvarColunasVisiveis(colunasVisiveis);
+            renderColunasPanel();
+            renderizarCabecalho();
+            renderizarLista();
+        }
+
+        function toggleColunasPanel(event) {
+            event?.stopPropagation();
+            const panel = document.getElementById('colunas-panel');
+            if (!panel) return;
+            panel.classList.toggle('open');
+            if (panel.classList.contains('open')) renderColunasPanel();
+        }
+
+        function fecharColunasPanel() {
+            document.getElementById('colunas-panel')?.classList.remove('open');
+        }
+
+        function renderizarCabecalho() {
+            const tr = document.querySelector('#thead-veiculos tr');
+            if (!tr) return;
+            tr.innerHTML = colunasVisiveis.map(id => {
+                const col = VEICULOS_COLUNAS.find(c => c.id === id);
+                return `<th>${col?.label || id}</th>`;
+            }).join('');
+        }
+
+        function renderizarCelula(colId, v) {
+            const isRotativa = v.vaga_tipo === 'rotativa' || v.company_id || v.company_name;
+            const displayTipo = isRotativa ? 'Rotativa' : (v.vaga_tipo === 'fixa' ? 'Fixa' : '-');
+
+            let vagaInfo = '-';
+            if (isRotativa) {
+                vagaInfo = v.company_name || '-';
+            } else if (v.vaga_tipo === 'fixa' && (v.parking_name || v.spot_number)) {
+                vagaInfo = v.parking_name || `Vaga ${v.spot_number}`;
+            }
+
+            const tag = v.tag_number
+                ? `<span class="badge-tag"><i class="fas fa-tag"></i> ${v.tag_number}</span>`
+                : '-';
+            const uhfTag = v.uhf_tag
+                ? `<span class="badge-tag" style="background:#ede9fe;color:#5b21b6;"><i class="fas fa-broadcast-tower"></i> ${v.uhf_tag}</span>`
+                : '-';
+
+            const obsRaw = (v.observacao || '').trim();
+            const obsDisplay = obsRaw
+                ? (obsRaw.length > 40 ? obsRaw.slice(0, 40) + '…' : obsRaw)
+                : '-';
+            const obsTitle = obsRaw ? obsRaw.replace(/"/g, '&quot;') : '';
+
+            switch (colId) {
+                case 'placa':
+                    return `<td><span class="badge-placa">${v.license_plate || v.plate || '-'}</span></td>`;
+                case 'marca':
+                    return `<td><strong>${v.brand || '-'}</strong></td>`;
+                case 'modelo':
+                    return `<td>${v.model || '-'}</td>`;
+                case 'cor':
+                    return `<td>${v.color || '-'}</td>`;
+                case 'tag_rfid':
+                    return `<td>${tag}</td>`;
+                case 'tag_uhf':
+                    return `<td>${uhfTag}</td>`;
+                case 'pessoa':
+                    return `<td>${v.owner_name || v.person_name || '-'}</td>`;
+                case 'tipo_vaga':
+                    return `<td><span style="font-weight:${isRotativa ? '700' : 'normal'};color:${isRotativa ? '#10b981' : 'inherit'}">${displayTipo}</span></td>`;
+                case 'vaga_empresa':
+                    return `<td>${vagaInfo}</td>`;
+                case 'observacao':
+                    return `<td title="${obsTitle}" style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${obsDisplay}</td>`;
+                case 'acoes':
+                    return `<td>
+                        <button class="btn btn-sm btn-secondary" onclick="editarVeiculo(${v.id})" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="excluirVeiculo(${v.id})" title="Excluir">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>`;
+                default:
+                    return '<td>-</td>';
+            }
+        }
+
+        async function filtrarPessoasPorEmpresa(empresaId) {
+            const input = document.getElementById('pessoa-search-input');
+            const dropdown = document.getElementById('pessoa-dropdown');
+            if (!input || !dropdown) return;
+
+            // Limpar seleção de pessoa atual
+            document.getElementById('pessoa-vinculada').value = '';
+            input.value = '';
+
+            dropdown.innerHTML = '<div style="padding:10px; color:#64748b; text-align:center;">Carregando pessoas da empresa...</div>';
+            dropdown.style.display = 'block';
+
+            try {
+                const res = await fetch(`/api/companies/${empresaId}/owners`, { headers: getHeaders() });
+                const data = await res.json();
+                const lista = Array.isArray(data) ? data : (data.data || []);
+
+                if (lista.length === 0) {
+                    const res2 = await fetch(`/api/persons?company_id=${empresaId}&limit=50&status=active`, { headers: getHeaders() });
+                    const data2 = await res2.json();
+                    const lista2 = Array.isArray(data2) ? data2 : (data2.data || []);
+
+                    if (lista2.length === 0) {
+                        dropdown.innerHTML = '<div style="padding:10px; color:#94a3b8; text-align:center;">Nenhuma pessoa vinculada a esta empresa</div>';
+                        return;
+                    }
+                    renderizarDropdownPessoas(lista2);
+                    return;
+                }
+
+                renderizarDropdownPessoas(lista);
+            } catch (err) {
+                try {
+                    const res2 = await fetch(`/api/persons?company_id=${empresaId}&limit=50&status=active`, { headers: getHeaders() });
+                    const data2 = await res2.json();
+                    const lista2 = Array.isArray(data2) ? data2 : (data2.data || []);
+                    if (lista2.length > 0) {
+                        renderizarDropdownPessoas(lista2);
+                    } else {
+                        dropdown.innerHTML = '<div style="padding:10px; color:#94a3b8; text-align:center;">Nenhuma pessoa encontrada</div>';
+                    }
+                } catch {
+                    dropdown.innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center;">Erro ao buscar pessoas</div>';
+                }
+            }
+        }
+
+        function renderizarDropdownPessoas(lista) {
+            const dropdown = document.getElementById('pessoa-dropdown');
+            if (!dropdown) return;
+
+            dropdown.innerHTML = lista.map(p => {
+                const nomeSafe = (p.name || '').replace(/'/g, "\\'");
+                const cpf = p.cpf ? ` · CPF: ${p.cpf}` : '';
+                const mat = p.registration_number ? ` · Mat: ${p.registration_number}` : '';
+                return `
+                <div onclick="selecionarPessoa(${p.id}, '${nomeSafe}')"
+                    style="padding:10px 12px; cursor:pointer; border-bottom:1px solid #f1f5f9;"
+                    onmouseenter="this.style.background='#f8fafc'"
+                    onmouseleave="this.style.background='white'">
+                    <div style="font-weight:600; color:#1e293b; font-size:0.9rem;">${p.name || '-'}</div>
+                    <div style="font-size:0.78rem; color:#64748b;">${cpf}${mat}</div>
+                </div>`;
+            }).join('');
+
+            dropdown.style.display = 'block';
+        }
+
+        // =============================================
+        // HELPERS
+        // =============================================
+        function getHeaders() {
+            const token = localStorage.getItem('acesscontrol_accessToken') || '';
+            const tenantId = localStorage.getItem('tenant_id')
+                || localStorage.getItem('acesscontrol_tenant') || '';
+            return {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json',
+                'X-Tenant-ID': tenantId
+            };
+        }
+
+        // =============================================
+        // CARREGAMENTO DE VEÍCULOS
+        // =============================================
+        async function carregarDados(page = 1) {
+            const headers = getHeaders();
+            const search = document.getElementById('search-veiculos')?.value || '';
+
+            document.getElementById('tbody-veiculos').innerHTML = `
+            <tr><td colspan="${getColunaCount()}" style="text-align:center; padding:40px; color:#64748b;">
+                <i class="fas fa-spinner fa-spin" style="font-size:1.5rem; display:block; margin-bottom:8px;"></i>
+                Carregando veículos...
+            </td></tr>`;
+
+            try {
+                let url = `/api/vehicles?page=${page}&limit=${ITEMS_PER_PAGE}`;
+                if (search) url += `&search=${encodeURIComponent(search)}`;
+
+                const veiculosRes = await fetch(url, { headers });
+
+                if (veiculosRes.ok) {
+                    const d = await veiculosRes.json();
+                    veiculos = Array.isArray(d) ? d : (d.data || []);
+                    if (d.pagination) {
+                        currentPage = d.pagination.page;
+                        totalPages = d.pagination.totalPages;
+                        totalVeiculos = d.pagination.total;
+                    } else {
+                        totalVeiculos = veiculos.length;
+                        totalPages = 1;
+                    }
+                } else {
+                    veiculos = [];
+                }
+
+                if (empresas.length === 0) {
+                    const empRes = await fetch('/api/companies?limit=500', { headers });
+                    if (empRes.ok) {
+                        const d = await empRes.json();
+                        empresas = Array.isArray(d) ? d : (d.data || []);
+                    }
+                }
+
+                renderizarLista();
+                carregarEmpresasSelect();
+
+            } catch (err) {
+                console.error('Erro ao carregar dados:', err);
+                document.getElementById('tbody-veiculos').innerHTML = `
+                <tr><td colspan="${getColunaCount()}" style="text-align:center; color:#ef4444; padding:40px;">
+                    <i class="fas fa-exclamation-triangle"></i> Erro ao carregar.
+                    <button class="btn btn-sm btn-secondary" style="margin-left:8px;"
+                        onclick="carregarDados()">Tentar novamente</button>
+                </td></tr>`;
+            }
+        }
+
+        // =============================================
+        // RENDERIZAÇÃO
+        // =============================================
+        function renderizarLista() {
+            const tbody = document.getElementById('tbody-veiculos');
+            if (!tbody) return;
+
+            document.getElementById('veiculos-count').textContent = totalVeiculos || veiculos.length;
+
+            if (veiculos.length === 0) {
+                tbody.innerHTML = `
+                <tr><td colspan="${getColunaCount()}">
+                    <div class="empty-message">
+                        <i class="fas fa-car"></i>
+                        <p>Nenhum veículo encontrado</p>
+                    </div>
+                </td></tr>`;
+                updatePagination();
+                return;
+            }
+
+            tbody.innerHTML = veiculos.map(v => `
+            <tr>${colunasVisiveis.map(colId => renderizarCelula(colId, v)).join('')}</tr>
+            `).join('');
+
+            updatePagination();
+        }
+
+        function updatePagination() {
+            document.getElementById('page-indicator').textContent =
+                `Página ${currentPage} de ${totalPages || 1}`;
+            document.getElementById('btn-prev-page').disabled = currentPage <= 1;
+            document.getElementById('btn-next-page').disabled = currentPage >= totalPages;
+        }
+
+        function changePage(direction) {
+            const np = currentPage + direction;
+            if (np >= 1 && np <= totalPages) carregarDados(np);
+        }
+
+        function filtrarVeiculos() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentPage = 1;
+                carregarDados(1);
+            }, 400);
+        }
+
+        // =============================================
+        // AUTOCOMPLETE DE PESSOA
+        // =============================================
+        function buscarPessoas(query) {
+            clearTimeout(pessoaEmpresaSearchTimeout);
+
+            const dropdown = document.getElementById('pessoa-dropdown');
+            if (!dropdown) return;
+
+            if (!query || query.length < 2) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            dropdown.innerHTML = '<div style="padding:10px; color:#64748b; text-align:center;">Buscando...</div>';
+            dropdown.style.display = 'block';
+
+            pessoaEmpresaSearchTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(
+                        `/api/persons?search=${encodeURIComponent(query)}&limit=100&status=active`,
+                        { headers: getHeaders() }
+                    );
+                    const data = await res.json();
+                    const lista = Array.isArray(data) ? data : (data.data || []);
+
+                    if (lista.length === 0) {
+                        dropdown.innerHTML = '<div style="padding:10px; color:#94a3b8; text-align:center;">Nenhuma pessoa encontrada</div>';
+                        return;
+                    }
+
+                    dropdown.innerHTML = lista.map(p => {
+                        const nomeSafe = (p.name || '').replace(/'/g, "\\'");
+                        const cpf = p.cpf ? ` · CPF: ${p.cpf}` : '';
+                        const mat = p.registration_number ? ` · Mat: ${p.registration_number}` : '';
+                        return `
+                    <div onclick="selecionarPessoa(${p.id}, '${nomeSafe}')"
+                        style="padding:10px 12px; cursor:pointer; border-bottom:1px solid #f1f5f9;"
+                        onmouseenter="this.style.background='#f8fafc'"
+                        onmouseleave="this.style.background='white'">
+                        <div style="font-weight:600; color:#1e293b; font-size:0.9rem;">${p.name || '-'}</div>
+                        <div style="font-size:0.78rem; color:#64748b;">${cpf}${mat}</div>
+                    </div>`;
+                    }).join('');
+                } catch (e) {
+                    dropdown.innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center;">Erro ao buscar</div>';
+                }
+            }, 300);
+        }
+
+        async function selecionarPessoa(id, nome) {
+            document.getElementById('pessoa-vinculada').value = id;
+            document.getElementById('pessoa-search-input').value = nome;
+            document.getElementById('pessoa-dropdown').style.display = 'none';
+            
+            // Buscar detalhes da pessoa para ver se tem empresa
+            try {
+                const res = await fetch(`/api/persons/${id}`, { headers: getHeaders() });
+                const data = await res.json();
+                const pessoa = data.data || data;
+                
+                if (pessoa.company_id) {
+                    const empresa = empresas.find(e => e.id === pessoa.company_id);
+                    const nomeEmpresa = empresa ? (empresa.corporate_name || empresa.trading_name || empresa.name) : 'Empresa ' + pessoa.company_id;
+                    
+                    document.getElementById('veiculo-empresa').value = pessoa.company_id;
+                    document.getElementById('empresa-search-input').value = nomeEmpresa;
+                    
+                    // Se tem empresa, força rotativa
+                    const tipoVagaSelect = document.getElementById('tipoVaga');
+                    if (tipoVagaSelect) {
+                        tipoVagaSelect.value = 'rotativa';
+                        toggleVagaVeiculoFields(false);
+                    }
+                }
+            } catch (err) {
+                console.warn('Não foi possível carregar detalhes da pessoa:', err);
+            }
+        }
+
+        document.addEventListener('click', e => {
+            const drop = document.getElementById('pessoa-dropdown');
+            const input = document.getElementById('pessoa-search-input');
+            if (drop && input && !input.contains(e.target) && !drop.contains(e.target)) {
+                drop.style.display = 'none';
+            }
+        });
+
+        // =============================================
+        // FORMULÁRIO — EXIBIR / OCULTAR
+        // =============================================
+        function showVeiculoForm() {
+            document.getElementById('veiculos-list').classList.add('hidden');
+            document.getElementById('veiculos-form').classList.remove('hidden');
+            document.getElementById('veiculo-form-title').textContent = 'Novo Veículo';
+
+            document.getElementById('veiculoForm').reset();
+            document.getElementById('veiculo-id').value = '';
+            document.getElementById('tag-numero').value = '';
+            document.getElementById('uhf-tag-input').value = '';
+            document.getElementById('observacao').value = '';
+            document.getElementById('uhf-preview').style.display = 'none';
+            document.getElementById('pessoa-vinculada').value = '';
+            document.getElementById('pessoa-search-input').value = '';
+            document.getElementById('pessoa-dropdown').style.display = 'none';
+
+            document.querySelector('input[name="tipo-tag"][value="manual"]').checked = true;
+            toggleTagFields();
+            // FIX: sem argumento = false = não limpa campos
+            toggleVagaVeiculoFields();
+            carregarVagasSelect();
+            carregarEmpresasSelect();
+            editandoId = null;
+        }
+
+        function showVeiculoList() {
+            document.getElementById('veiculos-list').classList.remove('hidden');
+            document.getElementById('veiculos-form').classList.add('hidden');
+            editandoId = null;
+        }
+
+        // =============================================
+        // SALVAR
+        // =============================================
+        async function saveVeiculo(e) {
+            e.preventDefault();
+
+            const placa = document.getElementById('placa').value.toUpperCase();
+            if (!/^[A-Z]{3}-?\d{4}$|^[A-Z]{3}\d[A-Z]\d{2}$/.test(placa)) {
+                alert('Placa inválida! Use o formato ABC-1234, ABC1234 ou ABC1D23');
+                return;
+            }
+
+            const pessoaId = document.getElementById('pessoa-vinculada').value;
+            if (!pessoaId) {
+                alert('Selecione uma pessoa vinculada ao veículo!');
+                return;
+            }
+
+            const tipoVaga = document.getElementById('tipoVaga')?.value || '';
+            let parking_id = null, company_id = null, spot_number = null;
+
+            if (tipoVaga === 'fixa') {
+                const val = document.getElementById('veiculo-vaga')?.value || '';
+                if (val.includes('|')) {
+                    const parts = val.split('|');
+                    parking_id = parts[0] ? Number(parts[0]) : null;
+                    spot_number = parts[1] || null;
+                }
+            } else if (tipoVaga === 'rotativa') {
+                const val = document.getElementById('veiculo-empresa')?.value;
+                company_id = val ? Number(val) : null;
+            }
+
+            const uhfRaw = document.getElementById('uhf-tag-input').value.trim();
+            const uhfFmt = document.getElementById('uhf-tag-format').value;
+            const uhfNorm = uhfRaw ? normalizarTagUhf(uhfRaw, uhfFmt) : null;
+
+            const payload = {
+                person_id: Number(pessoaId),
+                license_plate: placa,
+                plate: placa,
+                brand: document.getElementById('marca').value,
+                model: document.getElementById('modelo').value,
+                color: document.getElementById('cor').value,
+                tag_number: document.getElementById('tag-numero').value || null,
+                uhf_tag: uhfNorm,
+                parking_id,
+                company_id,
+                spot_number,
+                status: 'inactive',
+                observacao: document.getElementById('observacao').value.trim() || null
+            };
+
+            const idEdicao = editandoId
+                || (document.getElementById('veiculo-id').value
+                    ? Number(document.getElementById('veiculo-id').value)
+                    : null);
+
+            const btnSave = e.submitter;
+            if (btnSave) {
+                btnSave.disabled = true;
+                btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+            }
+
+            try {
+                const res = idEdicao
+                    ? await fetch(`/api/vehicles/${idEdicao}`, {
+                        method: 'PUT', headers: getHeaders(), body: JSON.stringify(payload)
+                    })
+                    : await fetch('/api/vehicles', {
+                        method: 'POST', headers: getHeaders(), body: JSON.stringify(payload)
+                    });
+
+                const result = await res.json();
+                if (result.success) {
+                    alert(idEdicao ? 'Veículo atualizado com sucesso!' : 'Veículo cadastrado com sucesso!');
+                    showVeiculoList();
+                    await carregarDados(idEdicao ? currentPage : 1);
+                } else {
+                    alert('Erro: ' + (result.message || 'Tente novamente'));
+                }
+            } catch (err) {
+                console.error('Erro ao salvar:', err);
+                alert('Erro ao salvar veículo.');
+            } finally {
+                if (btnSave) {
+                    btnSave.disabled = false;
+                    btnSave.innerHTML = '<i class="fas fa-save"></i> Salvar';
+                }
+            }
+        }
+
+        // =============================================
+        // EDITAR
+        // =============================================
+        async function editarVeiculo(id) {
+            const veiculo = veiculos.find(v => Number(v.id) === Number(id));
+            if (!veiculo) { alert('Veículo não encontrado'); return; }
+
+            editandoId = Number(id);
+            document.getElementById('veiculo-form-title').textContent = 'Editar Veículo';
+            document.getElementById('veiculos-list').classList.add('hidden');
+            document.getElementById('veiculos-form').classList.remove('hidden');
+
+            // Limpar autocomplete
+            document.getElementById('pessoa-vinculada').value = '';
+            document.getElementById('pessoa-search-input').value = '';
+            document.getElementById('pessoa-dropdown').style.display = 'none';
+
+            // Campos simples
+            document.getElementById('veiculo-id').value = id;
+            document.getElementById('placa').value = veiculo.license_plate || '';
+            document.getElementById('marca').value = veiculo.brand || '';
+            document.getElementById('modelo').value = veiculo.model || '';
+            document.getElementById('cor').value = veiculo.color || veiculo.cor || '';
+            document.getElementById('observacao').value = veiculo.observacao || '';
+            document.getElementById('tag-numero').value = veiculo.tag_number || '';
+            document.getElementById('uhf-tag-input').value = veiculo.uhf_tag || '';
+            document.getElementById('uhf-tag-format').value = 'padrao';
+            if (veiculo.uhf_tag) atualizarPreviewUhf();
+
+            // Pessoa: preencher autocomplete
+            const nomePessoa = veiculo.owner_name || veiculo.person_name || '';
+            if (veiculo.person_id && nomePessoa) {
+                selecionarPessoa(veiculo.person_id, nomePessoa);
+            } else if (veiculo.person_id) {
+                try {
+                    const res = await fetch(`/api/persons/${veiculo.person_id}`, { headers: getHeaders() });
+                    const data = await res.json();
+                    // FIX: aceita qualquer formato de resposta da API
+                    const pessoa = data?.data || data?.person || data;
+                    if (pessoa?.name) {
+                        selecionarPessoa(veiculo.person_id, pessoa.name);
+                    } else {
+                        document.getElementById('pessoa-vinculada').value = veiculo.person_id;
+                    }
+                } catch {
+                    document.getElementById('pessoa-vinculada').value = veiculo.person_id;
+                }
+            }
+
+            // Tipo de vaga
+            if (veiculo.vaga_tipo) {
+                document.getElementById('tipoVaga').value = veiculo.vaga_tipo;
+                // FIX: sem argumento = false = NÃO limpa campos durante edição
+                toggleVagaVeiculoFields();
+
+                setTimeout(async () => {
+                    if (veiculo.vaga_tipo === 'fixa' && veiculo.parking_id) {
+                        await carregarVagasSelect();
+                        const sel = document.getElementById('veiculo-vaga');
+                        for (let i = 0; i < sel.options.length; i++) {
+                            if (sel.options[i].value.startsWith(String(veiculo.parking_id) + '|')) {
+                                sel.selectedIndex = i; break;
+                            }
+                        }
+                        // FIX: removido o bloco que limpava o campo pessoa aqui
+                    } else if (veiculo.vaga_tipo === 'rotativa' && veiculo.company_id) {
+                        try {
+                            const res = await fetch(`/api/companies/${veiculo.company_id}`, { headers: getHeaders() });
+                            const data = await res.json();
+                            if (data.success && data.data) {
+                                const emp = data.data;
+                                const nomeEmpresa = emp.corporate_name || emp.trading_name || emp.name || 'Empresa ' + veiculo.company_id;
+                                document.getElementById('veiculo-empresa').value = veiculo.company_id;
+                                document.getElementById('empresa-search-input').value = nomeEmpresa;
+                                empresaSelecionada = { id: veiculo.company_id, nome: nomeEmpresa };
+                            }
+                        } catch {
+                            document.getElementById('veiculo-empresa').value = veiculo.company_id;
+                        }
+                        // Só filtra pessoas por empresa se não tiver pessoa já selecionada
+                        if (!veiculo.person_id) {
+                            filtrarPessoasPorEmpresa(veiculo.company_id);
+                        }
+                    }
+                }, 150);
+            } else {
+                // FIX: sem argumento = false = NÃO limpa campos
+                toggleVagaVeiculoFields();
+            }
+
+            document.querySelector('input[name="tipo-tag"][value="manual"]').checked = true;
+            toggleTagFields();
+        }
+
+        // =============================================
+        // EXCLUIR
+        // =============================================
+        async function excluirVeiculo(id) {
+            if (!confirm('Deseja realmente excluir este veículo?')) return;
+            try {
+                const res = await fetch(`/api/vehicles/${id}`, {
+                    method: 'DELETE', headers: getHeaders()
+                });
+                if (res.ok) {
+                    alert('Veículo excluído com sucesso!');
+                    const novaPagina = (veiculos.length === 1 && currentPage > 1)
+                        ? currentPage - 1 : currentPage;
+                    await carregarDados(novaPagina);
+                } else {
+                    alert('Erro ao excluir veículo.');
+                }
+            } catch (err) {
+                console.error('Erro ao excluir:', err);
+                alert('Erro ao excluir veículo.');
+            }
+        }
+
+        // =============================================
+        // SELECTS DE VAGA E EMPRESA
+        // =============================================
+        function carregarVagasSelect() {
+            const select = document.getElementById('veiculo-vaga');
+            if (!select) return;
+            select.innerHTML = '<option value="">Selecione uma vaga...</option>';
+            estacionamentos.forEach(est => {
+                const total = est.total_spots || 20;
+                for (let i = 1; i <= total; i++) {
+                    select.innerHTML += `<option value="${est.id}|${i}">${est.name} - Vaga ${i}</option>`;
+                }
+            });
+        }
+
+        function carregarEmpresasSelect() {
+            // Controlado pelo combobox
+        }
+
+        // =============================================
+        // BUSCAR EMPRESAS
+        // =============================================
+        let empresaSelecionada = null;
+        let empresaSearchTimeout = null;
+
+        async function carregarTodasEmpresas() {
+            const dropdown = document.getElementById('empresa-dropdown');
+            if (!dropdown) return;
+
+            dropdown.innerHTML = '<div style="padding:10px; color:#64748b;">Carregando...</div>';
+            dropdown.style.display = 'block';
+
+            try {
+                const headers = getHeaders();
+                const res = await fetch(`/api/companies?limit=500`, { headers });
+                const data = await res.json();
+                const lista = Array.isArray(data) ? data : (data.data || []);
+
+                if (lista.length === 0) {
+                    dropdown.innerHTML = '<div style="padding:10px; color:#94a3b8;">Nenhuma empresa encontrada</div>';
+                    return;
+                }
+
+                dropdown.innerHTML = lista.map(emp => {
+                    const nome = emp.corporate_name || emp.trading_name || emp.name || 'Empresa ' + emp.id;
+                    return `
+                        <div onclick="selecionarEmpresa(${emp.id}, '${nome.replace(/'/g, "\\'")}')"
+                            style="padding:10px 12px; cursor:pointer; border-bottom:1px solid #f1f5f9; transition:background 0.15s;"
+                            onmouseenter="this.style.background='#f8fafc'"
+                            onmouseleave="this.style.background='white'">
+                            <div style="font-weight:600; color:#1e293b;">${nome}</div>
+                            <div style="font-size:0.8rem; color:#64748b;">${emp.cnpj || ''}</div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                dropdown.innerHTML = '<div style="padding:10px; color:#ef4444;">Erro ao carregar</div>';
+            }
+        }
+
+        async function carregarTodasPessoas() {
+            const dropdown = document.getElementById('pessoa-dropdown');
+            if (!dropdown) return;
+
+            dropdown.innerHTML = '<div style="padding:10px; color:#64748b; text-align:center;">Carregando...</div>';
+            dropdown.style.display = 'block';
+
+            try {
+                const res = await fetch(`/api/persons?limit=1000&status=active`, { headers: getHeaders() });
+                const data = await res.json();
+                const lista = Array.isArray(data) ? data : (data.data || []);
+
+                if (lista.length === 0) {
+                    dropdown.innerHTML = '<div style="padding:10px; color:#94a3b8; text-align:center;">Nenhuma pessoa encontrada</div>';
+                    return;
+                }
+
+                dropdown.innerHTML = lista.map(p => {
+                    const nomeSafe = (p.name || '').replace(/'/g, "\\'");
+                    const cpf = p.cpf ? ` · CPF: ${p.cpf}` : '';
+                    const mat = p.registration_number ? ` · Mat: ${p.registration_number}` : '';
+                    return `
+                        <div onclick="selecionarPessoa(${p.id}, '${nomeSafe}')"
+                            style="padding:10px 12px; cursor:pointer; border-bottom:1px solid #f1f5f9;"
+                            onmouseenter="this.style.background='#f8fafc'"
+                            onmouseleave="this.style.background='white'">
+                            <div style="font-weight:600; color:#1e293b; font-size:0.9rem;">${p.name || '-'}</div>
+                            <div style="font-size:0.78rem; color:#64748b;">${cpf}${mat}</div>
+                        </div>`;
+                }).join('');
+            } catch (e) {
+                dropdown.innerHTML = '<div style="padding:10px; color:#ef4444; text-align:center;">Erro ao carregar</div>';
+            }
+        }
+
+        async function buscarEmpresas(query) {
+            clearTimeout(empresaSearchTimeout);
+            empresaSearchTimeout = setTimeout(async () => {
+                const dropdown = document.getElementById('empresa-dropdown');
+                if (!dropdown) return;
+
+                if (!query || query.length < 2) {
+                    dropdown.style.display = 'none';
+                    return;
+                }
+
+                dropdown.innerHTML = '<div style="padding:10px; color:#64748b;">Buscando...</div>';
+                dropdown.style.display = 'block';
+
+                try {
+                    const headers = getHeaders();
+                    const res = await fetch(`/api/companies?search=${encodeURIComponent(query)}&limit=100`, { headers });
+                    const data = await res.json();
+                    const lista = Array.isArray(data) ? data : (data.data || []);
+
+                    if (lista.length === 0) {
+                        dropdown.innerHTML = '<div style="padding:10px; color:#94a3b8;">Nenhuma empresa encontrada</div>';
+                        return;
+                    }
+
+                    dropdown.innerHTML = lista.map(emp => {
+                        const nome = emp.corporate_name || emp.trading_name || emp.name || 'Empresa ' + emp.id;
+                        return `
+                            <div onclick="selecionarEmpresa(${emp.id}, '${nome.replace(/'/g, "\\'")}')"
+                                style="padding:10px 12px; cursor:pointer; border-bottom:1px solid #f1f5f9; transition:background 0.15s;"
+                                onmouseenter="this.style.background='#f8fafc'"
+                                onmouseleave="this.style.background='white'">
+                                <div style="font-weight:600; color:#1e293b;">${nome}</div>
+                                <div style="font-size:0.8rem; color:#64748b;">${emp.cnpj || ''}</div>
+                            </div>
+                        `;
+                    }).join('');
+                } catch (err) {
+                    dropdown.innerHTML = '<div style="padding:10px; color:#ef4444;">Erro ao buscar</div>';
+                }
+            }, 300);
+        }
+
+        function selecionarEmpresa(id, nome) {
+            empresaSelecionada = { id, nome };
+            document.getElementById('veiculo-empresa').value = id;
+            document.getElementById('empresa-search-input').value = nome;
+            document.getElementById('empresa-dropdown').style.display = 'none';
+            
+            // Se selecionar uma empresa, o tipo de vaga DEVE ser rotativa
+            const tipoVagaSelect = document.getElementById('tipoVaga');
+            if (tipoVagaSelect) {
+                tipoVagaSelect.value = 'rotativa';
+                toggleVagaVeiculoFields(false); // false para não limpar campos que acabamos de preencher
+            }
+
+            // Filtrar pessoas vinculadas à empresa selecionada
+            if (id) filtrarPessoasPorEmpresa(id);
+        }
+
+        // =============================================
+        // FIX PRINCIPAL: toggleVagaVeiculoFields com flag
+        //
+        // triggeredByUser = true  → usuário mudou o select manualmente → pode limpar campos
+        // triggeredByUser = false → chamado internamente (edição/init) → NÃO limpa campos
+        // =============================================
+        function toggleVagaVeiculoFields(triggeredByUser = false) {
+            const tipo = document.getElementById('tipoVaga')?.value || '';
+            document.getElementById('vaga-fixa-container').style.display = tipo === 'fixa' ? 'block' : 'none';
+            document.getElementById('vaga-rotativa-container').style.display = tipo === 'rotativa' ? 'block' : 'none';
+
+            // Só executa a lógica de limpar/filtrar quando o usuário mudou o select
+            if (!triggeredByUser) return;
+
+            if (tipo === 'rotativa') {
+                // Usuário escolheu rotativa: se já tem empresa, filtrar pessoas
+                const empresaId = document.getElementById('veiculo-empresa')?.value;
+                if (empresaId) {
+                    filtrarPessoasPorEmpresa(empresaId);
+                }
+            } else if (tipo === 'fixa') {
+                // Usuário escolheu fixa: limpar pessoa para que escolha novamente
+                const input = document.getElementById('pessoa-search-input');
+                if (input) {
+                    input.value = '';
+                    document.getElementById('pessoa-vinculada').value = '';
+                    document.getElementById('pessoa-dropdown').style.display = 'none';
+                }
+            }
+        }
+
+        // =============================================
+        // TAG
+        // =============================================
+        function toggleTagFields() {
+            const tipo = document.querySelector('input[name="tipo-tag"]:checked').value;
+            document.getElementById('tag-manual-container').classList.toggle('hidden', tipo !== 'manual');
+            document.getElementById('tag-remoto-container').classList.toggle('hidden', tipo !== 'remoto');
+        }
+
+        function gerarTagAleatoria() {
+            document.getElementById('tag-numero').value =
+                Math.floor(Math.random() * 10000000000).toString().padStart(10, '0');
+        }
+
+        function iniciarCadastramentoRemoto() {
+            document.getElementById('tagRemotoModal').classList.add('active');
+            setTimeout(() => {
+                const tag = Math.floor(Math.random() * 10000000000).toString().padStart(10, '0');
+                document.getElementById('tag-numero').value = tag;
+                document.querySelector('input[name="tipo-tag"][value="manual"]').checked = true;
+                toggleTagFields();
+                fecharModalRemoto();
+                alert(`Tag lida com sucesso: ${tag}`);
+            }, 3000);
+        }
+
+        function fecharModalRemoto() {
+            document.getElementById('tagRemotoModal').classList.remove('active');
+        }
+
+        function formatarPlaca(input) {
+            input.value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        }
+
+        // =============================================
+        // CONVERSÃO DE TAG UHF
+        // =============================================
+        function normalizarTagUhf(raw, formato) {
+            const tag = raw.trim();
+            if (!tag) return null;
+
+            let num = null;
+
+            if (formato === 'padrao') {
+                // "123,4567" → número
+                const m = tag.match(/^(\d+),(\d+)$/);
+                if (m) num = parseInt(m[1]) * 10000 + parseInt(m[2]);
+                else if (/^\d+$/.test(tag)) num = parseInt(tag); // fallback decimal
+            } else if (formato === 'decimal') {
+                if (/^\d+$/.test(tag)) num = parseInt(tag);
+            } else if (formato === 'hex') {
+                const m = tag.match(/^(?:0x)?([0-9A-Fa-f]+)$/i);
+                if (m) num = parseInt(m[1], 16);
+            }
+
+            if (num === null || isNaN(num)) return tag; // retorna original se não reconhecer
+
+            // Sempre armazenar no formato padrão "A,B"
+            const high = Math.floor(num / 10000);
+            const low = num % 10000;
+            return `${high},${low.toString().padStart(4, '0')}`;
+        }
+
+        function atualizarPreviewUhf() {
+            const raw = document.getElementById('uhf-tag-input').value.trim();
+            const fmt = document.getElementById('uhf-tag-format').value;
+            const preview = document.getElementById('uhf-preview');
+
+            if (!raw) { preview.style.display = 'none'; return; }
+
+            const padrao = normalizarTagUhf(raw, fmt);
+            if (!padrao) { preview.style.display = 'none'; return; }
+
+            const m = padrao.match(/^(\d+),(\d+)$/);
+            let decimal = '-', hex = '-';
+            if (m) {
+                const num = parseInt(m[1]) * 10000 + parseInt(m[2]);
+                decimal = num.toString();
+                hex = num.toString(16).toUpperCase();
+            }
+
+            document.getElementById('uhf-prev-padrao').textContent = padrao;
+            document.getElementById('uhf-prev-decimal').textContent = decimal;
+            document.getElementById('uhf-prev-hex').textContent = hex;
+            preview.style.display = 'block';
+        }
+
+        // =============================================
+        // INIT
+        // =============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const placaInput = document.getElementById('placa');
+            if (placaInput) placaInput.addEventListener('input', () => formatarPlaca(placaInput));
+
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') {
+                    fecharModalRemoto();
+                    fecharColunasPanel();
+                }
+            });
+
+            document.addEventListener('click', e => {
+                const panel = document.getElementById('colunas-panel');
+                const dropdown = document.querySelector('.colunas-dropdown');
+                if (panel?.classList.contains('open') && dropdown && !dropdown.contains(e.target)) {
+                    fecharColunasPanel();
+                }
+            });
+
+            colunasVisiveis = carregarColunasVisiveis();
+            renderizarCabecalho();
+            renderColunasPanel();
+
+            empresas = [];
+            carregarDados(1);
+        });
+    </script>
+</body>
+
+</html>
