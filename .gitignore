@@ -1,0 +1,33 @@
+# Dependências
+node_modules/
+
+# Ambiente e segredos
+.env
+.env.*
+!.env.example
+
+# Banco de dados e backups
+backend/database/tenants/
+backend/database/**/*.db
+backend/database/**/*.db-*
+backend/database/monitoring_history.json
+*.sqlite
+*.sqlite3
+
+# Logs e relatórios
+backend/logs/
+backend/reports/
+*.log
+
+# Uploads e arquivos gerados
+backend/public/uploads/
+backend/public/photos/
+
+# SO / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# PM2
+.pm2/

@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>MAM Control - Sistema de Controle de Acesso</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <style>
+        /* Reset e estilos base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+        /* Cards */
+        .content-box {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Grid de formulário */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .grid-col-full {
+            grid-column: 1 / -1;
+        }
+
+        /* Form groups */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #ffffff;
+            font-family: inherit;
+        }
+
+        .form-group input:hover,
+        .form-group select:hover,
+        .form-group textarea:hover {
+            border-color: #94a3b8;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .form-group input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .form-group input[type="number"]::-webkit-inner-spin-button,
+        .form-group input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .required:after {
+            content: " *";
+            color: #e53e3e;
+        }
+
+        /* Form hint */
+        .form-hint {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* Botões */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.2);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Section header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-header-compact {
+            margin-bottom: 20px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title h2 {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Tabela */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: auto;
+            margin-bottom: 20px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            color: #1e293b;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Seções de seleção */
+        .selecao-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .selecao-section h3 {
+            margin-bottom: 16px;
+            color: #1e293b;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selecao-section h3 i {
+            color: #4a90d9;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #4a90d9;
+        }
+
+        .selecao-items {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .selecao-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .selecao-item:last-child {
+            border-bottom: none;
+        }
+
+        .selecao-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #4a90d9;
+        }
+
+        .selecao-item span {
+            flex: 1;
+            font-size: 0.95rem;
+        }
+
+        .selecao-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .selecao-header .btn-sm {
+            padding: 4px 8px;
+        }
+
+        /* Busca dentro das seções */
+        .selecao-search {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 0 8px;
+        }
+
+        .selecao-search i {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .selecao-search input {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            background: none;
+            font-size: 0.9rem;
+        }
+
+        .selecao-search input:focus {
+            outline: none;
+        }
+
+        /* Badge de contador */
+        .contador-badge {
+            background: #e2e8f0;
+            color: #475569;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Card de refeição */
+        .refeicao-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+
+        .refeicao-card:hover {
+            border-color: #4a90d9;
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.1);
+        }
+
+        .refeicao-card h4 {
+            margin-bottom: 16px;
+            color: #1e293b;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .refeicao-card h4 i {
+            color: #f59e0b;
+        }
+
+        /* Valor monetário */
+        .input-group {
+            display: flex;
+            align-items: center;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .input-group span {
+            padding: 10px 12px;
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+            border-right: 1.5px solid #e2e8f0;
+        }
+
+        .input-group input {
+            flex: 1;
+            border: none;
+            border-radius: 0;
+        }
+
+        .input-group input:focus {
+            box-shadow: none;
+        }
+
+        /* Ações do formulário */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Garantir que o formulário seja visível quando não hidden */
+        #refeicoes-form:not(.hidden) {
+            display: block !important;
+        }
+
+        /* Texto centralizado */
+        .text-center {
+            text-align: center;
+        }
+
+        /* Mensagem vazia */
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+
+        .empty-message i {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* Grid de refeições */
+        .refeicoes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .selecao-section {
+                padding: 16px;
+            }
+
+            .refeicoes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <!-- LIST VIEW -->
+                <section id="refeicoes-list" class="content-section active">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1>Refeições</h1>
+                            <p>Gerenciar tipos de refeição e autorizações</p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary" onclick="carregarRefeicoes()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button class="btn btn-primary" onclick="mostrarFormulario()">
+                                <i class="fas fa-plus"></i> Nova Refeição
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="content-box">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Refeição</th>
+                                    <th>Consumo p/ Dia</th>
+                                    <th>Valor Unitário</th>
+                                    <th>Autorizados</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="refeicoes-table-body">
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="empty-message">
+                                            <i class="fas fa-utensils"></i>
+                                            <p>Nenhuma refeição cadastrada</p>
+                                            <button class="btn btn-primary btn-sm" onclick="mostrarFormulario()" style="margin-top: 12px;">
+                                                <i class="fas fa-plus"></i> Cadastrar primeira refeição
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- FORM VIEW -->
+                <section id="refeicoes-form" class="content-section hidden">
+                    <div class="section-header section-header-compact">
+                        <div class="section-title">
+                            <h2 id="form-titulo">Nova Refeição</h2>
+                            <p>Configure os detalhes da refeição</p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary" onclick="mostrarLista()">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="refeicaoForm" onsubmit="salvarRefeicao(event)">
+                        <input type="hidden" id="refeicao-id">
+
+                        <!-- Dados da Refeição -->
+                        <div class="content-box" style="margin-bottom: 20px;">
+                            <h3 style="margin-bottom: 20px; color: #1e293b; font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-utensils" style="color: #4a90d9;"></i> Dados da Refeição
+                            </h3>
+
+                            <div class="form-grid">
+                                <div class="form-group grid-col-full">
+                                    <label for="refeicao-nome" class="required">Nome da Refeição</label>
+                                    <input type="text" id="refeicao-nome" required placeholder="Ex: Café da Manhã, Almoço, Jantar">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="refeicao-consumo" class="required">Consumo por Dia</label>
+                                    <input type="number" id="refeicao-consumo" required min="1" max="10" value="1" placeholder="Quantas vezes pode consumir por dia">
+                                    <div class="form-hint">Número de vezes que pode passar na catraca por dia</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="refeicao-valor" class="required">Valor Unitário (R$)</label>
+                                    <div class="input-group">
+                                        <span>R$</span>
+                                        <input type="number" id="refeicao-valor" required min="0" step="0.01" value="0.00" placeholder="0,00">
+                                    </div>
+                                    <div class="form-hint">Valor por refeição (pode ser 0 para gratuito)</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="refeicao-tipo">Tipo de Refeição</label>
+                                    <select id="refeicao-tipo">
+                                        <option value="cafe">Café da Manhã</option>
+                                        <option value="almoco" selected>Almoço</option>
+                                        <option value="cafe-tarde">Café da Tarde</option>
+                                        <option value="jantar">Jantar</option>
+                                        <option value="ceia">Ceia</option>
+                                        <option value="outro">Outro</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quem pode consumir -->
+                        <div class="content-box" style="margin-bottom: 20px;">
+                            <div class="selecao-section">
+                                <h3><i class="fas fa-users"></i> Quem pode consumir?</h3>
+                                
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="tipo-autorizacao" value="pessoas" checked onchange="toggleTipoAutorizacao()">
+                                        <span>Pessoas Específicas</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="tipo-autorizacao" value="grupos" onchange="toggleTipoAutorizacao()">
+                                        <span>Grupos</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="tipo-autorizacao" value="empresas" onchange="toggleTipoAutorizacao()">
+                                        <span>Empresas</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="tipo-autorizacao" value="todos" onchange="toggleTipoAutorizacao()">
+                                        <span>Todos</span>
+                                    </label>
+                                </div>
+
+                                <!-- Seleção de Pessoas -->
+                                <div id="selecao-pessoas" class="selecao-items">
+                                    <div class="selecao-header">
+                                        <span class="contador-badge" id="pessoas-count">0 selecionadas</span>
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="selecionarTodasPessoas()">
+                                            <i class="fas fa-check-double"></i> Selecionar todas
+                                        </button>
+                                    </div>
+                                    <div class="selecao-search">
+                                        <i class="fas fa-search"></i>
+                                        <input type="text" placeholder="Buscar pessoa..." onkeyup="buscarPessoas(this.value)">
+                                    </div>
+                                    <div id="pessoas-lista">
+                                        <!-- Lista de pessoas serão carregadas via JS do banco de dados -->
+                                    </div>
+                                </div>
+
+                                <!-- Seleção de Grupos -->
+                                <div id="selecao-grupos" class="selecao-items hidden">
+                                    <div class="selecao-header">
+                                        <span class="contador-badge" id="grupos-count">0 selecionados</span>
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="selecionarTodosGrupos()">
+                                            <i class="fas fa-check-double"></i> Selecionar todos
+                                        </button>
+                                    </div>
+                                    <div class="selecao-search">
+                                        <i class="fas fa-search"></i>
+                                        <input type="text" placeholder="Buscar grupo..." onkeyup="buscarGrupos(this.value)">
+                                    </div>
+                                    <div id="grupos-lista">
+                                        <!-- Lista de pessoas serão carregadas via JS do banco de dados -->
+                                    </div>
+                                </div>
+
+                                <!-- Seleção de Empresas -->
+                                <div id="selecao-empresas" class="selecao-items hidden">
+                                    <div class="selecao-header">
+                                        <span class="contador-badge" id="empresas-count">0 selecionadas</span>
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="selecionarTodasEmpresas()">
+                                            <i class="fas fa-check-double"></i> Selecionar todas
+                                        </button>
+                                    </div>
+                                    <div class="selecao-search">
+                                        <i class="fas fa-search"></i>
+                                        <input type="text" placeholder="Buscar empresa..." onkeyup="buscarEmpresas(this.value)">
+                                    </div>
+                                    <div id="empresas-lista">
+                                        <!-- Lista de pessoas serão carregadas via JS do banco de dados -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Equipamentos -->
+                        <div class="content-box" style="margin-bottom: 20px;">
+                            <div class="selecao-section">
+                                <h3><i class="fas fa-microchip"></i> Em quais equipamentos pode consumir?</h3>
+                                
+                                <div class="radio-group" style="margin-bottom: 16px;">
+                                    <label class="radio-option">
+                                        <input type="radio" name="tipo-equipamento" value="especificos" checked onchange="toggleTipoEquipamento()">
+                                        <span>Equipamentos Específicos</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="tipo-equipamento" value="todos" onchange="toggleTipoEquipamento()">
+                                        <span>Todos os Equipamentos</span>
+                                    </label>
+                                </div>
+
+                                <div id="selecao-equipamentos">
+                                    <div class="selecao-header" style="margin-bottom: 12px;">
+                                        <span class="contador-badge" id="equipamentos-count">0 selecionados</span>
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="selecionarTodosEquipamentos()">
+                                            <i class="fas fa-check-double"></i> Selecionar todos
+                                        </button>
+                                    </div>
+                                    <div class="selecao-search" style="margin-bottom: 12px;">
+                                        <i class="fas fa-search"></i>
+                                        <input type="text" placeholder="Buscar equipamento..." onkeyup="buscarEquipamentos(this.value)">
+                                    </div>
+                                    <div class="selecao-items" id="equipamentos-lista">
+                                        <!-- Lista de pessoas serão carregadas via JS do banco de dados -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Horários -->
+                        <div class="content-box" style="margin-bottom: 20px;">
+                            <div class="selecao-section">
+                                <h3><i class="fas fa-clock"></i> Em quais horários pode consumir?</h3>
+                                
+                                <div class="radio-group" style="margin-bottom: 16px;">
+                                    <label class="radio-option">
+                                        <input type="radio" name="tipo-horario" value="especificos" checked onchange="toggleTipoHorario()">
+                                        <span>Horários Específicos</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="tipo-horario" value="livre" onchange="toggleTipoHorario()">
+                                        <span>Livre (24/7)</span>
+                                    </label>
+                                </div>
+
+                                <div id="selecao-horarios">
+                                    <div class="selecao-header" style="margin-bottom: 12px;">
+                                        <span class="contador-badge" id="horarios-count">0 selecionados</span>
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="selecionarTodosHorarios()">
+                                            <i class="fas fa-check-double"></i> Selecionar todos
+                                        </button>
+                                    </div>
+                                    <div class="selecao-search" style="margin-bottom: 12px;">
+                                        <i class="fas fa-search"></i>
+                                        <input type="text" placeholder="Buscar horário..." onkeyup="buscarHorarios(this.value)">
+                                    </div>
+                                    <div class="selecao-items" id="horarios-lista">
+                                        <!-- Lista de pessoas serão carregadas via JS do banco de dados -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ações -->
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="mostrarLista()">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Salvar Refeição
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- AUTORIZAÇÕES VIEW -->
+                <section id="autorizacoes-view" class="content-section hidden">
+                    <div class="section-header section-header-compact">
+                        <div class="section-title">
+                            <h2>Autorizações da Refeição</h2>
+                            <p id="autorizacao-refeicao-nome">Gerenciar autorizações</p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary" onclick="voltarParaRefeicoes()">
+                                <i class="fas fa-arrow-left"></i> Voltar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="content-box">
+                        <div class="selecao-header" style="margin-bottom: 20px;">
+                            <h3 style="font-size: 1rem; color: #1e293b;">Pessoas Autorizadas</h3>
+                            <button class="btn btn-primary btn-sm" onclick="adicionarAutorizacao()">
+                                <i class="fas fa-plus"></i> Adicionar Autorização
+                            </button>
+                        </div>
+
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Tipo</th>
+                                    <th>Consumo Diário</th>
+                                    <th>Equipamentos</th>
+                                    <th>Horários</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="autorizacoes-table-body">
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="empty-message">
+                                            <i class="fas fa-users-slash"></i>
+                                            <p>Nenhuma autorização para esta refeição</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+    <script src="../../auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+    <script>
+        // Estado da aplicação
+        let refeicoes = [];
+        let autorizacoes = [];
+        let editandoId = null;
+        let refeicaoSelecionada = null;
+
+        // Dados mockados
+        const refeicoesExemplo = [];
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM carregado');
+            refeicoes = [...refeicoesExemplo];
+            renderizarLista();
+            
+            // Garantir que o formulário comece escondido
+            document.getElementById('refeicoes-list').classList.remove('hidden');
+            document.getElementById('refeicoes-form').classList.add('hidden');
+            document.getElementById('autorizacoes-view').classList.add('hidden');
+        });
+
+        // Navegação
+        function mostrarFormulario() {
+            console.log('Mostrando formulário');
+            const lista = document.getElementById('refeicoes-list');
+            const form = document.getElementById('refeicoes-form');
+            const autorizacoes = document.getElementById('autorizacoes-view');
+            
+            if (lista && form) {
+                lista.classList.add('hidden');
+                form.classList.remove('hidden');
+                autorizacoes.classList.add('hidden');
+                
+                document.getElementById('form-titulo').textContent = 'Nova Refeição';
+                document.getElementById('refeicaoForm').reset();
+                document.getElementById('refeicao-id').value = '';
+                editandoId = null;
+                
+                // Resetar seleções
+                const radioPessoas = document.querySelector('input[name="tipo-autorizacao"][value="pessoas"]');
+                if (radioPessoas) radioPessoas.checked = true;
+                
+                const radioEquip = document.querySelector('input[name="tipo-equipamento"][value="especificos"]');
+                if (radioEquip) radioEquip.checked = true;
+                
+                const radioHorario = document.querySelector('input[name="tipo-horario"][value="especificos"]');
+                if (radioHorario) radioHorario.checked = true;
+                
+                toggleTipoAutorizacao();
+                toggleTipoEquipamento();
+                toggleTipoHorario();
+                atualizarContadores();
+            } else {
+                console.error('Elementos não encontrados:', {lista, form});
+            }
+        }
+
+        function mostrarLista() {
+            console.log('Mostrando lista');
+            const lista = document.getElementById('refeicoes-list');
+            const form = document.getElementById('refeicoes-form');
+            const autorizacoes = document.getElementById('autorizacoes-view');
+            
+            if (lista && form) {
+                lista.classList.remove('hidden');
+                form.classList.add('hidden');
+                autorizacoes.classList.add('hidden');
+                editandoId = null;
+                refeicaoSelecionada = null;
+            } else {
+                console.error('Elementos não encontrados:', {lista, form});
+            }
+        }
+
+        function mostrarAutorizacoes(refeicaoId) {
+            const refeicao = refeicoes.find(r => r.id === refeicaoId);
+            if (!refeicao) return;
+            
+            refeicaoSelecionada = refeicao;
+            
+            document.getElementById('refeicoes-list').classList.add('hidden');
+            document.getElementById('refeicoes-form').classList.add('hidden');
+            document.getElementById('autorizacoes-view').classList.remove('hidden');
+            
+            document.getElementById('autorizacao-refeicao-nome').textContent = refeicao.nome;
+            renderizarAutorizacoes();
+        }
+
+        function voltarParaRefeicoes() {
+            document.getElementById('refeicoes-list').classList.remove('hidden');
+            document.getElementById('autorizacoes-view').classList.add('hidden');
+            refeicaoSelecionada = null;
+        }
+
+        function carregarRefeicoes() {
+            console.log('Recarregando refeições');
+            renderizarLista();
+        }
+
+        // Toggle de seções
+        function toggleTipoAutorizacao() {
+            const tipo = document.querySelector('input[name="tipo-autorizacao"]:checked')?.value;
+            console.log('Tipo selecionado:', tipo);
+            
+            if (!tipo) return;
+            
+            const secoes = {
+                pessoas: document.getElementById('selecao-pessoas'),
+                grupos: document.getElementById('selecao-grupos'),
+                empresas: document.getElementById('selecao-empresas')
+            };
+            
+            // Esconder todas
+            Object.values(secoes).forEach(sec => {
+                if (sec) sec.classList.add('hidden');
+            });
+            
+            // Mostrar a selecionada
+            if (tipo !== 'todos' && secoes[tipo]) {
+                secoes[tipo].classList.remove('hidden');
+            }
+        }
+
+        function toggleTipoEquipamento() {
+            const tipo = document.querySelector('input[name="tipo-equipamento"]:checked')?.value;
+            const equipamentos = document.getElementById('selecao-equipamentos');
+            
+            if (tipo === 'especificos') {
+                equipamentos.style.display = 'block';
+            } else {
+                equipamentos.style.display = 'none';
+            }
+        }
+
+        function toggleTipoHorario() {
+            const tipo = document.querySelector('input[name="tipo-horario"]:checked')?.value;
+            const horarios = document.getElementById('selecao-horarios');
+            
+            if (tipo === 'especificos') {
+                horarios.style.display = 'block';
+            } else {
+                horarios.style.display = 'none';
+            }
+        }
+
+        // Funções de seleção em massa
+        function selecionarTodasPessoas() {
+            const checkboxes = document.querySelectorAll('#pessoas-lista input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+            atualizarContadores();
+        }
+
+        function selecionarTodosGrupos() {
+            const checkboxes = document.querySelectorAll('#grupos-lista input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+            atualizarContadores();
+        }
+
+        function selecionarTodasEmpresas() {
+            const checkboxes = document.querySelectorAll('#empresas-lista input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+            atualizarContadores();
+        }
+
+        function selecionarTodosEquipamentos() {
+            const checkboxes = document.querySelectorAll('#equipamentos-lista input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+            atualizarContadores();
+        }
+
+        function selecionarTodosHorarios() {
+            const checkboxes = document.querySelectorAll('#horarios-lista input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+            atualizarContadores();
+        }
+
+        // Busca
+        function buscarPessoas(termo) {
+            console.log('Buscando pessoas:', termo);
+        }
+
+        function buscarGrupos(termo) {
+            console.log('Buscando grupos:', termo);
+        }
+
+        function buscarEmpresas(termo) {
+            console.log('Buscando empresas:', termo);
+        }
+
+        function buscarEquipamentos(termo) {
+            console.log('Buscando equipamentos:', termo);
+        }
+
+        function buscarHorarios(termo) {
+            console.log('Buscando horários:', termo);
+        }
+
+        // Atualizar contadores
+        function atualizarContadores() {
+            const pessoasCount = document.querySelectorAll('#pessoas-lista input[type="checkbox"]:checked').length;
+            const pessoasEl = document.getElementById('pessoas-count');
+            if (pessoasEl) pessoasEl.textContent = pessoasCount + ' selecionadas';
+            
+            const gruposCount = document.querySelectorAll('#grupos-lista input[type="checkbox"]:checked').length;
+            const gruposEl = document.getElementById('grupos-count');
+            if (gruposEl) gruposEl.textContent = gruposCount + ' selecionados';
+            
+            const empresasCount = document.querySelectorAll('#empresas-lista input[type="checkbox"]:checked').length;
+            const empresasEl = document.getElementById('empresas-count');
+            if (empresasEl) empresasEl.textContent = empresasCount + ' selecionadas';
+            
+            const equipamentosCount = document.querySelectorAll('#equipamentos-lista input[type="checkbox"]:checked').length;
+            const equipamentosEl = document.getElementById('equipamentos-count');
+            if (equipamentosEl) equipamentosEl.textContent = equipamentosCount + ' selecionados';
+            
+            const horariosCount = document.querySelectorAll('#horarios-lista input[type="checkbox"]:checked').length;
+            const horariosEl = document.getElementById('horarios-count');
+            if (horariosEl) horariosEl.textContent = horariosCount + ' selecionados';
+        }
+
+        // Adicionar listeners para checkboxes
+        document.addEventListener('change', function(e) {
+            if (e.target.matches('input[type="checkbox"]')) {
+                atualizarContadores();
+            }
+        });
+
+        // Salvar refeição
+        function salvarRefeicao(e) {
+            e.preventDefault();
+            console.log('Salvando refeição');
+            
+            const nome = document.getElementById('refeicao-nome')?.value;
+            if (!nome) {
+                alert('Digite um nome para a refeição!');
+                return;
+            }
+            
+            const consumo = document.getElementById('refeicao-consumo')?.value;
+            if (!consumo || consumo < 1) {
+                alert('Defina a quantidade de consumo por dia!');
+                return;
+            }
+            
+            const valor = document.getElementById('refeicao-valor')?.value;
+            if (valor === '' || valor < 0) {
+                alert('Defina o valor unitário da refeição!');
+                return;
+            }
+            
+            const refeicao = {
+                id: editandoId || Date.now(),
+                nome: nome,
+                consumo: parseInt(consumo),
+                valor: parseFloat(valor),
+                tipo: document.getElementById('refeicao-tipo').value,
+                descricao: document.getElementById('refeicao-descricao')?.value || ''
+            };
+            
+            if (editandoId) {
+                const index = refeicoes.findIndex(r => r.id === editandoId);
+                if (index !== -1) {
+                    refeicoes[index] = refeicao;
+                    alert('Refeição atualizada com sucesso!');
+                }
+            } else {
+                refeicoes.push(refeicao);
+                alert('Refeição cadastrada com sucesso!');
+            }
+            
+            renderizarLista();
+            mostrarLista();
+        }
+
+        // Editar refeição
+        function editarRefeicao(id) {
+            console.log('Editando refeição:', id);
+            const refeicao = refeicoes.find(r => r.id === id);
+            if (!refeicao) return;
+            
+            editandoId = id;
+            document.getElementById('refeicao-nome').value = refeicao.nome;
+            document.getElementById('refeicao-consumo').value = refeicao.consumo;
+            document.getElementById('refeicao-valor').value = refeicao.valor.toFixed(2);
+            document.getElementById('refeicao-tipo').value = refeicao.tipo;
+            document.getElementById('refeicao-descricao').value = refeicao.descricao || '';
+            document.getElementById('refeicao-id').value = id;
+            document.getElementById('form-titulo').textContent = 'Editar Refeição';
+            
+            mostrarFormulario();
+        }
+
+        // Excluir refeição
+        function excluirRefeicao(id) {
+            console.log('Excluindo refeição:', id);
+            if (confirm('Deseja realmente excluir esta refeição?')) {
+                refeicoes = refeicoes.filter(r => r.id !== id);
+                alert('Refeição excluída com sucesso!');
+                renderizarLista();
+            }
+        }
+
+        // Gerenciar autorizações
+        function gerenciarAutorizacoes(id) {
+            console.log('Gerenciando autorizações para refeição:', id);
+            mostrarAutorizacoes(id);
+        }
+
+        function adicionarAutorizacao() {
+            alert('Funcionalidade de adicionar autorização em desenvolvimento');
+        }
+
+        function renderizarAutorizacoes() {
+            const tbody = document.getElementById('autorizacoes-table-body');
+            if (!tbody) return;
+            
+            // Dados mockados de autorizações
+            tbody.innerHTML = `
+                <tr>
+                    <td><strong>João Silva</strong></td>
+                    <td>Pessoa</td>
+                    <td>1x por dia</td>
+                    <td>Catraca Refeitório</td>
+                    <td>11:30 - 14:00</td>
+                    <td><span class="badge badge-success">Ativo</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="removerAutorizacao(1)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Diretoria</strong></td>
+                    <td>Grupo</td>
+                    <td>1x por dia</td>
+                    <td>Catraca Refeitório Executivo</td>
+                    <td>11:30 - 14:00</td>
+                    <td><span class="badge badge-success">Ativo</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="removerAutorizacao(2)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function removerAutorizacao(id) {
+            if (confirm('Deseja remover esta autorização?')) {
+                alert('Autorização removida!');
+                renderizarAutorizacoes();
+            }
+        }
+
+        // Renderizar lista
+        function renderizarLista() {
+            console.log('Renderizando lista');
+            const tbody = document.getElementById('refeicoes-table-body');
+            
+            if (!tbody) {
+                console.error('Elemento tbody não encontrado');
+                return;
+            }
+            
+            if (refeicoes.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-message">
+                                <i class="fas fa-utensils"></i>
+                                <p>Nenhuma refeição cadastrada</p>
+                                <button class="btn btn-primary btn-sm" onclick="mostrarFormulario()" style="margin-top: 12px;">
+                                    <i class="fas fa-plus"></i> Cadastrar primeira refeição
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const tipoLabel = {
+                'cafe': 'Café da Manhã',
+                'almoco': 'Almoço',
+                'cafe-tarde': 'Café da Tarde',
+                'jantar': 'Jantar',
+                'ceia': 'Ceia',
+                'outro': 'Outro'
+            };
+
+            tbody.innerHTML = refeicoes.map(r => `
+                <tr>
+                    <td>
+                        <strong>${r.nome}</strong>
+                        <br>
+                        <small style="color: #64748b;">${tipoLabel[r.tipo]}</small>
+                    </td>
+                    <td>${r.consumo}x por dia</td>
+                    <td><strong>R$ ${r.valor.toFixed(2)}</strong></td>
+                    <td>
+                        <button class="btn btn-sm btn-info" onclick="gerenciarAutorizacoes(${r.id})" style="background: #dbeafe; color: #1e40af; border: none;">
+                            <i class="fas fa-users"></i> Ver autorizações
+                        </button>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" onclick="editarRefeicao(${r.id})" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="excluirRefeicao(${r.id})" title="Excluir">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Função para o botão Nova Autorização (da página original)
+        function addAutorizacaoRefeicao() {
+            mostrarFormulario();
+        }
+    </script>
+</body>
+</html>

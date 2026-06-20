@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fila de E-mails - MAM Control</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <style>
+        /* Estilos específicos para a fila de e-mails */
+        .tabs-header {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 2px;
+        }
+
+        .tab-link {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #64748b;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+        }
+
+        .tab-link.active {
+            color: #4a90d9;
+            border-bottom-color: #4a90d9;
+        }
+
+        .tab-link:hover:not(.active) {
+            color: #1e293b;
+            border-bottom-color: #cbd5e0;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-sent { background: #d1fae5; color: #065f46; }
+        .status-failed { background: #fee2e2; color: #991b1b; }
+        
+        .truncate {
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .stat-icon.pending { background: #fff7ed; color: #f59e0b; }
+        .stat-icon.sent { background: #f0fdf4; color: #22c55e; }
+        .stat-icon.failed { background: #fee2e2; color: #ef4444; }
+
+        /* Modal content */
+        #emailBodyContent {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            overflow-y: auto;
+            max-height: 500px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="fila-emails" class="content-section active">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1>Fila de E-mails</h1>
+                            <p>Monitore o histórico e o status de envio de notificações por e-mail</p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary" onclick="loadEmails()">
+                                <i class="fas fa-sync-alt"></i> Atualizar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon pending"><i class="fas fa-clock"></i></div>
+                            <div class="stat-info">
+                                <h3 id="countPending">0</h3>
+                                <p>Pendentes</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon sent"><i class="fas fa-check-circle"></i></div>
+                            <div class="stat-info">
+                                <h3 id="countSent">0</h3>
+                                <p>Enviados</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon failed"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="stat-info">
+                                <h3 id="countFailed">0</h3>
+                                <p>Falhas</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-box">
+                        <div class="tabs-header">
+                            <button class="tab-link active" onclick="switchTab('all')" id="tab-all">
+                                <i class="fas fa-list"></i> Todos
+                            </button>
+                            <button class="tab-link" onclick="switchTab('pending')" id="tab-pending">
+                                <i class="fas fa-clock"></i> Pendentes
+                            </button>
+                            <button class="tab-link" onclick="switchTab('failed')" id="tab-failed">
+                                <i class="fas fa-exclamation-circle"></i> Falhas
+                            </button>
+                        </div>
+
+                        <div class="table-header-simple" style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+                            <div class="search-box">
+                                <input type="text" id="emailSearch" placeholder="Buscar destinatário..." onkeyup="handleSearch(event)" class="form-control" style="padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0; width: 300px;">
+                            </div>
+                        </div>
+
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data/Hora</th>
+                                        <th>Destinatário</th>
+                                        <th>Assunto</th>
+                                        <th>Status</th>
+                                        <th>Tentativas</th>
+                                        <th class="text-right">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="emailsList">
+                                    <tr>
+                                        <td colspan="6" class="text-center">Carregando e-mails...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="table-footer">
+                            <div id="pagination" class="pagination">
+                                <!-- Gerado dinamicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para visualizar corpo do email -->
+    <div id="emailModal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3>Visualizar Conteúdo do E-mail</h3>
+                <span class="close" onclick="closeModal('emailModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="info-row">
+                    <strong>Para:</strong> <span id="modalTo"></span>
+                </div>
+                <div class="info-row">
+                    <strong>Assunto:</strong> <span id="modalSubject"></span>
+                </div>
+                <hr>
+                <div id="emailBodyContent"></div>
+                <div id="errorDetails" style="display: none; margin-top: 15px; padding: 10px; background: #fff5f5; color: #c62828; border-radius: 4px; font-size: 13px;">
+                    <strong>Erro:</strong> <span id="modalError"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('emailModal')">Fechar</button>
+                <button id="btnResend" class="btn btn-primary" style="display: none;">
+                    <i class="fas fa-paper-plane"></i> Reenviar E-mail
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+    <script src="../../auth.js"></script>
+    <script>
+        let currentTab = 'all';
+        let currentPage = 1;
+        let searchTimeout = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof initSidebar === 'function') {
+                initSidebar('emails');
+            }
+            loadEmails();
+        });
+
+        function getAuthHeader() {
+            const token = localStorage.getItem('mamcontrol_accessToken');
+            const tenantId = localStorage.getItem('mamcontrol_tenant') || 'default';
+            return {
+                'X-Tenant-ID': tenantId,
+                'Authorization': `Bearer ${token}`
+            };
+        }
+
+        function getTenant() {
+            return localStorage.getItem('mamcontrol_tenant') || 'default';
+        }
+
+        async function loadEmails(page = 1) {
+            currentPage = page;
+            const search = document.getElementById('emailSearch').value;
+            const status = currentTab === 'all' ? '' : currentTab;
+            
+            try {
+                const response = await fetch(`/api/emails?tenant_id=${getTenant()}&status=${status}&search=${search}&page=${page}&limit=20`, {
+                    headers: getAuthHeader()
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    renderEmails(result.data);
+                    renderPagination(result.pagination);
+                    updateStats(result.data, result.pagination);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function formatDateTime(isoString) {
+            if (!isoString) return '-';
+            const date = new Date(isoString);
+            return date.toLocaleString('pt-BR');
+        }
+
+        function renderEmails(emails) {
+            const tbody = document.getElementById('emailsList');
+            if (!emails || emails.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center grey-text">Nenhum email encontrado</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = emails.map(email => `
+                <tr>
+                    <td>${formatDateTime(email.created_at)}</td>
+                    <td><div class="truncate" title="${email.to_address}">${email.to_address}</div></td>
+                    <td><div class="truncate" title="${email.subject}">${email.subject}</div></td>
+                    <td>
+                        <span class="status-badge status-${email.status}">
+                            ${formatStatus(email.status)}
+                        </span>
+                    </td>
+                    <td class="text-center">${email.attempts}</td>
+                    <td class="text-right">
+                        <button class="btn-icon" onclick="viewEmail(${JSON.stringify(email).replace(/"/g, '&quot;')})" title="Ver Conteúdo">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        ${email.status === 'failed' ? `
+                            <button class="btn-icon" onclick="resendEmail(${email.id})" title="Reenviar">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                        ` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function formatStatus(status) {
+            const map = {
+                'pending': 'Pendente',
+                'sent': 'Enviado',
+                'failed': 'Falha'
+            };
+            return map[status] || status;
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-link').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            loadEmails(1);
+        }
+
+        function handleSearch(event) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                loadEmails(1);
+            }, 500);
+        }
+
+        async function viewEmail(email) {
+            document.getElementById('modalTo').textContent = email.to_address;
+            document.getElementById('modalSubject').textContent = email.subject;
+            document.getElementById('emailBodyContent').innerHTML = email.body;
+            
+            const errorDiv = document.getElementById('errorDetails');
+            if (email.status === 'failed' && email.error_message) {
+                errorDiv.style.display = 'block';
+                document.getElementById('modalError').textContent = email.error_message;
+            } else {
+                errorDiv.style.display = 'none';
+            }
+
+            const btnResend = document.getElementById('btnResend');
+            if (email.status === 'failed') {
+                btnResend.style.display = 'inline-block';
+                btnResend.onclick = () => {
+                    closeModal('emailModal');
+                    resendEmail(email.id);
+                };
+            } else {
+                btnResend.style.display = 'none';
+            }
+
+            openModal('emailModal');
+        }
+
+        async function resendEmail(logId) {
+            if (!confirm('Deseja reenviar este e-mail?')) return;
+
+            try {
+                const response = await fetch('/api/emails/resend', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${getToken()}`,
+                        'X-Tenant-ID': getTenant()
+                    },
+                    body: JSON.stringify({
+                        tenant_id: getTenant(),
+                        log_id: logId
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    showAlert('success', 'Email reenviado para a fila com sucesso!');
+                    loadEmails(currentPage);
+                } else {
+                    showAlert('error', 'Erro ao reenviar: ' + result.message);
+                }
+            } catch (error) {
+                showAlert('error', 'Erro ao processar solicitação');
+            }
+        }
+
+        function updateStats(emails, pagination) {
+            // Se for a primeira página de 'Todos', podemos estimar ou buscar totais reais
+            // Por simplicidade, vamos mostrar os totais se o backend retornasse, 
+            // mas aqui vamos apenas contar o que está na tela ou deixar como placeholder
+            // O ideal seria o backend retornar esses counts separadamente.
+            if (currentTab === 'all' && currentPage === 1) {
+                const pending = emails.filter(e => e.status === 'pending').length;
+                const sent = emails.filter(e => e.status === 'sent').length;
+                const failed = emails.filter(e => e.status === 'failed').length;
+                
+                // Nota: Isso é apenas da página atual. Para veracidade real, o backend deveria enviar.
+                // Mas para o usuário, ver que tem algo já ajuda.
+                document.getElementById('countPending').textContent = pending;
+                document.getElementById('countSent').textContent = sent;
+                document.getElementById('countFailed').textContent = failed;
+            }
+        }
+
+        function renderPagination(nav) {
+            const container = document.getElementById('pagination');
+            if (!nav || nav.totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = `
+                <div class="pagination-info">
+                    Mostrando ${currentPage} de ${nav.totalPages} páginas (${nav.total} total)
+                </div>
+                <div class="pagination-buttons">
+                    <button class="btn-page" ${currentPage === 1 ? 'disabled' : ''} onclick="loadEmails(${currentPage - 1})">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+            `;
+
+            for (let i = 1; i <= nav.totalPages; i++) {
+                if (i === 1 || i === nav.totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    html += `<button class="btn-page ${i === currentPage ? 'active' : ''}" onclick="loadEmails(${i})">${i}</button>`;
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    html += `<span class="page-dots">...</span>`;
+                }
+            }
+
+            html += `
+                    <button class="btn-page" ${currentPage === nav.totalPages ? 'disabled' : ''} onclick="loadEmails(${currentPage + 1})">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function getTenant() {
+            return localStorage.getItem('mamcontrol_tenant') || 'default';
+        }
+
+        function getToken() {
+            return localStorage.getItem('mamcontrol_accessToken');
+        }
+
+        // Fallbacks para funções globais
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.style.display = 'block';
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.style.display = 'none';
+        }
+
+        function showAlert(type, message) {
+            alert(message);
+        }
+    </script>
+</body>
+</html>

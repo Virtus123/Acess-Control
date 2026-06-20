@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horários - MAM Control</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <script src="../../auth.js"></script>
+    
+    <!-- Styles específicos da página -->
+    <style>
+        /* Reset e estilos base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+        /* Cards */
+        .content-box {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Grid de formulário */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .grid-col-full {
+            grid-column: 1 / -1;
+        }
+
+        /* Form groups */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #ffffff;
+            font-family: inherit;
+        }
+
+        .form-group input:hover,
+        .form-group select:hover,
+        .form-group textarea:hover {
+            border-color: #94a3b8;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .form-group input[type="time"] {
+            font-family: monospace;
+        }
+
+        .required:after {
+            content: " *";
+            color: #e53e3e;
+        }
+
+        /* Form section */
+        .form-section {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .form-section h3 {
+            margin-bottom: 20px;
+            color: #1e293b;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Grid de horários */
+        .horarios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .dia-horario {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+
+        .dia-horario:hover {
+            border-color: #4a90d9;
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.1);
+        }
+
+        .dia-horario h4 {
+            margin-bottom: 16px;
+            color: #1e293b;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dia-horario h4 input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #4a90d9;
+        }
+
+        .horarios-inputs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .horarios-inputs .form-group {
+            flex: 1;
+        }
+
+        .horarios-inputs .form-group label {
+            font-size: 0.75rem;
+            margin-bottom: 2px;
+        }
+
+        .copiar-btn {
+            width: 100%;
+            background: #e2e8f0;
+            color: #475569;
+            padding: 8px;
+        }
+
+        .copiar-btn:hover {
+            background: #4a90d9;
+            color: white;
+        }
+
+        /* Botões */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.2);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Section header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-header-compact {
+            margin-bottom: 20px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title h2 {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Tabela */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            color: #1e293b;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Ações do formulário */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        /* Modal - CORRIGIDO - Fora do fluxo normal */
+        .modal-overlay {
+            position: fixed;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 999999 !important; /* Z-index extremamente alto */
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            margin: 0 !important;
+            padding: 0 !important;
+            pointer-events: none;
+        }
+
+        .modal-overlay.active {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: all !important;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            transform: scale(0.95) translateY(0);
+            transition: transform 0.3s;
+            position: relative;
+            margin: 20px !important;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #1e293b;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-header h3 i {
+            color: #4a90d9;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: all 0.2s;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+
+        .modal-close:hover {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .modal-body {
+            padding: 24px;
+            background: white;
+        }
+
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: white;
+            border-radius: 0 0 16px 16px;
+        }
+
+        /* Checkbox grid no modal */
+        .dias-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .dia-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dia-checkbox:hover {
+            background: #ebf5ff;
+            border-color: #4a90d9;
+        }
+
+        .dia-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #4a90d9;
+        }
+
+        .dia-checkbox span {
+            font-size: 0.95rem;
+            color: #1e293b;
+            flex: 1;
+        }
+
+        .info-box {
+            background: #ebf5ff;
+            border-left: 4px solid #4a90d9;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #1e293b;
+            font-size: 0.95rem;
+        }
+
+        .info-box strong {
+            color: #2c5282;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .horarios-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .horarios-inputs {
+                flex-direction: column;
+            }
+
+            .data-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .dias-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-container {
+                width: 95%;
+                margin: 10px !important;
+            }
+        }
+
+        /* Texto centralizado */
+        .text-center {
+            text-align: center;
+        }
+
+        /* Mensagem vazia */
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+
+        .empty-message i {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="horarios" class="content-section active">
+                    <!-- HORARIOS LIST VIEW -->
+                    <div id="horarios-list">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <h1>Horários de Acesso</h1>
+                                <p>Configurar horários de acesso ao prédio</p>
+                            </div>
+                            <div class="section-actions">
+                                <button class="btn btn-primary" onclick="showHorarioForm()">
+                                    <i class="fas fa-plus"></i> Novo Horário
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="content-box">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Segunda-Sexta</th>
+                                        <th>Sábado</th>
+                                        <th>Domingo</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-horarios">
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="empty-message">
+                                                <i class="fas fa-clock"></i>
+                                                <p>Nenhum horário cadastrado</p>
+                                                <button class="btn btn-primary btn-sm" onclick="showHorarioForm()" style="margin-top: 12px;">
+                                                    <i class="fas fa-plus"></i> Cadastrar primeiro horário
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- HORARIOS FORM VIEW -->
+                    <div id="horarios-form" class="hidden">
+                        <div class="section-header section-header-compact">
+                            <div class="section-title">
+                                <h2 id="horario-form-title">Novo Horário</h2>
+                                <p>Configure os horários de acesso</p>
+                            </div>
+                            <div class="section-actions">
+                                <button class="btn btn-secondary" onclick="showHorarioList()">
+                                    <i class="fas fa-times"></i> Fechar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="content-box">
+                            <form id="horarioForm" onsubmit="saveHorario(event)">
+                                <input type="hidden" id="horario-id">
+
+                                <div class="form-grid">
+                                    <div class="form-group grid-col-full">
+                                        <label for="nomeHorario" class="required">Nome do Horário</label>
+                                        <input type="text" id="nomeHorario" required placeholder="Ex: Horário Comercial, Turno Noturno">
+                                    </div>
+                                </div>
+
+                                <div class="form-section">
+                                    <h3>Configuração por Dia</h3>
+                                    
+                                    <div class="horarios-grid">
+                                        <!-- Segunda-feira -->
+                                        <div class="dia-horario">
+                                            <h4>
+                                                <input type="checkbox" id="ativo-seg" checked onchange="toggleDia('seg')">
+                                                Segunda-feira
+                                            </h4>
+                                            <div id="horarios-seg" class="horarios-inputs">
+                                                <div class="form-group">
+                                                    <label for="seg-de">De:</label>
+                                                    <input type="time" id="seg-de" value="08:00">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="seg-ate">Até:</label>
+                                                    <input type="time" id="seg-ate" value="18:00">
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-secondary copiar-btn" onclick="abrirModalCopiar('seg')">
+                                                <i class="fas fa-copy"></i> Copiar para outros dias
+                                            </button>
+                                        </div>
+
+                                        <!-- Terça-feira -->
+                                        <div class="dia-horario">
+                                            <h4>
+                                                <input type="checkbox" id="ativo-ter" checked onchange="toggleDia('ter')">
+                                                Terça-feira
+                                            </h4>
+                                            <div id="horarios-ter" class="horarios-inputs">
+                                                <div class="form-group">
+                                                    <label for="ter-de">De:</label>
+                                                    <input type="time" id="ter-de" value="08:00">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="ter-ate">Até:</label>
+                                                    <input type="time" id="ter-ate" value="18:00">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Quarta-feira -->
+                                        <div class="dia-horario">
+                                            <h4>
+                                                <input type="checkbox" id="ativo-qua" checked onchange="toggleDia('qua')">
+                                                Quarta-feira
+                                            </h4>
+                                            <div id="horarios-qua" class="horarios-inputs">
+                                                <div class="form-group">
+                                                    <label for="qua-de">De:</label>
+                                                    <input type="time" id="qua-de" value="08:00">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="qua-ate">Até:</label>
+                                                    <input type="time" id="qua-ate" value="18:00">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Quinta-feira -->
+                                        <div class="dia-horario">
+                                            <h4>
+                                                <input type="checkbox" id="ativo-qui" checked onchange="toggleDia('qui')">
+                                                Quinta-feira
+                                            </h4>
+                                            <div id="horarios-qui" class="horarios-inputs">
+                                                <div class="form-group">
+                                                    <label for="qui-de">De:</label>
+                                                    <input type="time" id="qui-de" value="08:00">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="qui-ate">Até:</label>
+                                                    <input type="time" id="qui-ate" value="18:00">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Sexta-feira -->
+                                        <div class="dia-horario">
+                                            <h4>
+                                                <input type="checkbox" id="ativo-sex" checked onchange="toggleDia('sex')">
+                                                Sexta-feira
+                                            </h4>
+                                            <div id="horarios-sex" class="horarios-inputs">
+                                                <div class="form-group">
+                                                    <label for="sex-de">De:</label>
+                                                    <input type="time" id="sex-de" value="08:00">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="sex-ate">Até:</label>
+                                                    <input type="time" id="sex-ate" value="18:00">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Sábado -->
+                                        <div class="dia-horario">
+                                            <h4>
+                                                <input type="checkbox" id="ativo-sab" onchange="toggleDia('sab')">
+                                                Sábado
+                                            </h4>
+                                            <div id="horarios-sab" class="horarios-inputs hidden">
+                                                <div class="form-group">
+                                                    <label for="sab-de">De:</label>
+                                                    <input type="time" id="sab-de" value="08:00">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="sab-ate">Até:</label>
+                                                    <input type="time" id="sab-ate" value="12:00">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Domingo -->
+                                        <div class="dia-horario">
+                                            <h4>
+                                                <input type="checkbox" id="ativo-dom" onchange="toggleDia('dom')">
+                                                Domingo
+                                            </h4>
+                                            <div id="horarios-dom" class="horarios-inputs hidden">
+                                                <div class="form-group">
+                                                    <label for="dom-de">De:</label>
+                                                    <input type="time" id="dom-de" value="08:00">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="dom-ate">Até:</label>
+                                                    <input type="time" id="dom-ate" value="12:00">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-secondary" onclick="showHorarioList()">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Salvar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Copiar Horários - CORRIGIDO - Fora de qualquer container -->
+    <div id="copiarModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-copy"></i> Copiar Horários</h3>
+                <button class="modal-close" onclick="fecharModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="info-box">
+                    <strong>Origem:</strong> <span id="modal-dia-origem"></span><br>
+                    <strong>Horário:</strong> <span id="modal-horario-origem"></span>
+                </div>
+                
+                <p style="margin-bottom: 12px; color: #475569;">Selecione os dias para copiar:</p>
+                
+                <div class="dias-grid" id="modal-dias-lista">
+                    <!-- Os dias serão inseridos via JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="fecharModal()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" onclick="confirmarCopiar()">
+                    <i class="fas fa-check"></i> Copiar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+
+    <script>
+        let horarios = [];
+        let editandoId = null;
+        const dias = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'];
+        const diasNomes = {
+            seg: 'Segunda-feira',
+            ter: 'Terça-feira',
+            qua: 'Quarta-feira',
+            qui: 'Quinta-feira',
+            sex: 'Sexta-feira',
+            sab: 'Sábado',
+            dom: 'Domingo'
+        };
+
+        let diaOrigemCopiar = null;
+
+        function showHorarioForm() {
+            try {
+                const listView = document.getElementById('horarios-list');
+                const formView = document.getElementById('horarios-form');
+                if (listView) listView.classList.add('hidden');
+                if (formView) formView.classList.remove('hidden');
+                const title = document.getElementById('horario-form-title');
+                if (title) title.textContent = 'Novo Horário';
+                const formEl = document.getElementById('horarioForm');
+                if (formEl) {
+                    formEl.reset();
+                    document.getElementById('horario-id').value = '';
+                }
+                
+                dias.forEach(dia => {
+                    const ativo = ['seg', 'ter', 'qua', 'qui', 'sex'].includes(dia);
+                    const checkbox = document.getElementById(`ativo-${dia}`);
+                    if (checkbox) checkbox.checked = ativo;
+                    toggleDia(dia);
+                });
+                
+                editandoId = null;
+            } catch (e) {
+                console.error('Erro em showHorarioForm:', e);
+            }
+        }
+
+        function showHorarioList() {
+            try {
+                const listView = document.getElementById('horarios-list');
+                const formView = document.getElementById('horarios-form');
+                if (listView) listView.classList.remove('hidden');
+                if (formView) formView.classList.add('hidden');
+                editandoId = null;
+            } catch (e) {
+                console.error('Erro em showHorarioList:', e);
+            }
+        }
+
+        function toggleDia(dia) {
+            const checkbox = document.getElementById(`ativo-${dia}`);
+            const inputs = document.getElementById(`horarios-${dia}`);
+            if (checkbox && inputs) {
+                if (checkbox.checked) {
+                    inputs.classList.remove('hidden');
+                } else {
+                    inputs.classList.add('hidden');
+                }
+            }
+        }
+
+        function abrirModalCopiar(dia) {
+            diaOrigemCopiar = dia;
+            
+            const de = document.getElementById(`${dia}-de`).value;
+            const ate = document.getElementById(`${dia}-ate`).value;
+            
+            // Atualizar informações no modal
+            document.getElementById('modal-dia-origem').textContent = diasNomes[dia];
+            document.getElementById('modal-horario-origem').textContent = `${de} - ${ate}`;
+            
+            // Gerar lista de dias
+            const diasLista = document.getElementById('modal-dias-lista');
+            diasLista.innerHTML = '';
+            
+            dias.forEach(d => {
+                if (d !== dia) { // Não mostrar o dia de origem
+                    const div = document.createElement('div');
+                    div.className = 'dia-checkbox';
+                    div.innerHTML = `
+                        <input type="checkbox" id="modal-dia-${d}" value="${d}" checked>
+                        <span>${diasNomes[d]}</span>
+                    `;
+                    diasLista.appendChild(div);
+                }
+            });
+            
+            // Abrir modal
+            document.getElementById('copiarModal').classList.add('active');
+        }
+
+        function fecharModal() {
+            document.getElementById('copiarModal').classList.remove('active');
+            diaOrigemCopiar = null;
+        }
+
+        function confirmarCopiar() {
+            if (!diaOrigemCopiar) return;
+            
+            const de = document.getElementById(`${diaOrigemCopiar}-de`).value;
+            const ate = document.getElementById(`${diaOrigemCopiar}-ate`).value;
+            
+            // Coletar dias selecionados
+            const diasSelecionados = [];
+            dias.forEach(d => {
+                if (d !== diaOrigemCopiar) {
+                    const checkbox = document.getElementById(`modal-dia-${d}`);
+                    if (checkbox && checkbox.checked) {
+                        diasSelecionados.push(d);
+                    }
+                }
+            });
+            
+            if (diasSelecionados.length === 0) {
+                alert('Selecione pelo menos um dia para copiar!');
+                return;
+            }
+            
+            // Copiar horários
+            diasSelecionados.forEach(dia => {
+                document.getElementById(`${dia}-de`).value = de;
+                document.getElementById(`${dia}-ate`).value = ate;
+                document.getElementById(`ativo-${dia}`).checked = true;
+                toggleDia(dia);
+            });
+            
+            fecharModal();
+            
+            // Feedback visual
+            const btn = document.querySelector(`[onclick="abrirModalCopiar('${diaOrigemCopiar}')"]`);
+            if (btn) {
+                btn.style.background = '#10b981';
+                btn.style.color = 'white';
+                setTimeout(() => {
+                    btn.style.background = '';
+                    btn.style.color = '';
+                }, 1000);
+            }
+        }
+
+        function saveHorario(e) {
+            e.preventDefault();
+
+            const nome = document.getElementById('nomeHorario').value;
+            if (!nome) {
+                alert('Digite o nome do horário!');
+                return;
+            }
+
+            // Converter dias para o formato do backend
+            const ranges = [];
+            dias.forEach(dia => {
+                const checkbox = document.getElementById(`ativo-${dia}`);
+                if (checkbox && checkbox.checked) {
+                    const de = document.getElementById(`${dia}-de`).value;
+                    const ate = document.getElementById(`${dia}-ate`).value;
+                    
+                    if (de >= ate) {
+                        alert(`Horário inválido para ${diasNomes[dia]}: o horário final deve ser maior que o inicial!`);
+                        throw new Error('Horário inválido');
+                    }
+                    
+                    // Mapear dia para número (0 = domingo, 1 = segunda, etc.)
+                    const dayOfWeek = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'].indexOf(dia);
+                    ranges.push({
+                        day_of_week: dayOfWeek,
+                        start_time: de,
+                        end_time: ate
+                    });
+                }
+            });
+
+            if (ranges.length === 0) {
+                alert('Selecione pelo menos um dia da semana!');
+                return;
+            }
+
+            const scheduleData = {
+                name: nome,
+                type: 'general',
+                description: '',
+                ranges: ranges
+            };
+
+            // Salvar no banco de dados
+            if (editandoId) {
+                // Atualizar
+                api.updateSchedule(editandoId, scheduleData).then(result => {
+                    console.log('DEBUG updateSchedule result:', result);
+                    if (result && result.success) {
+                        alert('Horário atualizado com sucesso!');
+                        showHorarioList();
+                        carregarHorarios();
+                    } else {
+                        alert('Erro ao atualizar horário: ' + (result?.message || 'Erro desconhecido'));
+                    }
+                }).catch(error => {
+                    console.error('Erro ao atualizar horário:', error);
+                    alert('Erro ao atualizar horário');
+                });
+            } else {
+                // Criar novo
+                api.createSchedule(scheduleData).then(result => {
+                    console.log('DEBUG createSchedule result:', result);
+                    if (result && result.success) {
+                        alert('Horário cadastrado com sucesso!');
+                        showHorarioList();
+                        carregarHorarios();
+                    } else {
+                        alert('Erro ao cadastrar horário: ' + (result?.message || 'Erro desconhecido'));
+                    }
+                }).catch(error => {
+                    console.error('Erro ao cadastrar horário:', error);
+                    alert('Erro ao cadastrar horário');
+                });
+            }
+        }
+
+        function editarHorario(id) {
+            console.log('DEBUG editarHorario - id:', id, 'type:', typeof id);
+            console.log('DEBUG editarHorario - horarios:', horarios);
+            
+            // Converter id para número para comparação
+            const idNum = Number(id);
+            const horario = horarios.find(h => Number(h.id) === idNum);
+            if (!horario) {
+                alert('Horário não encontrado! ID: ' + id);
+                console.log('DEBUG - horários disponíveis:', horarios.map(h => h.id));
+                return;
+            }
+            
+            console.log('DEBUG editarHorario - horario encontrado:', horario);
+            
+            editandoId = idNum;
+            document.getElementById('nomeHorario').value = horario.nome || '';
+            
+            // Reset all checkboxes first
+            dias.forEach(dia => {
+                const checkbox = document.getElementById(`ativo-${dia}`);
+                const de = document.getElementById(`${dia}-de`);
+                const ate = document.getElementById(`${dia}-ate`);
+                
+                if (checkbox) checkbox.checked = false;
+                if (de) de.value = '';
+                if (ate) ate.value = '';
+                toggleDia(dia);
+            });
+            
+            // Now set the values from the horario
+            Object.keys(horario.dias || {}).forEach(dia => {
+                console.log('DEBUG editarHorario - dia:', dia, 'dados:', horario.dias[dia]);
+                const checkbox = document.getElementById(`ativo-${dia}`);
+                const de = document.getElementById(`${dia}-de`);
+                const ate = document.getElementById(`${dia}-ate`);
+                
+                if (horario.dias[dia]) {
+                    if (checkbox) checkbox.checked = true;
+                    if (de) de.value = horario.dias[dia].de || '';
+                    if (ate) ate.value = horario.dias[dia].ate || '';
+                }
+                toggleDia(dia);
+            });
+            
+            document.getElementById('horario-id').value = idNum;
+            document.getElementById('horario-form-title').textContent = 'Editar Horário';
+            
+            // Mostrar o formulário sem resetar
+            const listView = document.getElementById('horarios-list');
+            const formView = document.getElementById('horarios-form');
+            if (listView) listView.classList.add('hidden');
+            if (formView) formView.classList.remove('hidden');
+        }
+
+        function excluirHorario(id) {
+            if (confirm('Deseja realmente excluir este horário?')) {
+                api.deleteSchedule(id).then(result => {
+                    console.log('DEBUG deleteSchedule result:', result);
+                    if (result && result.success) {
+                        alert('Horário excluído com sucesso!');
+                        carregarHorarios();
+                    } else {
+                        alert('Erro ao excluir horário: ' + (result?.message || 'Erro desconhecido'));
+                    }
+                }).catch(error => {
+                    console.error('Erro ao excluir horário:', error);
+                    alert('Erro ao excluir horário');
+                });
+            }
+        }
+
+        function formatarHorarios(dias) {
+            if (!dias || Object.keys(dias).length === 0) return '-';
+            const primeiro = Object.values(dias)[0];
+            return `${primeiro.de} - ${primeiro.ate}`;
+        }
+
+        function renderizarLista() {
+            const tbody = document.getElementById('tbody-horarios');
+            
+            if (!tbody) return;
+            
+            if (horarios.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-message">
+                                <i class="fas fa-clock"></i>
+                                <p>Nenhum horário cadastrado</p>
+                                <button class="btn btn-primary btn-sm" onclick="showHorarioForm()" style="margin-top: 12px;">
+                                    <i class="fas fa-plus"></i> Cadastrar primeiro horário
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = horarios.map(h => {
+                const semana = h.dias.seg ? `${h.dias.seg.de} - ${h.dias.seg.ate}` : '-';
+                const sabado = h.dias.sab ? `${h.dias.sab.de} - ${h.dias.sab.ate}` : '-';
+                const domingo = h.dias.dom ? `${h.dias.dom.de} - ${h.dias.dom.ate}` : '-';
+
+                return `
+                    <tr>
+                        <td><strong>${h.nome}</strong></td>
+                        <td>${semana}</td>
+                        <td>${sabado}</td>
+                        <td>${domingo}</td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="editarHorario(${h.id})" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="excluirHorario(${h.id})" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Carregar horários do banco de dados
+        async function carregarHorarios() {
+            try {
+                const result = await api.getSchedules();
+                console.log('DEBUG getSchedules result:', result);
+                
+                if (result && result.success && Array.isArray(result.data)) {
+                    // Converter formato do banco para formato do frontend
+                    horarios = result.data.map(schedule => {
+                        console.log('DEBUG schedule:', schedule);
+                        const dias = {};
+                        if (schedule.ranges && schedule.ranges.length > 0) {
+                            schedule.ranges.forEach(range => {
+                                console.log('DEBUG range:', range);
+                                const diaKeys = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
+                                const dia = diaKeys[range.day_of_week];
+                                console.log('DEBUG day_of_week:', range.day_of_week, '-> dia:', dia);
+                                dias[dia] = {
+                                    de: range.start_time,
+                                    ate: range.end_time
+                                };
+                            });
+                        }
+                        return {
+                            id: schedule.id,
+                            nome: schedule.name,
+                            dias: dias
+                        };
+                    });
+                    console.log('DEBUG horarios convertidos:', horarios);
+                } else {
+                    horarios = [];
+                }
+                renderizarLista();
+            } catch (error) {
+                console.error('Erro ao carregar horários:', error);
+                horarios = [];
+                renderizarLista();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarHorarios();
+        });
+    </script>
+</body>
+</html>

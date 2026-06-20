@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>MAM Control - Fila de Tarefas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    
+    <style>
+        /* Estilos específicos para a fila de tarefas */
+        .tabs-header {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 2px;
+        }
+
+        .tab-link {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #64748b;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-link.active {
+            color: #4a90d9;
+            border-bottom-color: #4a90d9;
+        }
+
+        .tab-link:hover:not(.active) {
+            color: #1e293b;
+            border-bottom-color: #cbd5e0;
+        }
+
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-resolved { background: #d1fae5; color: #065f46; }
+        .badge-error { background: #fee2e2; color: #991b1b; }
+
+        .task-type {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .task-target {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.pending { background: #fff7ed; color: #f59e0b; }
+        .stat-icon.resolved { background: #f0fdf4; color: #22c55e; }
+        .stat-icon.all { background: #f1f5f9; color: #64748b; }
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="fila-tarefas" class="content-section active">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1>Fila de Tarefas</h1>
+                            <p>Monitore comandos e sincronizações enviados aos equipamentos</p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary" onclick="loadTasks()">
+                                <i class="fas fa-sync-alt"></i> Atualizar
+                            </button>
+                            <button class="btn btn-danger" onclick="clearQueue()">
+                                <i class="fas fa-trash-alt"></i> Limpar Fila
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Estatísticas Rápidas -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon pending">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="count-pending">0</h3>
+                                <p>Pendentes</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon resolved">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="count-resolved">0</h3>
+                                <p>Resolvidas (Hoje)</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon all">
+                                <i class="fas fa-list-ul"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="count-total">0</h3>
+                                <p>Total (Últimas 100)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtros e Tabs -->
+                    <div class="content-box">
+                        <div class="tabs-header">
+                            <div class="tab-link active" onclick="switchTab('pending')" id="tab-pending">
+                                <i class="fas fa-hourglass-half"></i> Pendentes
+                            </div>
+                            <div class="tab-link" onclick="switchTab('resolved')" id="tab-resolved">
+                                <i class="fas fa-history"></i> Histórico
+                            </div>
+                        </div>
+
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Tipo / Comando</th>
+                                        <th>Equipamento</th>
+                                        <th>Alvo</th>
+                                        <th>Status</th>
+                                        <th>Criado em</th>
+                                        <th>Resolvido em</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tasks-table-body">
+                                    <tr>
+                                        <td colspan="7" class="text-center">Carregando tarefas...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="table-footer">
+                            <div class="table-info">
+                                <span id="tasks-count">0</span> tarefas encontradas
+                            </div>
+                            <div class="pagination" id="pagination-container">
+                                <!-- Paginação via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+    <script src="../../auth.js"></script>
+    <script>
+        let currentTab = 'pending';
+        let currentPage = 1;
+        const limit = 20;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTasks();
+            // Polling auto a cada 10 segundos para pendentes
+            setInterval(() => {
+                if (currentTab === 'pending') loadTasks(false);
+            }, 10000);
+        });
+
+        function getAuthHeader() {
+            const token = localStorage.getItem('mamcontrol_accessToken');
+            const tenantId = localStorage.getItem('mamcontrol_tenant') || 'default';
+            return {
+                'X-Tenant-ID': tenantId,
+                'Authorization': `Bearer ${token}`
+            };
+        }
+
+        async function loadTasks(showLoading = true) {
+            const tbody = document.getElementById('tasks-table-body');
+            if (showLoading) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center"><i class="fas fa-spinner fa-spin"></i> Carregando...</td></tr>';
+            }
+
+            try {
+                const tenantId = localStorage.getItem('mamcontrol_tenant') || 'default';
+                const response = await fetch(`/api/access-tasks?tenant_id=${tenantId}&status=${currentTab}&page=${currentPage}&limit=${limit}`, {
+                    headers: getAuthHeader()
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    renderTasks(result.data);
+                    updateStats();
+                    renderPagination(result.pagination);
+                }
+            } catch (error) {
+                console.error('Erro ao carregar tarefas:', error);
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Erro ao carregar dados</td></tr>';
+            }
+        }
+
+        async function updateStats() {
+            try {
+                const tenantId = localStorage.getItem('mamcontrol_tenant') || 'default';
+                // Pegar contagem de pendentes
+                const resPending = await fetch(`/api/access-tasks?tenant_id=${tenantId}&status=pending&limit=1`, { headers: getAuthHeader() });
+                const dataPending = await resPending.json();
+                document.getElementById('count-pending').textContent = dataPending.pagination.total;
+
+                // Pegar total geral (últimas 100)
+                const resTotal = await fetch(`/api/access-tasks?tenant_id=${tenantId}&limit=1`, { headers: getAuthHeader() });
+                const dataTotal = await resTotal.json();
+                document.getElementById('count-total').textContent = dataTotal.pagination.total;
+                
+                // Resolvidas hoje (simplificado: apenas pega o total de resolvidas por enquanto)
+                const resResolved = await fetch(`/api/access-tasks?tenant_id=${tenantId}&status=resolved&limit=1`, { headers: getAuthHeader() });
+                const dataResolved = await resResolved.json();
+                document.getElementById('count-resolved').textContent = dataResolved.pagination.total;
+
+            } catch (e) { console.error(e); }
+        }
+
+        function renderTasks(tasks) {
+            const tbody = document.getElementById('tasks-table-body');
+            if (tasks.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center">Nenhuma tarefa ${currentTab === 'pending' ? 'pendente' : 'no histórico'}</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = tasks.map(task => {
+                const dateCreated = new Date(task.created_at).toLocaleString('pt-BR');
+                const dateResolved = task.resolved_at ? new Date(task.resolved_at).toLocaleString('pt-BR') : '-';
+                
+                const statusBadge = task.resolved === 0 
+                    ? '<span class="badge badge-pending">Pendente</span>'
+                    : '<span class="badge badge-resolved">Resolvida</span>';
+
+                let targetInfo = '-';
+                if (task.person_id) targetInfo = `Pessoa ID: ${task.person_id}`;
+                if (task.target_type && task.target_id) targetInfo = `${task.target_type}: ${task.target_id}`;
+                if (task.description) targetInfo = task.description;
+
+                return `
+                    <tr>
+                        <td>#${task.id}</td>
+                        <td>
+                            <div class="task-type">${formatTaskType(task.task_type)}</div>
+                            <small class="text-muted">${task.task_type}</small>
+                        </td>
+                        <td>${task.equip_validator || 'Todos'}</td>
+                        <td class="task-target">${targetInfo}</td>
+                        <td>${statusBadge}</td>
+                        <td>${dateCreated}</td>
+                        <td>${dateResolved}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('tasks-count').textContent = tasks.length;
+        }
+
+        function formatTaskType(type) {
+            const labels = {
+                'liberar_acesso': 'Liberação Remota',
+                'emergencia': 'Modo Emergência',
+                'template_remote': 'Cadastro Biométrico',
+                'sync_person': 'Sincronizar Pessoa',
+                'delete_person': 'Remover Pessoa',
+                'sync_all': 'Sincronização Geral'
+            };
+            return labels[type] || type;
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            currentPage = 1;
+            document.querySelectorAll('.tab-link').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            loadTasks();
+        }
+
+        async function clearQueue() {
+            if (!confirm('Tem certeza que deseja limpar a fila de tarefas pendentes? Todas as tarefas não executadas serão marcadas como resolvidas.')) return;
+
+            try {
+                const tenantId = localStorage.getItem('mamcontrol_tenant') || 'default';
+                const response = await fetch('/api/access-tasks/clear', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+                    body: JSON.stringify({ tenant_id: tenantId })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('Fila limpa com sucesso!');
+                    loadTasks();
+                }
+            } catch (error) {
+                alert('Erro ao limpar fila');
+            }
+        }
+
+        function renderPagination(pagination) {
+            const container = document.getElementById('pagination-container');
+            if (!pagination || pagination.totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = `
+                <button class="btn btn-sm btn-secondary" ${pagination.page === 1 ? 'disabled' : ''} onclick="gotoPage(${pagination.page - 1})">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <span>Página ${pagination.page} de ${pagination.totalPages}</span>
+                <button class="btn btn-sm btn-secondary" ${pagination.page === pagination.totalPages ? 'disabled' : ''} onclick="gotoPage(${pagination.page + 1})">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+        }
+
+        function gotoPage(page) {
+            currentPage = page;
+            loadTasks();
+        }
+    </script>
+</body>
+</html>

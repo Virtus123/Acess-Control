@@ -1,0 +1,19 @@
+{
+  "name": "mam-push-service",
+  "version": "1.0.0",
+  "description": "Push Service para comunicação direta equipamento Control iD ↔ MAMCONTROL",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.22.1",
+    "sqlite3": "^5.1.6",
+    "winston": "^3.11.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

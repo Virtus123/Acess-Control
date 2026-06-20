@@ -1,0 +1,2318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Módulo de Cadastro - MAM Control</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <script src="../../auth.js"></script>
+    <script src="../../app.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .app-layout {
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .main-content {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .content-area {
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .content-area::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .content-area::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .content-area::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 8px;
+        }
+
+        .cadastro-bloco {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px 28px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .cadastro-bloco h3 {
+            margin: 0 0 20px 0;
+            color: #1e293b;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .cadastro-bloco h3 i {
+            margin-right: 10px;
+            color: #4a90d9;
+            font-size: 1.2rem;
+        }
+
+        .dados-principais {
+            display: flex;
+            gap: 28px;
+            margin-bottom: 24px;
+        }
+
+        .foto-container {
+            flex: 0 0 120px;
+        }
+
+        .foto-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .photo-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 2px dashed #cbd5e0;
+            background: #f8fafc;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .photo-circle:hover {
+            border-color: #4a90d9;
+            background: #ebf5ff;
+        }
+
+        .photo-circle.has-image {
+            border-style: solid;
+            border-color: #4a90d9;
+            border-width: 3px;
+        }
+
+        .photo-circle.has-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-circle-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #94a3b8;
+            text-align: center;
+        }
+
+        .photo-circle-placeholder i {
+            font-size: 2rem;
+            margin-bottom: 4px;
+        }
+
+        .photo-circle-placeholder span {
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .photo-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #1e293b;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        .campos-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            align-content: start;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #1e3a5f;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: #ffffff;
+            font-family: inherit;
+        }
+
+        .form-group input:hover,
+        .form-group select:hover,
+        .form-group textarea:hover {
+            border-color: #94a3b8;
+            background: #fefefe;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.15);
+        }
+
+        .text-required {
+            color: #e53e3e;
+            margin-left: 4px;
+            font-weight: bold;
+        }
+
+        .busca-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: end;
+            margin-bottom: 16px;
+        }
+
+        .busca-row .n-documento {
+            grid-column: 1;
+            position: relative;
+        }
+
+        /* Autocomplete dropdown for visitor search */
+        .visitor-search-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            max-height: 280px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            margin-top: 6px;
+        }
+
+        .visitor-search-dropdown.active {
+            display: block;
+        }
+
+        .visitor-search-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background 0.15s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .visitor-search-item:hover {
+            background: #ebf5ff;
+        }
+
+        .visitor-search-item .visitor-name {
+            font-weight: 700;
+            color: #0f2b3f;
+            font-size: 0.95rem;
+        }
+
+        .visitor-search-item .visitor-doc {
+            font-size: 0.8rem;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .visitor-search-item .visitor-company {
+            font-size: 0.8rem;
+            color: #4a90d9;
+            font-weight: 600;
+        }
+
+        .visitor-search-item .visitor-status {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .visitor-search-item .visitor-status.ativo {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .visitor-search-item .visitor-status.inativo {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .busca-row .form-group:last-child {
+            grid-column: 2;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .busca-row .form-group:last-child button {
+            width: 100%;
+            min-width: 130px;
+            justify-content: center;
+        }
+
+        .tag-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 14px;
+            border: 1px solid #e2e8f0;
+            margin-top: 6px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 12px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #4a90d9;
+        }
+
+        .tag-input-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .tag-input-group input {
+            flex: 1;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #4a90d9;
+        }
+
+        .checkbox-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: none;
+        }
+
+        .observacao-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            background: #f8fafc;
+            padding: 8px 16px;
+            border-radius: 40px;
+            border: 1px solid #e2e8f0;
+            width: fit-content;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .observacao-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #4a90d9;
+        }
+
+        .observacao-field {
+            margin-top: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .observacao-field.hidden {
+            display: none;
+        }
+
+        .liberacao-options {
+            display: flex;
+            gap: 16px;
+            background: #f8fafc;
+            padding: 10px 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .liberacao-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 40px;
+            transition: all 0.2s;
+            background: white;
+            border: 1px solid #cbd5e1;
+            flex: 1;
+            font-size: 0.9rem;
+            font-weight: 600;
+            justify-content: center;
+        }
+
+        .liberacao-option:hover {
+            background: #ebf5ff;
+            border-color: #4a90d9;
+        }
+
+        .liberacao-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #4a90d9;
+        }
+
+        .periodo-campos {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-top: 8px;
+        }
+
+        .periodo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .alerta {
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .alerta-info {
+            background: #ebf5ff;
+            border-left: 4px solid #4a90d9;
+            color: #1e4a76;
+        }
+
+        .alerta-warning {
+            background: #fffaf0;
+            border-left: 4px solid #ed8936;
+            color: #9b4a1a;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .section-title h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #0f2b3f;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #475569;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Equipamentos List for Modal */
+        .equip-selection-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .equip-selection-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .equip-selection-item:hover {
+            background: #f8fafc;
+        }
+
+        .equip-selection-item i {
+            font-size: 1.2rem;
+            color: #4a90d9;
+        }
+
+        .equip-selection-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .equip-selection-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.95rem;
+        }
+
+        .equip-selection-validador {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        #face-remote-modal-equipamentos {
+            z-index: 10001;
+            /* Above the capture modal */
+        }
+
+        .modal-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+            border: none;
+            padding: 0;
+        }
+
+        .modal-body {
+            padding: 28px;
+            text-align: center;
+        }
+
+        .modal-body i {
+            font-size: 3rem;
+            color: #4a90d9;
+            margin-bottom: 16px;
+        }
+
+        .modal-body p {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 8px 0;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .grid-full {
+            grid-column: 1 / -1;
+        }
+
+        /* Combobox/Autocomplete Styles */
+        .combobox-container {
+            position: relative;
+            width: 100%;
+        }
+
+        #empresaVisitada-container {
+            min-width: 450px;
+        }
+
+        #empresaVisitada-container .combobox-input {
+            min-width: 450px;
+            width: 100%;
+            padding: 10px 12px;
+        }
+
+        #empresa-visitada-wrapper {
+            flex: 1.6 !important;
+            min-width: 480px;
+        }
+
+        #pessoa-visitada-wrapper {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        #visitados-wrapper {
+            flex-wrap: wrap;
+        }
+
+        @media screen and (max-width: 900px) {
+            #visitados-wrapper {
+                flex-direction: column;
+            }
+
+            #empresa-visitada-wrapper,
+            #pessoa-visitada-wrapper {
+                flex: none !important;
+                width: 100% !important;
+                min-width: 100% !important;
+            }
+        }
+
+        .combobox-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            font-family: inherit;
+            background: #ffffff;
+            cursor: text;
+        }
+
+        .combobox-input:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.15);
+        }
+
+        .combobox-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .combobox-dropdown.active {
+            display: block;
+        }
+
+        .combobox-option {
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background 0.15s;
+        }
+
+        .combobox-option:hover {
+            background: #ebf5ff;
+        }
+
+        .combobox-option.selected {
+            background: #dbeafe;
+            font-weight: 600;
+        }
+
+        .combobox-option.manual-option {
+            color: #4a90d9;
+            font-weight: 600;
+        }
+
+        .combobox-clear {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 6px;
+            display: none;
+            font-size: 1rem;
+        }
+
+        .combobox-clear:hover {
+            color: #475569;
+        }
+
+        .combobox-clear.visible {
+            display: block;
+        }
+
+        @media (max-width: 1024px) {
+            .dados-principais {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .foto-container {
+                flex: 0 0 auto;
+                align-self: center;
+            }
+
+            .campos-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .busca-row {
+                grid-template-columns: 1fr;
+            }
+
+            .busca-row .form-group:last-child {
+                grid-column: 1;
+            }
+        }
+
+        /* ======= Lightbox foto visitante ======= */
+        #photo-lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 999999;
+            align-items: center;
+            justify-content: center;
+        }
+        #photo-lightbox.active { display: flex; }
+        #photo-lightbox img {
+            max-width: 90vw;
+            max-height: 88vh;
+            border-radius: 12px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+            object-fit: contain;
+        }
+        #photo-lightbox .lightbox-close {
+            position: absolute;
+            top: 20px; right: 24px;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: #fff;
+            font-size: 1.6rem;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        #photo-lightbox .lightbox-close:hover { background: rgba(255,255,255,0.3); }
+
+        @media (max-width: 640px) {
+            .campos-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .liberacao-options {
+                flex-direction: column;
+            }
+
+            .periodo-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cadastro-bloco {
+                padding: 16px;
+            }
+        }
+    </style>
+
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="modulo-cadastro" class="content-section active">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1>📋 Módulo de Recepção</h1>
+                            <p>Cadastro e controle de visitantes</p>
+                        </div>
+                        <button class="btn btn-secondary" onclick="limparFormulario()">
+                            <i class="fas fa-broom"></i> Limpar
+                        </button>
+                    </div>
+
+                    <div class="cadastro-bloco">
+                        <h3><i class="fas fa-id-card"></i> Identificação do Visitante</h3>
+
+                        <form onsubmit="localizarVisitante(event)">
+                            <div class="busca-row">
+                                <div class="form-group n-documento">
+                                    <label for="numeroDoc"><strong>🔍 Documento / Nome</strong></label>
+                                    <input type="text" id="numeroDoc" required
+                                        placeholder="Digite CPF, RG ou primeiro nome" autocomplete="off">
+                                    <div id="visitor-search-dropdown" class="visitor-search-dropdown"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search"></i> Localizar
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div id="resultado-busca" class="alerta alerta-info" style="display: none;">
+                            <i class="fas fa-check-circle"></i>
+                            <strong>Visitante encontrado!</strong> Dados carregados automaticamente.
+                        </div>
+
+                        <div id="novo-visitante" class="alerta alerta-warning" style="display: none;">
+                            <i class="fas fa-user-plus"></i>
+                            <strong>Visitante não localizado.</strong> Preencha os dados abaixo para cadastrar.
+                        </div>
+
+                        <h3 style="margin-top: 20px;"><i class="fas fa-user-edit"></i> Dados do Visitante</h3>
+
+                        <form id="visitanteForm" onsubmit="salvarVisitante(event)">
+                            <div class="dados-principais">
+                                <div class="foto-container">
+                                    <div class="foto-wrapper">
+                                        <div id="visitante-photo-preview" class="photo-circle"
+                                            onclick="handlePhotoCircleClick()">
+                                            <div class="photo-circle-placeholder">
+                                                <i class="fas fa-camera"></i>
+                                                <span>Adicionar foto</span>
+                                            </div>
+                                        </div>
+                                        <input type="file" id="visitante-photo-input" accept="image/*" class="hidden"
+                                            onchange="handleVisitantePhotoUpload(event)">
+                                        <div class="photo-actions">
+                                            <button type="button" class="btn btn-sm btn-secondary"
+                                                onclick="document.getElementById('visitante-photo-input').click()">
+                                                <i class="fas fa-upload"></i> Enviar
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-primary"
+                                                onclick="VisitanteManager.openCamera()">
+                                                <i class="fas fa-camera"></i> Câmera
+                                            </button>
+                                            <!-- <button type="button" class="btn btn-sm btn-secondary"
+                                                onclick="iniciarCapturaFaceRemotaVisitante()" id="btn-face-remote-visitante" title="Capturar foto via equipamento remoto">
+                                                <i class="fas fa-wifi"></i> Captura Remota
+                                            </button> -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="campos-grid">
+                                    <div style="grid-column: span 2;">
+                                        <div class="form-group">
+                                            <label for="nome"><strong>Nome Completo *</strong></label>
+                                            <input type="text" id="nome" required placeholder="Nome completo">
+                                        </div>
+                                    </div>
+
+                                    <div id="campo-empresa-visitante-container" style="grid-column: span 2;">
+                                        <div class="form-group">
+                                            <label for="empresaVisitante"><strong>Empresa do Visitante</strong></label>
+                                            <input type="text" id="empresaVisitante" placeholder="Empresa ABC Ltda">
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="form-group">
+                                            <label for="documento"><strong>Documento *</strong></label>
+                                            <input type="text" id="documento" placeholder="CPF, RG ou Doc. Único">
+                                        </div>
+                                    </div>
+
+                                    <div id="campo-celular-container">
+                                        <div class="form-group">
+                                            <label for="celular"><strong>Celular</strong></label>
+                                            <input type="tel" id="celular" placeholder="(00) 00000-0000">
+                                        </div>
+                                    </div>
+
+                                    <div style="grid-column: span 2;">
+                                        <div id="visitados-wrapper" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                                            <div id="empresa-visitada-wrapper" style="flex: 1.6; min-width: 480px;">
+                                                <div class="form-group">
+                                                    <label for="empresaVisitada"><strong>Empresa
+                                                            Visitada</strong></label>
+                                                    <div class="combobox-container" id="empresaVisitada-container">
+                                                        <input type="text" id="empresaVisitada" class="combobox-input"
+                                                            placeholder="Selecione ou digite..." autocomplete="off">
+                                                        <input type="hidden" id="empresaVisitada-value">
+                                                        <button type="button" class="combobox-clear"
+                                                            onclick="clearCombobox('empresaVisitada')" title="Limpar">
+                                                            <i class="fas fa-times-circle"></i>
+                                                        </button>
+                                                        <div class="combobox-dropdown" id="empresaVisitada-dropdown">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div id="campo-pessoa-visitada-container"
+                                                style="flex: 1; min-width: 250px;">
+                                                <div class="form-group">
+                                                    <label for="pessoaVisitada"><strong>Visitado</strong></label>
+                                                    <div class="combobox-container" id="pessoaVisitada-container">
+                                                        <input type="text" id="pessoaVisitada" class="combobox-input"
+                                                            placeholder="Selecione ou digite..." autocomplete="off">
+                                                        <input type="hidden" id="pessoaVisitada-value">
+                                                        <button type="button" class="combobox-clear"
+                                                            onclick="clearCombobox('pessoaVisitada')" title="Limpar">
+                                                            <i class="fas fa-times-circle"></i>
+                                                        </button>
+                                                        <div class="combobox-dropdown" id="pessoaVisitada-dropdown">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style="grid-column: span 2;" id="campo-cartao-container">
+                                        <div class="form-group">
+                                            <label><i class="fas fa-credit-card"></i> <strong>Cartão de
+                                                    Acesso</strong></label>
+                                            <div class="tag-section">
+                                                <div class="radio-group">
+                                                    <label class="radio-option">
+                                                        <input type="radio" name="tipo-cartao" value="manual" checked
+                                                            onchange="toggleCartaoFields()">
+                                                        <span>Manual</span>
+                                                    </label>
+                                                    <label class="radio-option">
+                                                        <input type="radio" name="tipo-cartao" value="remoto"
+                                                            onchange="toggleCartaoFields()">
+                                                        <span>Remoto</span>
+                                                    </label>
+                                                </div>
+
+                                                <div id="cartao-manual-container">
+                                                    <div class="tag-input-group">
+                                                        <input type="text" id="numero-cartao"
+                                                            placeholder="Número do cartão">
+                                                        <button type="button" class="btn btn-sm btn-secondary"
+                                                            onclick="gerarCartaoAleatorio()">
+                                                            <i class="fas fa-random"></i> Gerar
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div id="cartao-remoto-container" class="hidden">
+                                                    <button type="button" class="btn btn-sm btn-primary"
+                                                        onclick="iniciarCadastramentoRemoto()">
+                                                        <i class="fas fa-wifi"></i> Ler cartão
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 20px;">
+                                <div class="observacao-checkbox">
+                                    <input type="checkbox" id="mostrar-observacao" onchange="toggleObservacao()">
+                                    <label for="mostrar-observacao"><i class="fas fa-pen"></i> <strong>Adicionar
+                                            Observação</strong></label>
+                                </div>
+
+                                <div id="observacao-field" class="observacao-field hidden">
+                                    <div class="form-group">
+                                        <textarea id="observacao" rows="2"
+                                            placeholder="Informações adicionais sobre a visita"></textarea>
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: 20px;">
+                                    <div class="form-group">
+                                        <label><strong>Liberação de Acesso</strong></label>
+                                        <div class="liberacao-options">
+                                            <label class="liberacao-option">
+                                                <input type="radio" name="tipoLiberacao" value="unica" checked
+                                                    onchange="togglePeriodo()">
+                                                <span>Visita Única</span>
+                                            </label>
+                                            <label class="liberacao-option">
+                                                <input type="radio" name="tipoLiberacao" value="periodo"
+                                                    onchange="togglePeriodo()">
+                                                <span>Período</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="periodoCampos" style="display: none;">
+                                    <div class="periodo-campos">
+                                        <div class="periodo-grid">
+                                            <div class="form-group">
+                                                <label for="dataInicio"><strong>Início</strong></label>
+                                                <input type="datetime-local" id="dataInicio">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="dataFim"><strong>Fim</strong></label>
+                                                <input type="datetime-local" id="dataFim">
+                                            </div>
+                                        </div>
+                                        <div class="checkbox-group" style="margin-top: 14px;">
+                                            <input type="checkbox" id="naoDarBaixa" name="naoDarBaixa">
+                                            <label for="naoDarBaixa"
+                                                title="Se marcado, o visitante não será inativado ao sair. O acesso só será bloqueado após o período expirar.">
+                                                <i class="fas fa-ban"></i> <strong>Não dar baixa ao sair</strong>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" onclick="limparFormulario()">
+                                    <i class="fas fa-broom"></i> Limpar
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Salvar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div id="cartaoRemotoModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-wifi"></i> Leitura Remota</h3>
+                <button class="modal-close" onclick="fecharModalRemoto()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <i class="fas fa-sync-alt fa-spin"></i>
+                <p>Aguardando cartão...</p>
+                <small>Aproxime do leitor</small>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModalRemoto()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../components.js"></script>
+
+    <script>
+        // ==================== TODO O BACKEND PERMANECE IDÊNTICO ====================
+        // Mantidas todas as funções originais: localizarVisitante, salvarVisitante, 
+        // busca em tempo real, comboboxes, etc. Nenhuma linha de lógica foi alterada.
+
+        let visitantes = [];
+        let visitanteId = null;
+        let visitantePhotoData = null;
+        let visitantePhotoOriginal = null;
+        let visitorSearchTimeout = null;
+        let lastSearchTerm = '';
+
+        if (!window.STATE) {
+            window.STATE = {};
+        }
+        window.STATE.cameraActive = false;
+        window.STATE.cameraStream = null;
+
+        function debounce(func, wait) {
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(visitorSearchTimeout);
+                    func(...args);
+                };
+                clearTimeout(visitorSearchTimeout);
+                visitorSearchTimeout = setTimeout(later, wait);
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('numeroDoc');
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(function (e) {
+                    const term = e.target.value.trim();
+                    if (term.length >= 2) {
+                        performLiveSearch(term);
+                    } else {
+                        hideVisitorDropdown();
+                    }
+                }, 300));
+
+                document.addEventListener('click', function (e) {
+                    const dropdown = document.getElementById('visitor-search-dropdown');
+                    const container = document.querySelector('.busca-row .n-documento');
+                    if (dropdown && container && !container.contains(e.target)) {
+                        dropdown.classList.remove('active');
+                    }
+                });
+
+                searchInput.addEventListener('keydown', function (e) {
+                    const dropdown = document.getElementById('visitor-search-dropdown');
+                    if (!dropdown.classList.contains('active')) return;
+
+                    const items = dropdown.querySelectorAll('.visitor-search-item');
+                    if (items.length === 0) return;
+
+                    let selectedIndex = Array.from(items).findIndex(item => item.classList.contains('selected'));
+
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        if (selectedIndex < items.length - 1) {
+                            if (selectedIndex >= 0) items[selectedIndex].classList.remove('selected');
+                            items[selectedIndex + 1].classList.add('selected');
+                            items[selectedIndex + 1].scrollIntoView({ block: 'nearest' });
+                        }
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        if (selectedIndex > 0) {
+                            items[selectedIndex].classList.remove('selected');
+                            items[selectedIndex - 1].classList.add('selected');
+                            items[selectedIndex - 1].scrollIntoView({ block: 'nearest' });
+                        }
+                    } else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (selectedIndex >= 0) {
+                            items[selectedIndex].click();
+                        }
+                    } else if (e.key === 'Escape') {
+                        hideVisitorDropdown();
+                    }
+                });
+            }
+        });
+
+        function performLiveSearch(term) {
+            const dropdown = document.getElementById('visitor-search-dropdown');
+            if (term === lastSearchTerm && dropdown.classList.contains('active')) return;
+            lastSearchTerm = term;
+
+            dropdown.innerHTML = '<div class="visitor-search-loading"><i class="fas fa-spinner"></i> Buscando...</div>';
+            dropdown.classList.add('active');
+
+            const isNumericSearch = /^\d+$/.test(term.replace(/\D/g, ''));
+            const searchType = isNumericSearch ? 'exact' : 'firstName';
+            const url = `/visitors?search=${encodeURIComponent(term)}&searchType=${searchType}&limit=10`;
+
+            api.request(url).then(response => {
+                if (response.success && response.data && response.data.length > 0) {
+                    renderVisitorResults(response.data);
+                } else {
+                    dropdown.innerHTML = '<div class="visitor-search-no-results">Nenhum visitante encontrado</div>';
+                }
+            }).catch(error => {
+                console.error('Erro na busca de visitantes:', error);
+                dropdown.innerHTML = '<div class="visitor-search-no-results">Erro ao buscar</div>';
+            });
+        }
+
+        function renderVisitorResults(visitantes) {
+            const dropdown = document.getElementById('visitor-search-dropdown');
+            dropdown.innerHTML = '';
+
+            visitantes.forEach((v, index) => {
+                const item = document.createElement('div');
+                item.className = 'visitor-search-item';
+                item.dataset.index = index;
+                item.dataset.id = v.id;
+
+                const statusClass = v.status === 'active' ? 'ativo' : 'inativo';
+                const statusText = v.status === 'active' ? 'Ativo' : 'Inativo';
+
+                item.innerHTML = `
+                    <div>
+                        <div class="visitor-name">${v.name || 'Sem nome'}</div>
+                        <div class="visitor-doc">${v.document || 'Sem documento'}</div>
+                        ${v.visitor_company ? `<div class="visitor-company">${v.visitor_company}</div>` : ''}
+                    </div>
+                    <span class="visitor-status ${statusClass}">${statusText}</span>
+                `;
+
+                item.addEventListener('click', function () {
+                    selectVisitorFromDropdown(v);
+                });
+
+                dropdown.appendChild(item);
+            });
+
+            dropdown.classList.add('active');
+        }
+
+        function hideVisitorDropdown() {
+            const dropdown = document.getElementById('visitor-search-dropdown');
+            if (dropdown) {
+                dropdown.classList.remove('active');
+            }
+            lastSearchTerm = '';
+        }
+
+        function selectVisitorFromDropdown(visitante) {
+            hideVisitorDropdown();
+            document.getElementById('numeroDoc').value = visitante.name || '';
+            Promise.all([initPessoaCombobox(), initEmpresaCombobox()]).then(() => {
+                fillVisitorForm(visitante);
+            });
+        }
+
+        function fillVisitorForm(visitanteExistente) {
+            visitanteId = visitanteExistente.id;
+            document.getElementById('resultado-busca').style.display = 'flex';
+            document.getElementById('novo-visitante').style.display = 'none';
+            document.getElementById('nome').value = visitanteExistente.name || '';
+            document.getElementById('documento').value = visitanteExistente.document || '';
+            document.getElementById('celular').value = visitanteExistente.cellphone || '';
+            document.getElementById('empresaVisitante').value = visitanteExistente.visitor_company || '';
+
+            const empresaValueInput = document.getElementById('empresaVisitada-value');
+            const pessoaValueInput = document.getElementById('pessoaVisitada-value');
+            empresaValueInput.value = String(visitanteExistente.visited_company_id || '');
+            pessoaValueInput.value = String(visitanteExistente.visited_person_id || '');
+
+            const empresaName = empresasList.find(e => String(e.id) === String(visitanteExistente.visited_company_id));
+            document.getElementById('empresaVisitada').value = empresaName ? empresaName.name : '';
+            const pessoaName = pessoasList.find(p => String(p.id) === String(visitanteExistente.visited_person_id));
+            document.getElementById('pessoaVisitada').value = pessoaName ? pessoaName.name : '';
+
+            if (empresaValueInput.value) {
+                document.getElementById('empresaVisitada-container').querySelector('.combobox-clear').classList.add('visible');
+            }
+            if (pessoaValueInput.value) {
+                document.getElementById('pessoaVisitada-container').querySelector('.combobox-clear').classList.add('visible');
+            }
+
+            if (visitanteExistente.visited_company_id) {
+                carregarPessoasPorEmpresa(visitanteExistente.visited_company_id);
+            }
+
+            document.getElementById('observacao').value = visitanteExistente.notes || '';
+            const radioUnica = document.querySelector('input[name="tipoLiberacao"][value="unica"]');
+            if (radioUnica) {
+                radioUnica.checked = true;
+                togglePeriodo();
+            }
+
+            const fotoUrl = visitanteExistente.photo_url || visitanteExistente.photo || null;
+            const fotoBase64 = visitanteExistente.photo_base64 || visitanteExistente.foto || null;
+
+            if (fotoUrl) {
+                const separator = fotoUrl.includes('?') ? '&' : '?';
+                const fotoUrlComTimestamp = `${fotoUrl}${separator}t=${Date.now()}`;
+                visitantePhotoData = fotoUrl;
+                visitantePhotoOriginal = fotoUrl;
+                STATE.visitorPhoto = fotoUrl;
+                const preview = document.getElementById('visitante-photo-preview');
+                if (preview) {
+                    preview.innerHTML = `<img src="${fotoUrlComTimestamp}" alt="Foto" style="max-width: 100%; height: auto;">`;
+                    preview.classList.add('has-image');
+                }
+            } else if (fotoBase64) {
+                visitantePhotoData = fotoBase64;
+                visitantePhotoOriginal = fotoBase64;
+                STATE.visitorPhoto = fotoBase64;
+                const preview = document.getElementById('visitante-photo-preview');
+                if (preview) {
+                    preview.innerHTML = `<img src="${fotoBase64}" alt="Foto" style="max-width: 100%; height: auto;">`;
+                    preview.classList.add('has-image');
+                }
+            } else {
+                visitantePhotoData = null;
+                visitantePhotoOriginal = null;
+                STATE.visitorPhoto = null;
+                const preview = document.getElementById('visitante-photo-preview');
+                if (preview) {
+                    preview.innerHTML = '';
+                    preview.classList.remove('has-image');
+                }
+            }
+
+            if (visitanteExistente.notes) {
+                document.getElementById('mostrar-observacao').checked = true;
+                toggleObservacao();
+            }
+        }
+
+        function toggleObservacao() {
+            const mostrar = document.getElementById('mostrar-observacao').checked;
+            const observacaoField = document.getElementById('observacao-field');
+            if (mostrar) {
+                observacaoField.classList.remove('hidden');
+            } else {
+                observacaoField.classList.add('hidden');
+                document.getElementById('observacao').value = '';
+            }
+        }
+
+        function preencherPeriodoDiaTodo() {
+            const hoje = new Date();
+            const ano = hoje.getFullYear();
+            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+            const dia = String(hoje.getDate()).padStart(2, '0');
+            document.getElementById('dataInicio').value = `${ano}-${mes}-${dia}T00:00`;
+            document.getElementById('dataFim').value = `${ano}-${mes}-${dia}T23:59`;
+        }
+
+        function toggleCartaoFields() {
+            const tipo = document.querySelector('input[name="tipo-cartao"]:checked').value;
+            document.getElementById('cartao-manual-container').classList.toggle('hidden', tipo !== 'manual');
+            document.getElementById('cartao-remoto-container').classList.toggle('hidden', tipo !== 'remoto');
+        }
+
+        function gerarCartaoAleatorio() {
+            const cartao = Math.floor(Math.random() * 10000000000).toString().padStart(10, '0');
+            document.getElementById('numero-cartao').value = cartao;
+        }
+
+        function iniciarCadastramentoRemoto() {
+            document.getElementById('cartaoRemotoModal').classList.add('active');
+            setTimeout(() => {
+                const cartao = Math.floor(Math.random() * 10000000000).toString().padStart(10, '0');
+                document.getElementById('numero-cartao').value = cartao;
+                document.querySelector('input[name="tipo-cartao"][value="manual"]').checked = true;
+                toggleCartaoFields();
+                fecharModalRemoto();
+            }, 2000);
+        }
+
+        function fecharModalRemoto() {
+            document.getElementById('cartaoRemotoModal').classList.remove('active');
+        }
+
+        function togglePeriodo() {
+            const periodo = document.querySelector('input[name="tipoLiberacao"]:checked').value;
+            const periodoCampos = document.getElementById('periodoCampos');
+            if (periodo === 'periodo') {
+                periodoCampos.style.display = 'block';
+                preencherPeriodoDiaTodo();
+            } else {
+                periodoCampos.style.display = 'none';
+            }
+        }
+
+        function handlePhotoCircleClick() {
+            const preview = document.getElementById('visitante-photo-preview');
+            if (preview.classList.contains('has-image')) {
+                const img = preview.querySelector('img');
+                if (img) openPhotoLightbox(img.src);
+            } else {
+                VisitanteManager.openCamera();
+            }
+        }
+
+        function openPhotoLightbox(src) {
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('photo-lightbox').classList.add('active');
+        }
+
+        function closePhotoLightbox() {
+            document.getElementById('photo-lightbox').classList.remove('active');
+            document.getElementById('lightbox-img').src = '';
+        }
+
+        function handleVisitantePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    visitantePhotoData = e.target.result;
+                    STATE.visitorPhoto = e.target.result;
+                    const preview = document.getElementById('visitante-photo-preview');
+                    preview.innerHTML = `<img src="${visitantePhotoData}" alt="Foto">`;
+                    preview.classList.add('has-image');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function localizarVisitante(e) {
+            if (e) e.preventDefault();
+            const numeroDoc = document.getElementById('numeroDoc').value;
+            if (!numeroDoc) {
+                NotificationSystem.showToast('warning', 'Busca', 'Por favor, digite o número do documento ou nome.');
+                return;
+            }
+            Promise.all([initPessoaCombobox(), initEmpresaCombobox()]).then(() => {
+                const isNumericSearch = /^\d+$/.test(numeroDoc.replace(/\D/g, ''));
+                const searchType = isNumericSearch ? 'exact' : 'firstName';
+                api.request('/visitors?search=' + encodeURIComponent(numeroDoc) + '&searchType=' + searchType).then(response => {
+                    if (response.success && response.data && response.data.length > 0) {
+                        const isDocumentSearch = /^\d+$/.test(numeroDoc.replace(/\D/g, ''));
+                        let visitanteExistente = null;
+                        if (isDocumentSearch) {
+                            visitanteExistente = response.data.find(v =>
+                                v.document === numeroDoc ||
+                                (v.document && v.document.replace(/\D/g, '').includes(numeroDoc.replace(/\D/g, '')))
+                            );
+                        } else {
+                            const searchLower = numeroDoc.toLowerCase();
+                            visitanteExistente = response.data.find(v =>
+                                v.name && v.name.toLowerCase().startsWith(searchLower)
+                            );
+                        }
+                        if (visitanteExistente) {
+                            fillVisitorForm(visitanteExistente);
+                        } else {
+                            visitanteId = null;
+                            visitantePhotoOriginal = null;
+                            document.getElementById('resultado-busca').style.display = 'none';
+                            document.getElementById('novo-visitante').style.display = 'flex';
+                        }
+                    } else {
+                        visitanteId = null;
+                        visitantePhotoOriginal = null;
+                        document.getElementById('resultado-busca').style.display = 'none';
+                        document.getElementById('novo-visitante').style.display = 'flex';
+                    }
+                }).catch(error => {
+                    console.error('Erro ao buscar visitante:', error);
+                    visitanteId = null;
+                    visitantePhotoOriginal = null;
+                    document.getElementById('resultado-busca').style.display = 'none';
+                    document.getElementById('novo-visitante').style.display = 'flex';
+                });
+            });
+        }
+
+        function salvarVisitante(e) {
+            e.preventDefault();
+            const nomeValor = document.getElementById('nome').value;
+            const documentoValor = document.getElementById('documento').value;
+            if (!nomeValor || nomeValor.trim() === '') {
+                NotificationSystem.showToast('warning', 'Nome', 'Por favor, preencha o nome do visitante.');
+                return;
+            }
+            if (!documentoValor || documentoValor.trim() === '') {
+                NotificationSystem.showToast('warning', 'Documento', 'Por favor, preencha o número do documento.');
+                return;
+            }
+            const tipoLiberacao = document.querySelector('input[name="tipoLiberacao"]:checked');
+            if (!tipoLiberacao) {
+                NotificationSystem.showToast('warning', 'Liberação', 'Por favor, selecione o tipo de liberação.');
+                return;
+            }
+            const tipoLiberacaoValor = tipoLiberacao.value;
+            if (tipoLiberacaoValor === 'periodo') {
+                const dataInicio = document.getElementById('dataInicio').value;
+                const dataFim = document.getElementById('dataFim').value;
+                if (new Date(dataFim) < new Date(dataInicio)) {
+                    NotificationSystem.showToast('warning', 'Data', 'A data final deve ser posterior à data inicial!');
+                    return;
+                }
+            }
+            const documento = document.getElementById('documento').value;
+            const payload = {
+                name: document.getElementById('nome').value,
+                document: documento,
+                cellphone: document.getElementById('celular').value,
+                visitor_company: document.getElementById('empresaVisitante').value,
+                visited_person_id: document.getElementById('pessoaVisitada-value').value || null,
+                visited_company_id: document.getElementById('empresaVisitada-value').value || null,
+                notes: document.getElementById('mostrar-observacao').checked ? document.getElementById('observacao').value : '',
+                liberation_type: tipoLiberacaoValor,
+                status: 'on_premises'
+            };
+            if (tipoLiberacaoValor === 'periodo') {
+                payload.period_start = document.getElementById('dataInicio').value;
+                payload.period_end = document.getElementById('dataFim').value;
+                const naoDarBaixa = document.getElementById('naoDarBaixa');
+                if (naoDarBaixa && naoDarBaixa.checked) {
+                    payload.prevent_auto_exit = 1;
+                }
+            }
+            const isUpdate = visitanteId !== null;
+            if (isUpdate) {
+                const fotoAtual = STATE.visitorPhoto || visitantePhotoData;
+                const fotoAlterada = fotoAtual !== visitantePhotoOriginal;
+                if (fotoAlterada && fotoAtual && typeof fotoAtual === 'string' && fotoAtual.startsWith('data:')) {
+                    payload.photo_base64 = fotoAtual;
+                }
+                payload.status = 'on_premises';
+                payload.entry_date = new Date().toISOString();
+                api.updateVisitor(visitanteId, payload).then(result => {
+                    NotificationSystem.showToast('success', 'Visitante', 'Visitante atualizado com sucesso!');
+                    limparFormulario();
+                    window.location.reload();
+                }).catch(error => {
+                    NotificationSystem.showToast('error', 'Erro', error.message || 'Erro ao atualizar visitante');
+                });
+            } else {
+                payload.photo_base64 = STATE.visitorPhoto;
+                api.createVisitor(payload).then(result => {
+                    NotificationSystem.showToast('success', 'Visitante', 'Visitante cadastrado com sucesso!');
+                    limparFormulario();
+                    window.location.reload();
+                }).catch(error => {
+                    if (error.status === 409 && error.data) {
+                        if (confirm(`O documento fornecido já está vinculado ao visitante: ${error.data.name}.\n\nDeseja recarregar o cadastro existente para atualizar ou reativá-lo?`)) {
+                            limparFormulario();
+                            fillVisitorForm(error.data);
+                        }
+                    } else {
+                        NotificationSystem.showToast('error', 'Erro', error.message || 'Erro ao cadastrar visitante');
+                    }
+                });
+            }
+        }
+
+        function limparFormulario() {
+            document.getElementById('numeroDoc').value = '';
+            document.getElementById('visitanteForm').reset();
+            document.getElementById('resultado-busca').style.display = 'none';
+            document.getElementById('novo-visitante').style.display = 'none';
+            visitanteId = null;
+            visitantePhotoData = null;
+            visitantePhotoOriginal = null;
+            STATE.visitorPhoto = null;
+            const preview = document.getElementById('visitante-photo-preview');
+            preview.innerHTML = `<div class="photo-circle-placeholder"><i class="fas fa-camera"></i><span>Adicionar foto</span></div>`;
+            preview.classList.remove('has-image');
+            document.querySelector('input[name="tipo-cartao"][value="manual"]').checked = true;
+            toggleCartaoFields();
+            document.querySelector('input[name="tipoLiberacao"][value="unica"]').checked = true;
+            togglePeriodo();
+            document.getElementById('mostrar-observacao').checked = false;
+            toggleObservacao();
+        }
+
+        function carregarVisitantes() {
+            const stored = localStorage.getItem('mamcontrol_visitantes');
+            if (stored) {
+                visitantes = JSON.parse(stored);
+            }
+        }
+
+        document.getElementById('celular').addEventListener('input', function (e) {
+            let valor = e.target.value.replace(/\D/g, '');
+            if (valor.length > 11) valor = valor.substr(0, 11);
+            if (valor.length > 6) {
+                valor = valor.replace(/^(\d{2})(\d{5})(\d{0,4}).*/, '($1) $2-$3');
+            } else if (valor.length > 2) {
+                valor = valor.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+            } else if (valor.length > 0) {
+                valor = valor.replace(/^(\d*)/, '($1');
+            }
+            e.target.value = valor;
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                fecharModalRemoto();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            carregarVisitantes();
+            initPessoaCombobox();
+            initEmpresaCombobox();
+            togglePeriodo();
+            toggleCartaoFields();
+            toggleObservacao();
+            aplicarConfiguracaoCampos();
+        });
+
+        let empresasList = [];
+        let pessoasList = [];
+
+        function initCombobox(inputId, dropdownId, data, onSelect, onFilter, allowManualEntry = true) {
+            const input = document.getElementById(inputId);
+            const dropdown = document.getElementById(dropdownId);
+            const container = document.getElementById(inputId + '-container');
+            const clearBtn = container.querySelector('.combobox-clear');
+            const valueInput = document.getElementById(inputId + '-value');
+            if (!input || !dropdown) return;
+            input.addEventListener('focus', function () {
+                renderDropdown(dropdownId, data, onSelect, allowManualEntry);
+                dropdown.classList.add('active');
+            });
+            input.addEventListener('input', function () {
+                const searchTerm = this.value.toLowerCase();
+                const filtered = onFilter ? onFilter(data, searchTerm) : filterDefault(data, searchTerm);
+                if (!allowManualEntry && searchTerm.length > 0) {
+                    renderDropdown(dropdownId, filtered, onSelect, allowManualEntry);
+                } else {
+                    renderDropdown(dropdownId, filtered, onSelect, allowManualEntry, searchTerm);
+                }
+                dropdown.classList.add('active');
+                if (this.value) {
+                    clearBtn.classList.add('visible');
+                } else {
+                    clearBtn.classList.remove('visible');
+                }
+            });
+            container.addEventListener('click', function (e) {
+                if (!e.target.closest('.combobox-clear')) {
+                    if (!dropdown.classList.contains('active')) {
+                        renderDropdown(dropdownId, data, onSelect);
+                        dropdown.classList.add('active');
+                    }
+                }
+            });
+            input.addEventListener('blur', function () {
+                setTimeout(() => {
+                    dropdown.classList.remove('active');
+                }, 200);
+            });
+            input.addEventListener('keydown', function (e) {
+                const options = dropdown.querySelectorAll('.combobox-option:not(.no-results)');
+                let selectedIndex = Array.from(options).findIndex(opt => opt.classList.contains('selected'));
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (selectedIndex < options.length - 1) {
+                        if (selectedIndex >= 0) options[selectedIndex].classList.remove('selected');
+                        options[selectedIndex + 1].classList.add('selected');
+                        options[selectedIndex + 1].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (selectedIndex > 0) {
+                        options[selectedIndex].classList.remove('selected');
+                        options[selectedIndex - 1].classList.add('selected');
+                        options[selectedIndex - 1].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (selectedIndex >= 0) {
+                        options[selectedIndex].click();
+                    }
+                } else if (e.key === 'Escape') {
+                    dropdown.classList.remove('active');
+                }
+            });
+        }
+
+        function filterDefault(data, searchTerm) {
+            if (!searchTerm) return data;
+            return data.filter(item => item.name.toLowerCase().includes(searchTerm));
+        }
+
+        function renderDropdown(dropdownId, data, onSelect, allowManualEntry = true, manualSearchTerm = '') {
+            const dropdown = document.getElementById(dropdownId);
+            if (!dropdown) return;
+            let html = '';
+            if (allowManualEntry && manualSearchTerm) {
+                const inputId = dropdownId.replace('-dropdown', '');
+                html += `<div class="combobox-option manual-option" data-id="" data-name="${manualSearchTerm}" data-manual="true"><i class="fas fa-plus-circle"></i> Adicionar "${manualSearchTerm}"</div>`;
+            }
+            if (data.length === 0 && !manualSearchTerm) {
+                dropdown.innerHTML = '<div class="combobox-option no-results">Nenhum resultado encontrado</div>';
+                return;
+            }
+            data.forEach(item => {
+                html += `<div class="combobox-option" data-id="${item.id}" data-name="${item.name}">${item.name}</div>`;
+            });
+            dropdown.innerHTML = html;
+            dropdown.querySelectorAll('.combobox-option:not(.no-results)').forEach(option => {
+                option.addEventListener('click', function () {
+                    const id = this.dataset.id;
+                    const name = this.dataset.name;
+                    const isManual = this.dataset.manual === 'true';
+                    const inputId = dropdownId.replace('-dropdown', '');
+                    if (isManual) {
+                        const valueInput = document.getElementById(inputId + '-value');
+                        const input = document.getElementById(inputId);
+                        const container = document.getElementById(inputId + '-container');
+                        const clearBtn = container.querySelector('.combobox-clear');
+                        input.value = name;
+                        if (valueInput) {
+                            valueInput.value = '';
+                        }
+                        clearBtn.classList.add('visible');
+                    } else {
+                        onSelect(id, name, inputId);
+                    }
+                    dropdown.classList.remove('active');
+                });
+            });
+        }
+
+        function selectComboboxOption(id, name, inputId) {
+            const input = document.getElementById(inputId);
+            const valueInput = document.getElementById(inputId + '-value');
+            const container = document.getElementById(inputId + '-container');
+            const clearBtn = container.querySelector('.combobox-clear');
+            input.value = name;
+            if (valueInput) {
+                valueInput.value = id;
+            }
+            clearBtn.classList.add('visible');
+        }
+
+        function clearCombobox(inputId) {
+            const input = document.getElementById(inputId);
+            const valueInput = document.getElementById(inputId + '-value');
+            const container = document.getElementById(inputId + '-container');
+            const clearBtn = container.querySelector('.combobox-clear');
+            input.value = '';
+            if (valueInput) {
+                valueInput.value = '';
+            }
+            clearBtn.classList.remove('visible');
+            if (inputId === 'empresaVisitada') {
+                carregarPessoasPorEmpresa('');
+            }
+        }
+
+        function filterEmpresas(empresas, searchTerm) {
+            if (!searchTerm) return empresas;
+            return empresas.filter(empresa => {
+                const name = (empresa.name || '').toLowerCase();
+                return name.includes(searchTerm);
+            });
+        }
+
+        function onEmpresaSelect(id, name) {
+            selectComboboxOption(id, name, 'empresaVisitada');
+            carregarPessoasPorEmpresa(id);
+        }
+
+        async function initEmpresaCombobox() {
+            try {
+                const response = await api.request('/companies?limit=10000');
+                empresasList = response.success ? response.data.map(e => ({
+                    id: e.id,
+                    name: (e.fantasy_name || e.nomeFantasia || e.corporate_name || e.razao_social || '') + (e.active === false ? ' (Inativa)' : '')
+                })) : [];
+                initCombobox('empresaVisitada', 'empresaVisitada-dropdown', empresasList, onEmpresaSelect, filterEmpresas, false);
+            } catch (error) {
+                console.error('Erro ao inicializar combobox de empresas:', error);
+            }
+        }
+
+        async function initPessoaCombobox() {
+            try {
+                const response = await api.request('/persons?limit=1000');
+                pessoasList = response.success ? response.data.map(p => ({
+                    id: p.id,
+                    name: p.name || p.nome || ''
+                })) : [];
+                initCombobox('pessoaVisitada', 'pessoaVisitada-dropdown', pessoasList,
+                    (id, name) => selectComboboxOption(id, name, 'pessoaVisitada'),
+                    filterDefault
+                );
+            } catch (error) {
+                console.error('Erro ao inicializar combobox de pessoas:', error);
+            }
+        }
+
+        async function carregarPessoas() {
+            try {
+                const pessoas = await storage.getPessoas();
+                pessoasList = pessoasList.concat(pessoas.map(p => ({
+                    id: p.id,
+                    name: p.name || p.nome || ''
+                })));
+                return Promise.resolve();
+            } catch (error) {
+                console.error('Erro ao carregar pessoas:', error);
+                return Promise.resolve();
+            }
+        }
+
+        async function carregarEmpresas() {
+            try {
+                const empresas = await storage.getEmpresas(true);
+                empresasList = empresasList.concat(empresas.map(e => ({
+                    id: e.id,
+                    name: e.corporate_name || e.nomeFantasia || e.razao_social || ''
+                })));
+                return Promise.resolve();
+            } catch (error) {
+                console.error('Erro ao carregar empresas:', error);
+                return Promise.resolve();
+            }
+        }
+
+        async function carregarPessoasPorEmpresa(empresaId) {
+            const input = document.getElementById('pessoaVisitada');
+            const container = document.getElementById('pessoaVisitada-container');
+            if (!input || !container) return Promise.resolve();
+            input.value = '';
+            const clearBtn = container.querySelector('.combobox-clear');
+            if (clearBtn) clearBtn.classList.remove('visible');
+            try {
+                let pessoas;
+                if (!empresaId) {
+                    pessoas = await storage.getPessoas();
+                } else {
+                    const response = await api.request(`/companies/${empresaId}/owners`);
+                    if (!response.success) {
+                        throw new Error('Erro ao buscar proprietários');
+                    }
+                    pessoas = response.data || [];
+                }
+                pessoasList = pessoas.map(p => ({
+                    id: p.id,
+                    name: p.name || p.nome || ''
+                }));
+                initCombobox('pessoaVisitada', 'pessoaVisitada-dropdown', pessoasList,
+                    (id, name) => selectComboboxOption(id, name, 'pessoaVisitada'),
+                    filterDefault
+                );
+                return Promise.resolve();
+            } catch (error) {
+                console.error('Erro ao carregar pessoas por empresa:', error);
+                return Promise.resolve();
+            }
+        }
+
+        async function aplicarConfiguracaoCampos() {
+            try {
+                const modules = await loadModules();
+                const campoCelular = document.getElementById('campo-celular-container');
+                if (campoCelular) {
+                    const celularAtivado = modules.module_cadastro_celular;
+                    if (celularAtivado === false || celularAtivado === 'false') {
+                        campoCelular.style.display = 'none';
+                    } else {
+                        campoCelular.style.display = '';
+                    }
+                }
+                const campoEmpresaVisitante = document.getElementById('campo-empresa-visitante-container');
+                if (campoEmpresaVisitante) {
+                    const empresaVisitanteAtivada = modules.module_cadastro_empresa;
+                    if (empresaVisitanteAtivada === false || empresaVisitanteAtivada === 'false') {
+                        campoEmpresaVisitante.style.display = 'none';
+                    } else {
+                        campoEmpresaVisitante.style.display = 'block';
+                    }
+                }
+                const campoPessoaVisitada = document.getElementById('campo-pessoa-visitada-container');
+                if (campoPessoaVisitada) {
+                    const pessoaVisitadaAtivada = modules.module_cadastro_pessoa_visitada;
+                    if (pessoaVisitadaAtivada === false || pessoaVisitadaAtivada === 'false') {
+                        campoPessoaVisitada.style.display = 'none';
+                    } else {
+                        campoPessoaVisitada.style.display = 'block';
+                    }
+                }
+                const campoCartao = document.getElementById('campo-cartao-container');
+                if (campoCartao) {
+                    const cartaoAtivado = modules.module_cadastro_cartao;
+                    if (cartaoAtivado === false || cartaoAtivado === 'false') {
+                        campoCartao.style.display = 'none';
+                    } else {
+                        campoCartao.style.display = '';
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao carregar configurações dos campos:', error);
+            }
+        }
+
+        // ============================================
+        // Captura Remota de Foto (Face Remote) — Visitantes
+        // ============================================
+
+        let faceRemoteTaskId = null;
+        let faceRemotePollingInterval = null;
+        let faceRemotePhotoAnterior = null;
+        let isPreRegisteredFaceRemote = false; // Flag para pré-cadastro
+        const FACE_REMOTE_POLL_INTERVAL = 2000;
+
+        function getAuthHeaders() {
+            const token = localStorage.getItem('mamcontrol_accessToken') || '';
+            const tenantId = localStorage.getItem('mamcontrol_tenant') || '';
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'X-Tenant-ID': tenantId
+            };
+        }
+
+        function getTenantId() {
+            return localStorage.getItem('mamcontrol_tenant') || '';
+        }
+
+        async function iniciarCapturaFaceRemotaVisitante() {
+            // Validar campos obrigatórios antes do pré-cadastro
+            const nomeValor = document.getElementById('nome').value;
+            const documentoValor = document.getElementById('documento').value;
+
+            if (!nomeValor || nomeValor.trim() === '') {
+                NotificationSystem.showToast('warning', 'Atenção', 'Por favor, preencha o nome para prosseguir com o pré-cadastro.');
+                return;
+            }
+            if (!documentoValor || documentoValor.trim() === '') {
+                NotificationSystem.showToast('warning', 'Atenção', 'Por favor, preencha o documento para prosseguir com o pré-cadastro.');
+                return;
+            }
+
+            // Se for novo visitante (sem ID), realizar pré-cadastro
+            if (!window.visitanteId) {
+                try {
+                    const payload = {
+                        name: nomeValor,
+                        document: documentoValor,
+                        cellphone: document.getElementById('celular').value,
+                        visitor_company: document.getElementById('empresaVisitante').value,
+                        visited_person_id: document.getElementById('pessoaVisitada-value').value || null,
+                        visited_company_id: document.getElementById('empresaVisitada-value').value || null,
+                        status: 'pre-registered', // Status padrão para pré-cadastro reconhecido pelo backend
+                        entry_date: new Date().toISOString()
+                    };
+
+                    const result = await api.createVisitor(payload);
+                    if (result && result.id) {
+                        window.visitanteId = result.id;
+                        isPreRegisteredFaceRemote = true;
+                        NotificationSystem.showToast('info', 'Pré-cadastro', 'Visitante pré-cadastrado para captura.');
+                    } else {
+                        throw new Error('Falha ao obter ID do visitante');
+                    }
+                } catch (err) {
+                    console.error('[FaceRemote] Erro no pré-cadastro:', err);
+                    NotificationSystem.showToast('error', 'Erro', 'Não foi possível realizar o pré-cadastro do visitante.');
+                    return;
+                }
+            }
+
+            // visitanteId é global na página
+            const preview = document.getElementById('visitante-photo-preview');
+            const imgAtual = preview.querySelector('img');
+            faceRemotePhotoAnterior = imgAtual ? imgAtual.src : null;
+
+            // Abrir modal de seleção de equipamentos
+            abrirModalEquipamentosFace();
+        }
+
+        async function abrirModalEquipamentosFace() {
+            const modal = document.getElementById('face-remote-modal-equipamentos');
+            const list = document.getElementById('face-remote-equip-list');
+            const loading = document.getElementById('face-remote-equip-loading');
+
+            modal.classList.add('active');
+            list.style.display = 'none';
+            loading.style.display = 'block';
+
+            try {
+                const token = localStorage.getItem('mamcontrol_accessToken');
+                const tenantId = getTenantId();
+
+                const response = await fetch('/api/equipments', {
+                    headers: {
+                        'X-Tenant-ID': tenantId,
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                let equipamentos = [];
+                if (Array.isArray(data)) equipamentos = data;
+                else if (data.success && Array.isArray(data.data)) equipamentos = data.data;
+
+                loading.style.display = 'none';
+                list.innerHTML = '';
+
+                if (equipamentos.length === 0) {
+                    list.innerHTML = '<li class="text-center" style="padding: 20px;">Nenhum equipamento encontrado</li>';
+                } else {
+                    equipamentos.forEach(eq => {
+                        const eqId = eq.validador || eq.equip_validator || eq.id;
+                        const li = document.createElement('li');
+                        li.className = 'equip-selection-item';
+                        li.innerHTML = `
+                            <i class="fas fa-tv"></i>
+                            <div class="equip-selection-info">
+                                <span class="equip-selection-name">${eq.name || eqId}</span>
+                                <span class="equip-selection-validador">ID: ${eqId}</span>
+                            </div>
+                        `;
+                        li.onclick = () => confirmarEquipamentoParaFace(eqId);
+                        list.appendChild(li);
+                    });
+                }
+                list.style.display = 'block';
+
+            } catch (err) {
+                console.error('[FaceRemote] Erro ao buscar equipamentos:', err);
+                loading.innerHTML = '<p style="color:red">Erro ao carregar equipamentos</p>';
+            }
+        }
+
+        function fecharModalEquipamentosFace() {
+            document.getElementById('face-remote-modal-equipamentos').classList.remove('active');
+        }
+
+        async function confirmarEquipamentoParaFace(equipValidator) {
+            fecharModalEquipamentosFace();
+
+            try {
+                const tenantId = getTenantId();
+                const body = {
+                    equip_validator: equipValidator,
+                    person_type: 'visitor'
+                };
+
+                // Se o visitante já possui ID (edição)
+                if (window.visitanteId) {
+                    body.visitor_id = parseInt(window.visitanteId);
+                }
+
+                const res = await fetch(`/api/face-remote/task/${tenantId}`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(body)
+                });
+
+                const data = await res.json();
+                if (!data.success) {
+                    NotificationSystem.showToast('error', 'Erro', data.message || 'Erro ao criar tarefa');
+                    return;
+                }
+
+                faceRemoteTaskId = data.data.task_id;
+                abrirModalFaceRemota('visitante');
+                iniciarPollingFaceRemota('visitante', tenantId);
+
+            } catch (err) {
+                console.error('[FaceRemote] Erro:', err);
+                NotificationSystem.showToast('error', 'Erro', err.message);
+            }
+        }
+
+        function abrirModalFaceRemota(contexto) {
+            const modal = document.getElementById(`face-remote-modal-${contexto}`);
+            if (modal) modal.classList.add('active');
+            atualizarStatusFaceRemota('Aguardando equipamento', 'warning', contexto);
+        }
+
+        function fecharModalFaceRemota(contexto) {
+            const modal = document.getElementById(`face-remote-modal-${contexto}`);
+            if (modal) modal.classList.remove('active');
+        }
+
+        function atualizarStatusFaceRemota(mensagem, tipo, contexto) {
+            const statusEl = document.getElementById(`face-remote-status-${contexto}`);
+            if (!statusEl) return;
+
+            const cores = {
+                warning: { bg: '#fef3c7', color: '#92400e' },
+                success: { bg: '#d1fae5', color: '#065f46' },
+                error: { bg: '#fee2e2', color: '#991b1b' },
+                info: { bg: '#dbeafe', color: '#1e40af' }
+            };
+
+            const cor = cores[tipo] || cores.info;
+            statusEl.innerHTML = `
+                <span style="background: ${cor.bg}; color: ${cor.color}; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">
+                    ${mensagem}
+                </span>
+            `;
+        }
+
+        function iniciarPollingFaceRemota(contexto, tenantId) {
+            if (faceRemotePollingInterval) clearInterval(faceRemotePollingInterval);
+
+            faceRemotePollingInterval = setInterval(async () => {
+                if (!faceRemoteTaskId) {
+                    clearInterval(faceRemotePollingInterval);
+                    return;
+                }
+
+                try {
+                    const res = await fetch(`/api/face-remote/status/${tenantId}/${faceRemoteTaskId}`, { headers: getAuthHeaders() });
+                    const data = await res.json();
+
+                    if (!data.success) return;
+
+                    const status = data.data.status;
+
+                    if (status === 'done' && data.data.has_photo) {
+                        clearInterval(faceRemotePollingInterval);
+                        faceRemotePollingInterval = null;
+                        atualizarStatusFaceRemota('Foto capturada com sucesso!', 'success', contexto);
+
+                        // Sincronizar o ID do visitante caso o backend tenha criado/associado um
+                        if (data.data.visitor_id && !window.visitanteId) {
+                            window.visitanteId = data.data.visitor_id;
+                            console.log('[FaceRemote] Sincronizado visitor_id:', window.visitanteId);
+                        }
+
+                        // Atualizar preview - CORREÇÃO: Tratar se já existe '?' na URL para concatenação de timestamp
+                        let photoUrl = data.data.photo_url;
+                        const separator = photoUrl.includes('?') ? '&' : '?';
+                        const urlComTimestamp = photoUrl + separator + 't=' + Date.now();
+
+                        const preview = document.getElementById('visitante-photo-preview');
+                        if (preview) {
+                            preview.innerHTML = `<img src="${urlComTimestamp}" alt="Foto" style="width:100%; height:100%; object-fit:cover;">`;
+                            preview.classList.add('has-image');
+                        }
+
+                        // O ID do visitante já deve estar em window.visitanteId devido ao pré-cadastro no início do fluxo
+                        isPreRegisteredFaceRemote = false;
+
+                        setTimeout(() => fecharModalFaceRemota(contexto), 1500);
+
+                    } else if (status === 'error') {
+                        clearInterval(faceRemotePollingInterval);
+                        faceRemotePollingInterval = null;
+                        const mensagemErro = data.data.error || 'Equipamento não respondeu';
+                        atualizarStatusFaceRemota('Erro: ' + mensagemErro, 'error', contexto);
+                        setTimeout(() => fecharModalFaceRemota(contexto), 2000);
+                        faceRemoteTaskId = null;
+                    }
+                } catch (err) {
+                    console.error('[FaceRemote] Erro no polling:', err);
+                }
+            }, FACE_REMOTE_POLL_INTERVAL);
+        }
+
+        async function cancelarCapturaFaceRemota(contexto) {
+            if (faceRemotePollingInterval) {
+                clearInterval(faceRemotePollingInterval);
+                faceRemotePollingInterval = null;
+            }
+
+            if (faceRemoteTaskId) {
+                try {
+                    const tenantId = getTenantId();
+                    await fetch(`/api/face-remote/task/${tenantId}/${faceRemoteTaskId}`, { method: 'DELETE', headers: getAuthHeaders() });
+                } catch (err) {
+                    console.error('[FaceRemote] Erro ao cancelar tarefa:', err);
+                }
+            }
+
+            // Se foi um pré-cadastro, apagar o visitante
+            if (isPreRegisteredFaceRemote && window.visitanteId) {
+                try {
+                    await api.deleteVisitor(window.visitanteId);
+                    NotificationSystem.showToast('info', 'Cancelado', 'Pré-cadastro removido.');
+                    window.visitanteId = null;
+                    isPreRegisteredFaceRemote = false;
+
+                    // Limpar formulário se desejar, ou manter os dados preenchidos
+                    // mas marcar como novo visitante novamente
+                    document.getElementById('resultado-busca').style.display = 'none';
+                    document.getElementById('novo-visitante').style.display = 'flex';
+                } catch (err) {
+                    console.error('[FaceRemote] Erro ao remover pré-cadastro:', err);
+                }
+            }
+
+            // Reverter preview
+            const preview = document.getElementById('visitante-photo-preview');
+            if (preview) {
+                if (faceRemotePhotoAnterior) {
+                    preview.innerHTML = `<img src="${faceRemotePhotoAnterior}" alt="Foto" style="width:100%; height:100%; object-fit:cover;">`;
+                    preview.classList.add('has-image');
+                } else {
+                    preview.innerHTML = `<div class="photo-circle-placeholder"><i class="fas fa-camera"></i><span>Adicionar foto</span></div>`;
+                    preview.classList.remove('has-image');
+                }
+            }
+
+            faceRemoteTaskId = null;
+            fecharModalFaceRemota(contexto);
+            fecharModalEquipamentosFace();
+        }
+    </script>
+    <!-- Modais Face Remote -->
+    <div id="face-remote-modal-equipamentos" class="modal-overlay">
+        <div class="modal-container" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-tv"></i> Selecionar Equipamento</h3>
+                <span class="close" onclick="fecharModalEquipamentosFace()">&times;</span>
+            </div>
+            <div class="modal-body" style="padding: 15px;">
+                <p style="margin-bottom: 15px; font-size: 0.9rem; color: #64748b;">
+                    Escolha hardware para iniciar a captura remota:
+                </p>
+                <div id="face-remote-equip-loading" class="text-center" style="padding: 20px;">
+                    <i class="fas fa-sync-alt fa-spin" style="font-size: 2rem; color: #4a90d9;"></i>
+                    <p style="margin-top: 10px;">Buscando equipamentos...</p>
+                </div>
+                <ul id="face-remote-equip-list" class="equip-selection-list">
+                    <!-- Preenchido via JS -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="fecharModalEquipamentosFace()">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox: visualizar foto do visitante -->
+    <div id="photo-lightbox" onclick="closePhotoLightbox()">
+        <button class="lightbox-close" onclick="closePhotoLightbox()" title="Fechar"><i class="fas fa-times"></i></button>
+        <img id="lightbox-img" src="" alt="Foto do visitante" onclick="event.stopPropagation()">
+    </div>
+
+    <div id="face-remote-modal-visitante" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-camera"></i> Captura Remota</h3>
+                <span class="close" onclick="cancelarCapturaFaceRemota('visitante')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="face-remote-spinner-visitante">
+                    <i class="fas fa-sync-alt fa-spin"
+                        style="font-size: 3rem; color: #4a90d9; margin-bottom: 20px;"></i>
+                </div>
+                <p style="font-weight: 700;">Aguardando captura no equipamento...</p>
+                <div id="face-remote-status-visitante" style="margin-top: 15px;">
+                    <span
+                        style="background: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">
+                        Aguardando equipamento
+                    </span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="cancelarCapturaFaceRemota('visitante')">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

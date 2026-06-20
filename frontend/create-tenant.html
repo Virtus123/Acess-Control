@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="./favicon.png">
+    <title>Admin - Gerenciar Tenants | MAM Control</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="header-bar">
+        <div class="logo">MAM Control</div>
+        <div class="user-info">
+            <span>Ola, <strong id="userName">Admin</strong></span>
+            <span id="userEmail">admin@mamcontrol.com</span>
+            <button class="logout-btn" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Abas -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('listar')">
+                <i class="fas fa-list"></i> Listar Tenants
+            </button>
+            <button class="tab-btn" onclick="switchTab('criar')">
+                <i class="fas fa-plus"></i> Criar Novo Tenant
+            </button>
+        </div>
+
+        <!-- TAB 1: Listar Tenants -->
+        <div id="tab-listar" class="tab-content active">
+            <h2 class="mb-20">Gerenciar Tenants</h2>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <h3 id="totalTenants">0</h3>
+                    <p>Total de Tenants</p>
+                </div>
+                <div class="stat-box">
+                    <h3 id="activeTenants">0</h3>
+                    <p>Tenants Ativos</p>
+                </div>
+            </div>
+
+            <div id="alert"></div>
+
+            <table id="tenantsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Empresa</th>
+                        <th>Email Admin</th>
+                        <th>Pessoas</th>
+                        <th>Equipamentos</th>
+                        <th>Status</th>
+                        <th>Acoes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px;">
+                            <div class="empty-state">
+                                <p><i class="fas fa-spinner fa-spin"></i> Carregando...</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TAB 2: Criar Novo Tenant -->
+        <div id="tab-criar" class="tab-content">
+            <h2 class="mb-20">Criar Novo Tenant</h2>
+
+            <div id="alert"></div>
+
+            <form id="tenantForm">
+                <!-- ID do Tenant -->
+                <div class="form-group">
+                    <label for="tenantId">ID do Tenant *</label>
+                    <input 
+                        type="text" 
+                        id="tenantId" 
+                        name="tenant_id"
+                        placeholder="acme-corp"
+                        required
+                    >
+                    <div class="tenant-id-hint">Use apenas letras, numeros, hifen e underscore</div>
+                </div>
+
+                <!-- Dados da Empresa -->
+                <div class="tenant-form-section">
+                    <div class="form-group">
+                        <label style="color: #667eea; font-weight: 600;">Dados da Empresa</label>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="companyName">Razao Social *</label>
+                            <input 
+                                type="text" 
+                                id="companyName" 
+                                name="company_name"
+                                placeholder="ACME Corporation LTDA"
+                                required
+                            >
+                        </div>
+                        <div class="form-group">
+                            <label for="cnpj">CNPJ *</label>
+                            <input 
+                                type="text" 
+                                id="cnpj" 
+                                name="cnpj"
+                                placeholder="00000000000000"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">Cidade</label>
+                            <input 
+                                type="text" 
+                                id="city" 
+                                name="city"
+                                placeholder="Sao Paulo"
+                            >
+                        </div>
+                        <div class="form-group">
+                            <label for="state">Estado *</label>
+                            <input 
+                                type="text" 
+                                id="state" 
+                                name="state"
+                                placeholder="SP"
+                                maxlength="2"
+                                required
+                            >
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Telefone</label>
+                            <input 
+                                type="tel" 
+                                id="phone" 
+                                name="phone"
+                                placeholder="1133334444"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dados do Admin -->
+                <div class="tenant-form-section">
+                    <div class="form-group">
+                        <label style="color: #667eea; font-weight: 600;">Usuario Administrador</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="adminName">Nome do Admin *</label>
+                        <input 
+                            type="text" 
+                            id="adminName" 
+                            name="admin_name"
+                            placeholder="Joao Silva"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="adminEmail">Email do Admin *</label>
+                        <input 
+                            type="email" 
+                            id="adminEmail" 
+                            name="admin_email"
+                            placeholder="admin@acme.com"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="adminPassword">Senha (minimo 6 caracteres) *</label>
+                        <input 
+                            type="password" 
+                            id="adminPassword" 
+                            name="admin_password"
+                            placeholder="••••••••"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- Limites de Cadastro -->
+                <div class="tenant-form-section">
+                    <div class="form-group">
+                        <label style="color: #667eea; font-weight: 600;">Limites de Cadastro</label>
+                    </div>
+
+                    <div class="form-row three">
+                        <div class="form-group">
+                            <label for="maxPessoas">Max. de Pessoas *</label>
+                            <input 
+                                type="number" 
+                                id="maxPessoas" 
+                                name="max_pessoas"
+                                min="1"
+                                value="1000"
+                                required
+                            >
+                            <div class="tenant-id-hint">Limite total de pessoas</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="maxEquipamentos">Max. de Equipamentos *</label>
+                            <input 
+                                type="number" 
+                                id="maxEquipamentos" 
+                                name="max_equipamentos"
+                                min="1"
+                                value="50"
+                                required
+                            >
+                            <div class="tenant-id-hint">Limite total de equipamentos</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="maxVisitantes">Visitantes</label>
+                            <input 
+                                type="number" 
+                                id="maxVisitantes" 
+                                name="max_visitantes"
+                                value="99999"
+                                disabled
+                            >
+                            <div class="tenant-id-hint">Ilimitado</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box" class="mt-15">
+                        <strong>Importante</strong><br>
+                        Visitantes nao possuem limite. Pessoas e equipamentos sao contabilizados conforme cadastrados.
+                    </div>
+                </div>
+
+                <button type="submit" class="button full">Criar Tenant</button>
+            </form>
+
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 15px; color: #666;">Criando tenant...</p>
+            </div>
+
+            <div id="successMessage" class="success-message">
+                <h2>Tenant Criado com Sucesso!</h2>
+                <p style="color: #666; margin-bottom: 15px;">O novo tenant foi criado e esta pronto para uso.</p>
+                
+                <div class="credentials">
+                    <div class="credentials-item">
+                        <span><strong>Tenant ID:</strong></span>
+                        <span id="successTenantId"></span>
+                    </div>
+                    <div class="credentials-item">
+                        <span><strong>Email Admin:</strong></span>
+                        <span id="successAdminEmail"></span>
+                    </div>
+                    <div class="credentials-item">
+                        <span><strong>Senha:</strong></span>
+                        <span class="font-size-11">••••••••</span>
+                    </div>
+                </div>
+
+                <p style="font-size: 12px; color: #999; margin-bottom: 20px;">
+                    Guarde essas informacoes para acessar o tenant pela primeira vez.
+                </p>
+
+                <button type="button" class="button full" onclick="resetForm()">
+                    Criar Outro Tenant
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmacao -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Confirmar Acao</h2>
+                <p id="modalMessage">Tem certeza?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel" onclick="closeModal()">Cancelar</button>
+                <button class="confirm" id="confirmBtn" onclick="executeModalAction()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit"></i> Editar Tenant</h2>
+                <p id="editModalTenantId" style="color: #667eea; font-weight: 600;"></p>
+            </div>
+            <div style="padding: 20px; max-height: 60vh; overflow-y: auto;">
+                <form id="editTenantForm">
+                    <!-- Dados da Empresa -->
+                    <div class="form-group">
+                        <label for="editCompanyName">Razao Social</label>
+                        <input 
+                            type="text" 
+                            id="editCompanyName" 
+                            placeholder="ACME Corporation LTDA"
+                        >
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editCnpj">CNPJ</label>
+                            <input 
+                                type="text" 
+                                id="editCnpj" 
+                                placeholder="00000000000000"
+                            >
+                        </div>
+                        <div class="form-group">
+                            <label for="editPhone">Telefone</label>
+                            <input 
+                                type="tel" 
+                                id="editPhone" 
+                                placeholder="1133334444"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editCity">Cidade</label>
+                            <input 
+                                type="text" 
+                                id="editCity" 
+                                placeholder="Sao Paulo"
+                            >
+                        </div>
+                        <div class="form-group">
+                            <label for="editState">Estado</label>
+                            <input 
+                                type="text" 
+                                id="editState" 
+                                placeholder="SP"
+                                maxlength="2"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Limites -->
+                    <div class="tenant-form-section">
+                        <div class="form-group">
+                            <label style="color: #667eea; font-weight: 600;">Limites de Cadastro</label>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editMaxPessoas">Max. de Pessoas</label>
+                                <input 
+                                    type="number" 
+                                    id="editMaxPessoas" 
+                                    min="1"
+                                >
+                            </div>
+                            <div class="form-group">
+                                <label for="editMaxEquipamentos">Max. de Equipamentos</label>
+                                <input 
+                                    type="number" 
+                                    id="editMaxEquipamentos" 
+                                    min="1"
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel" onclick="closeEditModal()">Cancelar</button>
+                <button class="confirm" onclick="submitEditTenant()">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== VARIAVEIS GLOBAIS =====
+        let currentModalAction = null;
+        
+        // Verificar sessão master (novo sistema)
+        const masterToken = localStorage.getItem('mamcontrol_master_token');
+        const masterUser = JSON.parse(localStorage.getItem('mamcontrol_master_user') || 'null');
+        
+        // Fallback para sistema antigo
+        const savedTenant = localStorage.getItem('mamcontrol_tenant');
+        const savedUser = JSON.parse(localStorage.getItem('mamcontrol_user') || 'null');
+        const savedToken = localStorage.getItem('mamcontrol_accessToken');
+
+        // ===== URL BASE DA API =====
+        // Usa caminho relativo - Nginx faz reverse proxy automaticamente
+        const API_BASE_URL = '';
+
+        // ===== AUTH CHECK =====
+        // Verificar se é sessão master válida OU fallback para sistema antigo
+        const isMasterSession = masterToken && masterUser && masterUser.role === 'admin';
+        const isOldSession = savedTenant === 'mamcontrol' && savedUser && savedUser.role === 'admin' && savedToken;
+        
+        if (!isMasterSession && !isOldSession) {
+            window.location.href = './index.html';
+        }
+        
+        // Usar token master se disponível, senão usar token antigo
+        const currentToken = masterToken || savedToken;
+        
+        // Função helper para fazer requests autenticados
+        async function apiRequest(endpoint, options = {}) {
+            // Adicionar /api prefix se não existir
+            const url = endpoint.startsWith('/api') ? endpoint : `/api${endpoint}`;
+            const response = await fetch(url, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${currentToken}`,
+                    ...options.headers
+                }
+            });
+            return response.json();
+        }
+
+        // ===== INICIALIZACAO =====
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('userName').textContent = savedUser.name || 'Admin';
+            document.getElementById('userEmail').textContent = savedUser.email || 'admin@mamcontrol.com';
+            
+            setupFormListeners();
+            loadTenants();
+        });
+
+        // ===== NAVEGACAO =====
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById('tab-' + tabName).classList.add('active');
+
+            // Add active to clicked button
+            event.target.classList.add('active');
+
+            // NÃO carregar de novo ao trocar de abas - já foi carregado no init
+        }
+
+        // ===== LOGOUT =====
+        function handleLogout() {
+            localStorage.removeItem('mamcontrol_tenant');
+            localStorage.removeItem('mamcontrol_user');
+            localStorage.removeItem('mamcontrol_accessToken');
+            window.location.href = './index.html';
+        }
+
+        // ===== FORM SETUP =====
+        function setupFormListeners() {
+            const form = document.getElementById('tenantForm');
+
+            // CNPJ auto-format
+            document.getElementById('cnpj').addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/\D/g, '').slice(0, 14);
+            });
+
+            // Phone auto-format
+            document.getElementById('phone').addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/\D/g, '').slice(0, 11);
+            });
+
+            // State auto-format
+            document.getElementById('state').addEventListener('input', (e) => {
+                e.target.value = e.target.value.toUpperCase().slice(0, 2);
+            });
+
+            // Form submit
+            form.addEventListener('submit', handleFormSubmit);
+        }
+
+        // ===== FORM SUBMIT =====
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const tenantId = document.getElementById('tenantId').value.trim();
+            const companyName = document.getElementById('companyName').value.trim();
+            const cnpj = document.getElementById('cnpj').value.trim();
+            const adminName = document.getElementById('adminName').value.trim();
+            const adminEmail = document.getElementById('adminEmail').value.trim();
+            const adminPassword = document.getElementById('adminPassword').value;
+            const phone = document.getElementById('phone').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const state = document.getElementById('state').value.trim();
+            const maxPessoas = parseInt(document.getElementById('maxPessoas').value);
+            const maxEquipamentos = parseInt(document.getElementById('maxEquipamentos').value);
+
+            // Validacao
+            if (!tenantId || !companyName || !cnpj || !adminName || !adminEmail || !adminPassword) {
+                showAlert('Preencha todos os campos obrigatorios', 'error');
+                return;
+            }
+
+            if (adminPassword.length < 6) {
+                showAlert('Senha deve ter minimo 6 caracteres', 'error');
+                return;
+            }
+
+            if (tenantId.length < 2) {
+                showAlert('ID do tenant deve ter minimo 2 caracteres', 'error');
+                return;
+            }
+
+            if (tenantId.length > 50) {
+                showAlert('ID do tenant deve ter maximo 50 caracteres', 'error');
+                return;
+            }
+
+            if (!/^[a-zA-Z0-9_-]+$/.test(tenantId)) {
+                showAlert('ID do tenant deve conter apenas letras, numeros, hifen e underscore', 'error');
+                return;
+            }
+
+            if (maxPessoas < 1 || maxEquipamentos < 1) {
+                showAlert('Limites deve ser maiores que 0', 'error');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('tenantForm').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            getAlertBox().style.display = 'none';
+
+            try {
+                const result = await apiRequest('/admin/tenants', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        tenant_id: tenantId,
+                        company_name: companyName,
+                        cnpj,
+                        admin_name: adminName,
+                        admin_email: adminEmail,
+                        admin_password: adminPassword,
+                        phone,
+                        city,
+                        state,
+                        max_pessoas: maxPessoas,
+                        max_equipamentos: maxEquipamentos
+                    })
+                });
+
+                if (!result.success) {
+                    throw new Error(result.message || 'Erro ao criar tenant');
+                }
+
+                // Success
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+                document.getElementById('successTenantId').textContent = tenantId;
+                document.getElementById('successAdminEmail').textContent = adminEmail;
+
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('tenantForm').style.display = 'block';
+                showAlert(error.message, 'error');
+                console.error('Erro:', error);
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('tenantForm').reset();
+            document.getElementById('tenantForm').style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('loading').style.display = 'none';
+            getAlertBox().style.display = 'none';
+        }
+
+        // ===== LOAD TENANTS =====
+        async function loadTenants() {
+            try {
+                const result = await apiRequest('/admin/tenants');
+
+                if (!result.success) {
+                    throw new Error(result.message || 'Erro ao carregar tenants');
+                }
+
+                renderTenantsList(result.data || []);
+
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // ===== RENDER TENANTS TABLE =====
+        function renderTenantsList(tenants) {
+            const tbody = document.querySelector('#tenantsTable tbody');
+            
+            if (!tenants || tenants.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px;">
+                            <div class="empty-state">
+                                <p><i class="fas fa-inbox"></i></p>
+                                <p>Nenhum tenant cadastrado</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Update stats
+            document.getElementById('totalTenants').textContent = tenants.length;
+            document.getElementById('activeTenants').textContent = tenants.filter(t => t.status === 'active').length;
+
+            // Render rows
+            tbody.innerHTML = tenants.map(tenant => {
+                const statusBadge = tenant.status === 'active' ? 'Ativo' : 'Inativo';
+                const statusColor = tenant.status === 'active' ? '#28a745' : '#6c757d';
+                const pessoasInfo = tenant.status === 'error' ? 'Erro ao ler' : `${tenant.pessoas_count || 0}/${tenant.max_pessoas || 0}`;
+                const equipamentosInfo = tenant.status === 'error' ? 'Erro ao ler' : `${tenant.equipamentos_count || 0}/${tenant.max_equipamentos || 0}`;
+                
+                return `
+                    <tr>
+                        <td><strong>${tenant.tenant_id || '-'}</strong></td>
+                        <td>${tenant.company_name || '-'}</td>
+                        <td>${tenant.admin_email || '-'}</td>
+                        <td>${pessoasInfo}</td>
+                        <td>${equipamentosInfo}</td>
+                        <td>
+                            <span style="background: ${statusColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">
+                                ${statusBadge}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="action-btn edit" onclick="editTenant('${tenant.tenant_id}')" ${tenant.status === 'error' ? 'disabled' : ''}>
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="action-btn reset" onclick="resetTenantPassword('${tenant.tenant_id}')" ${tenant.status === 'error' ? 'disabled' : ''}>
+                                <i class="fas fa-key"></i> Resetar
+                            </button>
+                            <button class="action-btn ${tenant.status === 'active' ? 'warning' : 'success'}" onclick="toggleTenantStatus('${tenant.tenant_id}', '${tenant.status}')" ${tenant.status === 'error' ? 'disabled' : ''}>
+                                <i class="fas fa-${tenant.status === 'active' ? 'ban' : 'check'}"></i> ${tenant.status === 'active' ? 'Desativar' : 'Ativar'}
+                            </button>
+                            <button class="action-btn delete" onclick="deleteTenant('${tenant.tenant_id}')" ${tenant.status === 'error' ? 'disabled' : ''}>
+                                <i class="fas fa-trash"></i> Deletar
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ===== TENANT ACTIONS =====
+        let currentEditingTenant = null;
+
+        function editTenant(tenantId) {
+            // Carregar os dados do tenant atual
+            const tenants = Array.from(document.querySelectorAll('#tenantsTable tbody tr')).map(row => {
+                const cells = row.querySelectorAll('td');
+                return {
+                    tenant_id: cells[0].textContent.trim(),
+                    company_name: cells[1].textContent.trim(),
+                    admin_email: cells[2].textContent.trim()
+                };
+            });
+
+            const tenant = tenants.find(t => t.tenant_id === tenantId);
+            
+            if (!tenant) {
+                showAlert('Tenant não encontrado', 'error');
+                return;
+            }
+
+            currentEditingTenant = tenantId;
+            
+            // Preencher o formulário com os dados atuais
+            document.getElementById('editModalTenantId').textContent = `Tenant: ${tenantId}`;
+            document.getElementById('editCompanyName').value = tenant.company_name || '';
+            document.getElementById('editCnpj').value = '';
+            document.getElementById('editPhone').value = '';
+            document.getElementById('editCity').value = '';
+            document.getElementById('editState').value = '';
+            document.getElementById('editMaxPessoas').value = '';
+            document.getElementById('editMaxEquipamentos').value = '';
+
+            // Abrir modal
+            document.getElementById('editModal').classList.add('show');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('show');
+            currentEditingTenant = null;
+        }
+
+        async function submitEditTenant() {
+            if (!currentEditingTenant) {
+                showAlert('Erro: tenant não selecionado', 'error');
+                return;
+            }
+
+            const data = {};
+
+            // Coletar apenas os campos preenchidos
+            const companyName = document.getElementById('editCompanyName').value.trim();
+            const cnpj = document.getElementById('editCnpj').value.trim();
+            const phone = document.getElementById('editPhone').value.trim();
+            const city = document.getElementById('editCity').value.trim();
+            const state = document.getElementById('editState').value.trim();
+            const maxPessoas = document.getElementById('editMaxPessoas').value;
+            const maxEquipamentos = document.getElementById('editMaxEquipamentos').value;
+
+            if (companyName) data.company_name = companyName;
+            if (cnpj) data.cnpj = cnpj;
+            if (phone) data.phone = phone;
+            if (city) data.city = city;
+            if (state) data.state = state;
+            if (maxPessoas) data.max_pessoas = parseInt(maxPessoas);
+            if (maxEquipamentos) data.max_equipamentos = parseInt(maxEquipamentos);
+
+            if (Object.keys(data).length === 0) {
+                showAlert('Nenhum campo foi preenchido para editar', 'info');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/tenants/${currentEditingTenant}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${savedToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Erro ao editar tenant');
+                }
+
+                closeEditModal();
+                showAlert('Tenant atualizado com sucesso!', 'success');
+                loadTenants();
+
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert(error.message, 'error');
+            }
+        }
+
+        function resetTenantPassword(tenantId) {
+            showModal(
+                'Resetar Senha do Tenant',
+                `Deseja resetar a senha do tenant ${tenantId}? Uma nova senha sera enviada por email.`,
+                async () => {
+                    await confirmResetPassword(tenantId);
+                }
+            );
+        }
+
+        function deleteTenant(tenantId) {
+            showModal(
+                'Deletar Tenant',
+                `ATENCAO: Esta acao nao pode ser desfeita. Todos os dados do tenant ${tenantId} serao permanentemente deletados.`,
+                async () => {
+                    await confirmDeleteTenant(tenantId);
+                }
+            );
+        }
+
+        function toggleTenantStatus(tenantId, currentStatus) {
+            const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+            showModal(
+                `${newStatus === 'active' ? 'Ativar' : 'Desativar'} Tenant`,
+                `Deseja ${newStatus === 'active' ? 'ativar' : 'desativar'} o tenant ${tenantId}? ${newStatus === 'inactive' ? 'Os usuarios nao conseguirao acessar o sistema.' : ''}`,
+                async () => {
+                    await confirmToggleStatus(tenantId, newStatus === 'active');
+                }
+            );
+        }
+
+        // ===== CONFIRM ACTIONS =====
+        async function confirmResetPassword(tenantId) {
+            try {
+                const response = await fetch(`/api/admin/tenants/${tenantId}/reset-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${savedToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Erro ao resetar senha');
+                }
+
+                closeModal();
+                showAlert('Senha resetada com sucesso. Verifique o email.', 'success');
+                loadTenants();
+
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert(error.message, 'error');
+            }
+        }
+
+        async function confirmDeleteTenant(tenantId) {
+            try {
+                const response = await fetch(`/api/admin/tenants/${tenantId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${savedToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Erro ao deletar tenant');
+                }
+
+                closeModal();
+                showAlert('Tenant deletado com sucesso.', 'success');
+                loadTenants();
+
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert(error.message, 'error');
+            }
+        }
+
+        async function confirmToggleStatus(tenantId, active) {
+            try {
+                const response = await fetch(`/api/admin/tenants/${tenantId}/toggle-status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${savedToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ active })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || `Erro ao ${active ? 'ativar' : 'desativar'} tenant`);
+                }
+
+                closeModal();
+                showAlert(data.message, 'success');
+                loadTenants();
+
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // ===== MODAL =====
+        function showModal(title, message, onConfirm) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            currentModalAction = onConfirm;
+            document.getElementById('confirmModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('show');
+            currentModalAction = null;
+        }
+
+        function executeModalAction() {
+            if (currentModalAction) {
+                currentModalAction();
+            }
+        }
+
+        // ===== UTILS =====
+        function getAlertBox() {
+            // Get the alert box from the active tab
+            const activeTab = document.querySelector('.tab-content.active');
+            return activeTab.querySelector('#alert') || document.getElementById('alert');
+        }
+
+        function showAlert(message, type) {
+            const alertBox = getAlertBox();
+            alertBox.textContent = message;
+            alertBox.className = `alert ${type}`;
+            alertBox.style.display = 'block';
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    alertBox.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('confirmModal').addEventListener('click', (e) => {
+            if (e.target.id === 'confirmModal') {
+                closeModal();
+            }
+        });
+
+        document.getElementById('editModal').addEventListener('click', (e) => {
+            if (e.target.id === 'editModal') {
+                closeEditModal();
+            }
+        });
+    </script>
+</body>
+</html>

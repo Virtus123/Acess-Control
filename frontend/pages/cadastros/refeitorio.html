@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refeitório - MAM Control</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <script src="../../auth.js"></script>
+    
+    <!-- Styles específicos da página - mesmo estilo das outras -->
+    <style>
+        /* Reset e estilos base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+        /* Cards */
+        .content-box {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Grid de formulário - 3 colunas */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .grid-col-full {
+            grid-column: 1 / -1;
+        }
+
+        /* Form groups */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #ffffff;
+            font-family: inherit;
+        }
+
+        .form-group input:hover,
+        .form-group select:hover,
+        .form-group textarea:hover {
+            border-color: #94a3b8;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .form-group input[type="time"] {
+            font-family: monospace;
+        }
+
+        .required:after {
+            content: " *";
+            color: #e53e3e;
+        }
+
+        /* Botões */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.2);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Section header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-header-compact {
+            margin-bottom: 20px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title h2 {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Tabela */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            color: #1e293b;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* Ações do formulário */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .data-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        /* Texto centralizado */
+        .text-center {
+            text-align: center;
+        }
+
+        /* Mensagem vazia */
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+
+        .empty-message i {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="refeitorio" class="content-section active">
+                    <!-- REFEITORIO LIST VIEW -->
+                    <div id="refeitorios-list">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <h1>Refeitório</h1>
+                                <p>Gerenciar locais de refeitório</p>
+                            </div>
+                            <div class="section-actions">
+                                <button class="btn btn-primary" onclick="showRefeitorioForm()">
+                                    <i class="fas fa-plus"></i> Novo Refeitório
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="content-box">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Local</th>
+                                        <th>Capacidade</th>
+                                        <th>Tipo</th>
+                                        <th>Horário</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-refeitorios">
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="empty-message">
+                                                <i class="fas fa-utensils"></i>
+                                                <p>Nenhum refeitório cadastrado</p>
+                                                <button class="btn btn-primary btn-sm" onclick="showRefeitorioForm()" style="margin-top: 12px;">
+                                                    <i class="fas fa-plus"></i> Cadastrar primeiro refeitório
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- REFEITORIO FORM VIEW -->
+                    <div id="refeitorios-form" class="hidden">
+                        <div class="section-header section-header-compact">
+                            <div class="section-title">
+                                <h2 id="refeitorio-form-title">Novo Refeitório</h2>
+                                <p>Preencha os dados do refeitório</p>
+                            </div>
+                            <div class="section-actions">
+                                <button class="btn btn-secondary" onclick="showRefeitorioList()">
+                                    <i class="fas fa-times"></i> Fechar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="content-box">
+                            <form id="refeitorioForm" onsubmit="saveRefeitorio(event)">
+                                <input type="hidden" id="refeitorio-id">
+
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="nome" class="required">Nome do Refeitório</label>
+                                        <input type="text" id="nome" required placeholder="Ex: Refeitório Principal, Cantina">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="local">Local/Bloco</label>
+                                        <input type="text" id="local" placeholder="Ex: Bloco A, Térreo">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="capacidade">Capacidade</label>
+                                        <input type="number" id="capacidade" placeholder="Ex: 100" min="1">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="tipo" class="required">Tipo</label>
+                                        <select id="tipo" required>
+                                            <option value="">Selecione...</option>
+                                            <option value="interno">Pós-Pago</option>
+                                            <option value="externo">Pré-Pago</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="horario-abertura">Horário de Abertura</label>
+                                        <input type="time" id="horario-abertura" value="07:00">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="horario-fechamento">Horário de Fechamento</label>
+                                        <input type="time" id="horario-fechamento" value="19:00">
+                                    </div>
+
+                                    <div class="form-group grid-col-full">
+                                        <label for="observacoes">Observações</label>
+                                        <textarea id="observacoes" rows="3" placeholder="Informações adicionais (opcional)"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-secondary" onclick="showRefeitorioList()">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Salvar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+
+    <script>
+        let refeitorios = [];
+        let editandoId = null;
+
+        function showRefeitorioForm(limpar = true) {
+            try {
+                const listView = document.getElementById('refeitorios-list');
+                const formView = document.getElementById('refeitorios-form');
+                if (listView) listView.classList.add('hidden');
+                if (formView) formView.classList.remove('hidden');
+                
+                // Só limpa o formulário se for para criar novo
+                if (limpar) {
+                    const formEl = document.getElementById('refeitorioForm');
+                    if (formEl) {
+                        formEl.reset();
+                        document.getElementById('refeitorio-id').value = '';
+                    }
+                    editandoId = null;
+                }
+            } catch (e) {
+                console.error('Erro em showRefeitorioForm:', e);
+            }
+        }
+
+        function showRefeitorioList() {
+            try {
+                // Limpar formulário ao voltar para lista
+                const formEl = document.getElementById('refeitorioForm');
+                if (formEl) {
+                    formEl.reset();
+                    document.getElementById('refeitorio-id').value = '';
+                }
+                const listView = document.getElementById('refeitorios-list');
+                const formView = document.getElementById('refeitorios-form');
+                if (listView) listView.classList.remove('hidden');
+                if (formView) formView.classList.add('hidden');
+                editandoId = null;
+            } catch (e) {
+                console.error('Erro em showRefeitorioList:', e);
+            }
+        }
+
+        async function saveRefeitorio(e) {
+            e.preventDefault();
+
+            const nome = document.getElementById('nome').value;
+            
+            const refeitorio = {
+                nome: nome,
+                local: document.getElementById('local').value,
+                capacidade: document.getElementById('capacidade').value,
+                tipo: document.getElementById('tipo').value,
+                horarioAbertura: document.getElementById('horario-abertura').value,
+                horarioFechamento: document.getElementById('horario-fechamento').value,
+                observacoes: document.getElementById('observacoes').value
+            };
+
+            try {
+                let response;
+                if (editandoId) {
+                    response = await api.request(`/refeitorios/${editandoId}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(refeitorio)
+                    });
+                    if (response.success) {
+                        alert('Refeitório atualizado com sucesso!');
+                    }
+                } else {
+                    response = await api.request('/refeitorios', {
+                        method: 'POST',
+                        body: JSON.stringify(refeitorio)
+                    });
+                    if (response.success) {
+                        alert('Refeitório cadastrado com sucesso!');
+                    }
+                }
+
+                if (response.success) {
+                    showRefeitorioList();
+                    await loadRefeitorios();
+                } else if (response.message) {
+                    alert(response.message);
+                }
+            } catch (error) {
+                console.error('Erro ao salvar:', error);
+                alert('Erro ao salvar refeitório');
+            }
+        }
+
+        async function editarRefeitorio(id) {
+            console.log('DEBUG editarRefeitorio: id =', id, 'tipo =', typeof id);
+            console.log('DEBUG refeitorios array:', refeitorios);
+            
+            // Converter ID para número para garantir comparação correta
+            const idNum = parseInt(id);
+            console.log('DEBUG idNum =', idNum);
+            
+            const refeitorio = refeitorios.find(r => r.id === idNum);
+            console.log('DEBUG refeitorio encontrado:', refeitorio);
+            
+            if (!refeitorio) {
+                console.error('ERRO: Refeitório não encontrado:', id);
+                return;
+            }
+
+            editandoId = id;
+            
+            // Debug: verificar se os elementos existem
+            console.log('DEBUG: elemento nome =', document.getElementById('nome'));
+            console.log('DEBUG: elemento local =', document.getElementById('local'));
+            console.log('DEBUG: elemento tipo =', document.getElementById('tipo'));
+            console.log('DEBUG: elemento horario-abertura =', document.getElementById('horario-abertura'));
+            console.log('DEBUG: elemento horario-fechamento =', document.getElementById('horario-fechamento'));
+            
+            document.getElementById('nome').value = refeitorio.nome || '';
+            document.getElementById('local').value = refeitorio.local || '';
+            document.getElementById('capacidade').value = refeitorio.capacidade || '';
+            document.getElementById('tipo').value = refeitorio.tipo || 'interno';
+            document.getElementById('horario-abertura').value = refeitorio.horarioAbertura || '07:00';
+            document.getElementById('horario-fechamento').value = refeitorio.horarioFechamento || '19:00';
+            document.getElementById('observacoes').value = refeitorio.observacoes || '';
+            document.getElementById('refeitorio-id').value = id;
+            document.getElementById('refeitorio-form-title').textContent = 'Editar Refeitório';
+            
+            console.log('DEBUG: Valores preenchidos');
+            showRefeitorioForm(false); // false = não limpar o formulário
+        }
+
+        async function excluirRefeitorio(id) {
+            if (confirm('Deseja realmente excluir este refeitório?')) {
+                try {
+                    const response = await api.request(`/refeitorios/${id}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.success) {
+                        alert('Refeitório excluído com sucesso!');
+                        await loadRefeitorios();
+                    }
+                } catch (error) {
+                    console.error('Erro ao excluir:', error);
+                    alert('Erro ao excluir refeitório');
+                }
+            }
+        }
+
+        function renderizarLista() {
+            const tbody = document.getElementById('tbody-refeitorios');
+            
+            if (!tbody) return;
+            
+            if (refeitorios.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-message">
+                                <i class="fas fa-utensils"></i>
+                                <p>Nenhum refeitório cadastrado</p>
+                                <button class="btn btn-primary btn-sm" onclick="showRefeitorioForm()" style="margin-top: 12px;">
+                                    <i class="fas fa-plus"></i> Cadastrar primeiro refeitório
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const tipoLabel = {
+                'interno': 'Pós-Pago',
+                'externo': 'Pré-Pago',
+                'executivo': 'Executivo',
+                'cafeteria': 'Cafeteria'
+            };
+
+            const tipoClass = {
+                'interno': 'badge-success',
+                'externo': 'badge-warning',
+                'executivo': 'badge-info',
+                'cafeteria': 'badge'
+            };
+
+            tbody.innerHTML = refeitorios.map(r => {
+                const horario = r.horarioAbertura && r.horarioFechamento 
+                    ? `${r.horarioAbertura} - ${r.horarioFechamento}`
+                    : 'Não definido';
+
+                return `
+                    <tr>
+                        <td><strong>${r.nome}</strong></td>
+                        <td>${r.local || '-'}</td>
+                        <td>${r.capacidade ? r.capacidade + ' pessoas' : '-'}</td>
+                        <td><span class="badge ${tipoClass[r.tipo] || 'badge'}">${tipoLabel[r.tipo] || r.tipo}</span></td>
+                        <td>${horario}</td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="editarRefeitorio(${r.id})" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="excluirRefeitorio(${r.id})" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Carregar dados do backend
+        async function loadRefeitorios() {
+            try {
+                console.log('DEBUG loadRefeitorios: fazendo request...');
+                const data = await api.request('/refeitorios');
+                console.log('DEBUG loadRefeitorios: response =', data);
+                if (data.success) {
+                    refeitorios = data.data;
+                    console.log('DEBUG loadRefeitorios: refeitorios populados =', refeitorios);
+                    renderizarLista();
+                } else {
+                    console.error('DEBUG loadRefeitorios: data.success = false', data);
+                }
+            } catch (e) {
+                console.error('Erro ao carregar refeitorios:', e);
+            }
+        }
+
+        // Inicialização - carregar do backend
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRefeitorios();
+        });
+
+        // Expor funções globalmente para onclick no HTML
+        window.editarRefeitorio = editarRefeitorio;
+        window.excluirRefeitorio = excluirRefeitorio;
+        window.showRefeitorioForm = showRefeitorioForm;
+        window.showRefeitorioList = showRefeitorioList;
+        window.saveRefeitorio = saveRefeitorio;
+    </script>
+</body>
+</html>

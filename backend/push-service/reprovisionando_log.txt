@@ -1,0 +1,19 @@
+TESTE PESSOA	
+TESTE PESSOA Sem e-mail
+405832	Sem empresa	Ativo
+
+Foto	Nome	Matrícula	Documento	Empresa	Cartão	Ações
+VITOR FERNANDES	
+VITOR FERNANDES
+270001	145.305.619-09	Não informada	
+Sem cartão
+
+EQUIPAMENTO:
+Foto	Código	Nome	Matrícula	Senha	Data de início	Horário de Início	Data de fim	Horário de fim	N° de departamentos	N° de Cartões	Face	Data do último acesso	Admin	Ações
+1	TESTE PESSOA	pushtest_1		-	-	-	-	1	0		-		
+1000000002	VITOR FERNANDES	270001		-	-	-	-	1	0		-		
+
+
+A MATRICULA NO EQUIPAMENTO NÃO IMPORTA COMO VAI SER ENVIADO, MAS É IMPORTANQUE QUE O CÓDIGO OU SEJA, O USER ID SEJA O MESMO QUE A MATRICULA NO SISTEMA, ATÉ PORQUE NOS CLENTE QUE ESTÃO RODANDO, TODA A LOGICA RODA EM CIMA DA MATRICULA, NOS EQUIPAMENTOS, ESTÁ A MATRICULA, RESOLVA
+
+ESTÁ DANDO NÃO IDENTIFICADO

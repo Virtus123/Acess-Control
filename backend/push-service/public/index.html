@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<title>MAM Push — Dashboard</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #161922;
+    --border: #232735;
+    --muted: #8a90a3;
+    --text: #e7e9f0;
+    --green: #22c55e;
+    --red: #ef4444;
+    --amber: #f59e0b;
+    --blue: #3b82f6;
+    --accent: #a78bfa;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+         background: var(--bg); color: var(--text); font-size: 13px; }
+  header { display: flex; align-items: center; justify-content: space-between;
+           padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--panel); }
+  header h1 { margin: 0; font-size: 16px; font-weight: 600; }
+  header .meta { color: var(--muted); font-size: 12px; }
+  .grid { display: grid; gap: 16px; padding: 20px; }
+  .row-totals { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+          padding: 14px; }
+  .card .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+  .card .value { font-size: 26px; margin-top: 4px; font-weight: 600; }
+  .v-online { color: var(--green); }
+  .v-offline { color: var(--red); }
+  .v-warn { color: var(--amber); }
+  .v-info { color: var(--blue); }
+  section { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  section h2 { margin: 0; padding: 12px 16px; font-size: 13px; font-weight: 600;
+               border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  section h2 .actions button { font-size: 12px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 500; }
+  td { vertical-align: top; }
+  td.code { font-family: ui-monospace, Menlo, monospace; color: #c0c4d0; font-size: 12px; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 500; }
+  .pill-on { background: rgba(34,197,94,.15); color: var(--green); }
+  .pill-off { background: rgba(239,68,68,.15); color: var(--red); }
+  .pill-mute { background: rgba(138,144,163,.15); color: var(--muted); }
+  .pill-warn { background: rgba(245,158,11,.15); color: var(--amber); }
+  .pill-info { background: rgba(59,130,246,.15); color: var(--blue); }
+  button { background: var(--accent); color: #1b1d2a; border: 0; padding: 4px 10px;
+           border-radius: 4px; font-weight: 500; cursor: pointer; font-family: inherit; }
+  button.secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  button.danger { background: var(--red); color: #fff; }
+  button:hover { opacity: .85; }
+  pre.logs { margin: 0; padding: 14px 16px; background: #0a0c11; color: #c8cdd9;
+             font-size: 11px; line-height: 1.5; max-height: 320px; overflow: auto; }
+  pre.logs .err { color: #f87171; }
+  pre.logs .warn { color: #fbbf24; }
+  pre.logs .info { color: #c0c4d0; }
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: none; align-items: center; justify-content: center; z-index: 100; }
+  .modal-bg.show { display: flex; }
+  .modal { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; width: 480px; max-width: 90vw; padding: 18px; }
+  .modal h3 { margin: 0 0 12px 0; }
+  .modal label { display: block; margin: 10px 0 4px 0; font-size: 12px; color: var(--muted); }
+  .modal input { width: 100%; padding: 6px 10px; background: #0a0c11; border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-family: inherit; }
+  .modal .actions { margin-top: 14px; display: flex; gap: 8px; justify-content: flex-end; }
+  .modal pre { margin-top: 12px; padding: 10px; background: #0a0c11; border-radius: 4px; max-height: 200px; overflow: auto; font-size: 11px; color: #c0c4d0; }
+  .refresh-bar { display: flex; gap: 12px; align-items: center; }
+  .refresh-bar label { color: var(--muted); font-size: 12px; }
+  .refresh-bar select { background: #0a0c11; color: var(--text); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; font-family: inherit; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>MAM Push <span style="color:var(--muted);font-weight:400">— Dashboard</span></h1>
+    <div class="meta" id="meta">carregando…</div>
+  </div>
+  <div class="refresh-bar">
+    <label>Atualizar:
+      <select id="refresh">
+        <option value="2000">2s</option>
+        <option value="5000" selected>5s</option>
+        <option value="15000">15s</option>
+        <option value="0">Manual</option>
+      </select>
+    </label>
+    <button class="secondary" id="btn-refresh">↻ Agora</button>
+  </div>
+</header>
+
+<div class="grid row-totals" id="totals"></div>
+
+<div class="grid" style="grid-template-columns: 1fr;">
+  <section>
+    <h2>Equipamentos
+      <span class="actions"><button class="secondary" id="btn-refresh-2">↻</button></span>
+    </h2>
+    <table id="t-devices">
+      <thead><tr>
+        <th>Tenant</th><th>Validador</th><th>Nome</th><th>IP</th><th>Modelo</th>
+        <th>Push</th><th>Status</th><th>Last seen</th><th>Pendentes</th>
+        <th>In-flight</th><th>Dead</th><th>Long-poll</th><th>Circuit</th><th>Ações</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Logs recentes (push.log)
+      <span class="actions"><button class="secondary" id="btn-logs">↻</button></span>
+    </h2>
+    <pre class="logs" id="logs">carregando…</pre>
+  </section>
+</div>
+
+<div class="modal-bg" id="modal-reprov">
+  <div class="modal">
+    <h3>Reprovisionar equipamento</h3>
+    <div id="reprov-info" style="color:var(--muted);font-size:12px;margin-bottom:8px"></div>
+    <label>IP do equipamento</label>
+    <input id="r-ip" placeholder="192.168.1.100">
+    <label>Login</label>
+    <input id="r-login" value="admin">
+    <label>Senha</label>
+    <input id="r-password" value="admin" type="password">
+    <label>Host deste servidor Push (o equipamento alcança nesse endereço)</label>
+    <input id="r-server-host" placeholder="192.168.100.5">
+    <div id="r-server-host-warn" style="display:none;color:var(--red);font-size:11px;margin-top:4px">
+      ⚠ localhost/127.0.0.1 NÃO funciona: o equipamento vai apontar pra si mesmo.
+      Use o IP LAN do servidor (ex: 192.168.x.y).
+    </div>
+    <div id="r-server-host-options" style="font-size:11px;color:var(--muted);margin-top:4px"></div>
+    <label>Porta Push</label>
+    <input id="r-server-port" value="3001">
+    <label>Slot na tabela devices do equipamento</label>
+    <input id="r-server-id" value="5">
+    <pre id="r-output" style="display:none"></pre>
+    <div class="actions">
+      <button class="secondary" onclick="closeReprov()">Cancelar</button>
+      <button onclick="runReprov()">Executar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = (q) => document.querySelector(q);
+const $$ = (q) => document.querySelectorAll(q);
+let timer = null;
+let currentReprovValidator = null;
+let serverInfo = null;  // cache de /admin/server-info
+
+async function api(path, opts) {
+  const res = await fetch('/admin' + path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...opts,
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+function fmtAgo(sec) {
+  if (sec === null || sec === undefined) return '—';
+  if (sec < 60) return sec + 's atrás';
+  if (sec < 3600) return Math.floor(sec/60) + 'min atrás';
+  return Math.floor(sec/3600) + 'h atrás';
+}
+
+function renderTotals(t) {
+  const items = [
+    ['Equipamentos', t.equipments, ''],
+    ['Push ON', t.push_enabled, 'v-info'],
+    ['Online', t.online, 'v-online'],
+    ['Offline', t.offline, t.offline > 0 ? 'v-offline' : ''],
+    ['Pending', t.pending, t.pending > 50 ? 'v-warn' : ''],
+    ['In-flight', t.in_flight, ''],
+    ['Erros', t.error + t.dead, (t.error + t.dead) > 0 ? 'v-warn' : ''],
+  ];
+  $('#totals').innerHTML = items.map(([label, val, cls]) =>
+    `<div class="card"><div class="label">${label}</div><div class="value ${cls}">${val}</div></div>`
+  ).join('');
+}
+
+function renderDevices(devices) {
+  const tb = $('#t-devices tbody');
+  if (!devices.length) {
+    tb.innerHTML = '<tr><td colspan="14" style="color:var(--muted);text-align:center;padding:20px">Nenhum equipamento</td></tr>';
+    return;
+  }
+  tb.innerHTML = devices.map(d => {
+    const statusPill = !d.push_enabled
+      ? '<span class="pill pill-mute">push off</span>'
+      : d.online
+        ? '<span class="pill pill-on">online</span>'
+        : '<span class="pill pill-off">offline</span>';
+    const circuitPill = !d.circuit
+      ? '<span class="pill pill-mute">closed</span>'
+      : d.circuit.open
+        ? `<span class="pill pill-off">OPEN (${Math.ceil(d.circuit.msUntilHalfOpen/1000)}s)</span>`
+        : `<span class="pill pill-warn">${d.circuit.failures} falhas</span>`;
+    const pushPill = d.push_enabled
+      ? '<span class="pill pill-info">on</span>'
+      : '<span class="pill pill-mute">off</span>';
+    return `<tr>
+      <td class="code">${d.tenantId}</td>
+      <td class="code">${d.validador || '—'}</td>
+      <td>${d.name || '—'}</td>
+      <td class="code">${d.ip_address || '—'}</td>
+      <td>${d.modelo || '—'}</td>
+      <td>${pushPill}</td>
+      <td>${statusPill}</td>
+      <td>${fmtAgo(d.seen_ago_sec)}</td>
+      <td>${d.stats.pending}</td>
+      <td>${d.stats.in_flight}</td>
+      <td>${(d.stats.error||0)+(d.stats.dead||0)}</td>
+      <td>${d.waiting}</td>
+      <td>${circuitPill}</td>
+      <td>
+        ${d.push_enabled
+          ? `<button class="secondary" onclick="togglePush('${d.tenantId}','${d.validador}',false)">Disable</button>`
+          : `<button onclick="togglePush('${d.tenantId}','${d.validador}',true)">Enable</button>`}
+        <button class="secondary" onclick='openReprov(${JSON.stringify(d)})'>Reprovisionar</button>
+        ${d.circuit && d.circuit.open
+          ? `<button class="secondary" onclick="closeCircuit('${d.validador}')">Reset circuit</button>` : ''}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderLogs(lines) {
+  const html = lines.slice().reverse().map(line => {
+    let cls = 'info';
+    if (/error|err/i.test(line)) cls = 'err';
+    else if (/warn/i.test(line)) cls = 'warn';
+    return `<span class="${cls}">${line.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</span>`;
+  }).join('\n');
+  $('#logs').innerHTML = html || '(vazio)';
+}
+
+async function refresh() {
+  try {
+    const ov = await api('/overview');
+    $('#meta').textContent = `uptime ${(ov.uptime|0)}s · ${ov.totals.equipments} equip · mem ${(ov.memory.heapUsed/1024/1024).toFixed(0)}MB · ${ov.timestamp}`;
+    renderTotals(ov.totals);
+    renderDevices(ov.devices);
+  } catch (e) {
+    $('#meta').textContent = 'erro: ' + e.message;
+  }
+}
+
+async function refreshLogs() {
+  try {
+    const { lines } = await api('/logs?lines=80');
+    renderLogs(lines);
+  } catch (e) {
+    $('#logs').textContent = 'erro: ' + e.message;
+  }
+}
+
+async function togglePush(tenantId, validador, enable) {
+  const path = enable ? 'enable-push' : 'disable-push';
+  try {
+    await api(`/devices/${encodeURIComponent(validador)}/${path}`, {
+      method: 'POST',
+      body: JSON.stringify({ tenantId }),
+    });
+    refresh();
+  } catch (e) { alert('Erro: ' + e.message); }
+}
+
+async function closeCircuit(deviceId) {
+  await api('/circuit/close', { method: 'POST', body: JSON.stringify({ deviceId }) });
+  refresh();
+}
+
+function isBadHost(h) {
+  return !h || h === 'localhost' || /^127\./.test(h) || h === '0.0.0.0';
+}
+function validateHost() {
+  const v = $('#r-server-host').value.trim();
+  $('#r-server-host-warn').style.display = isBadHost(v) ? 'block' : 'none';
+}
+async function loadServerInfo() {
+  if (serverInfo) return serverInfo;
+  try { serverInfo = await api('/server-info'); } catch { serverInfo = { ips: [], suggestedHost: null }; }
+  return serverInfo;
+}
+
+async function openReprov(d) {
+  currentReprovValidator = d.validador;
+  $('#reprov-info').textContent = `${d.tenantId} / ${d.name} (${d.validador})`;
+  $('#r-ip').value = d.ip_address || '';
+
+  const info = await loadServerInfo();
+  // Preferir IP LAN do servidor; só cair em window.location.hostname se não houver
+  const def = info.suggestedHost || (isBadHost(window.location.hostname) ? '' : window.location.hostname);
+  $('#r-server-host').value = def;
+  $('#r-server-port').value = String(info.pushPort || 3001);
+  $('#r-server-host-options').innerHTML = info.ips?.length
+    ? 'IPs detectados: ' + info.ips.map(i =>
+        `<a href="#" onclick="$('#r-server-host').value='${i.ip}';validateHost();return false" style="color:var(--accent);text-decoration:none">${i.ip}</a> <span style="color:var(--muted)">(${i.iface})</span>`
+      ).join(' · ')
+    : '';
+  validateHost();
+
+  $('#r-output').style.display = 'none';
+  $('#r-output').textContent = '';
+  $('#modal-reprov').classList.add('show');
+}
+function closeReprov() { $('#modal-reprov').classList.remove('show'); }
+
+async function runReprov() {
+  const host = $('#r-server-host').value.trim();
+  if (isBadHost(host)) {
+    if (!confirm('O host "' + host + '" provavelmente não funciona — equipamento vai apontar pra si mesmo. Continuar mesmo assim?')) return;
+  }
+  const body = {
+    ip: $('#r-ip').value.trim(),
+    login: $('#r-login').value.trim(),
+    password: $('#r-password').value,
+    server_host: host,
+    server_port: $('#r-server-port').value.trim(),
+    server_id: $('#r-server-id').value.trim(),
+  };
+  $('#r-output').style.display = 'block';
+  $('#r-output').textContent = 'Executando…';
+  try {
+    const r = await api(`/devices/${encodeURIComponent(currentReprovValidator)}/reprovision`, {
+      method: 'POST', body: JSON.stringify(body),
+    });
+    $('#r-output').textContent = (r.ok ? '✅ OK\n\n' : `❌ exit=${r.exitCode}\n\n`)
+      + (r.stdout || '') + (r.stderr ? '\n---STDERR---\n' + r.stderr : '');
+    if (r.ok) setTimeout(refresh, 2000);
+  } catch (e) {
+    $('#r-output').textContent = 'Erro: ' + e.message;
+  }
+}
+// validação ao vivo do campo
+document.addEventListener('DOMContentLoaded', () => {
+  const h = document.getElementById('r-server-host');
+  if (h) h.addEventListener('input', validateHost);
+});
+
+function startTimer() {
+  if (timer) clearInterval(timer);
+  const ms = parseInt($('#refresh').value, 10);
+  if (ms > 0) timer = setInterval(() => { refresh(); refreshLogs(); }, ms);
+}
+$('#refresh').addEventListener('change', startTimer);
+$('#btn-refresh').addEventListener('click', () => { refresh(); refreshLogs(); });
+$('#btn-refresh-2').addEventListener('click', refresh);
+$('#btn-logs').addEventListener('click', refreshLogs);
+
+refresh(); refreshLogs(); startTimer();
+</script>
+</body>
+</html>

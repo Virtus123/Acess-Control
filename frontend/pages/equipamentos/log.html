@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>MAM Control - Sistema de Controle de Acesso</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                            <section id="equipamentos-log" class="content-section active">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h1>Log de Comunicação</h1>
+                        <p>Histórico de comunicação com equipamentos</p>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <div class="filter-bar">
+                        <input type="text" placeholder="Filtrar por equipamento..." class="input">
+                        <select class="select">
+                            <option>Últimas 24 horas</option>
+                            <option>Últimos 7 dias</option>
+                            <option>Último mês</option>
+                        </select>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Data/Hora</th>
+                                <th>Equipamento</th>
+                                <th>Tipo</th>
+                                <th>Status</th>
+                                <th>Detalhes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 40px; color: #999;">
+                                    <i class="fas fa-inbox"></i> Nenhum log disponível
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- NOTIFICAÇÃO DE CONECTIVIDADE SECTION -->
+
+            </div>
+        </div>
+    </div>
+    
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+    <script src="../../auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+</body>
+</html>

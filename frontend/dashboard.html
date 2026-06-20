@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>MAM Control - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 4px 20px rgba(245, 158, 11, 0.6);
+            }
+
+            100% {
+                box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            }
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.2);
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-warning:disabled {
+            background: #fcd34d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            border-color: #4a90d9;
+            box-shadow: 0 4px 12px rgba(74, 144, 217, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.primary {
+            background: #dbeafe;
+            color: #4a90d9;
+        }
+
+        .stat-icon.success {
+            background: #d1fae5;
+            color: #10b981;
+        }
+
+        .stat-icon.warning {
+            background: #fef3c7;
+            color: #f59e0b;
+        }
+
+        .stat-icon.purple {
+            background: #f3e8ff;
+            color: #9333ea;
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-info h3 {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1.2;
+            margin-bottom: 2px;
+        }
+
+        .stat-change {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .stat-change .up {
+            color: #10b981;
+        }
+
+        /* Dashboard Content */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h3 {
+            font-size: 1rem;
+            color: #1e293b;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-header h3 i {
+            color: #4a90d9;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* Gráficos */
+        .chart-container {
+            height: 250px;
+            position: relative;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto !important;
+        }
+
+        /* Atalhos do Sistema */
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .shortcut-card {
+            background: white;
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .shortcut-card:hover {
+            border-color: #4a90d9;
+            box-shadow: 0 4px 12px rgba(74, 144, 217, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .shortcut-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: #f0f6ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: #4a90d9;
+            flex-shrink: 0;
+        }
+
+        .shortcut-info h4 {
+            font-size: 0.82rem;
+            color: #1e293b;
+            margin-bottom: 2px;
+            white-space: nowrap;
+        }
+
+        .shortcut-info p {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            white-space: nowrap;
+        }
+
+        /* Atividade Recente */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .activity-item:hover {
+            background: #f8fafc;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .activity-icon.success {
+            background: #d1fae5;
+            color: #10b981;
+        }
+
+        .activity-icon.warning {
+            background: #fef3c7;
+            color: #f59e0b;
+        }
+
+        .activity-icon.info {
+            background: #dbeafe;
+            color: #4a90d9;
+        }
+
+        .activity-icon.purple {
+            background: #f3e8ff;
+            color: #9333ea;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-content p {
+            font-size: 0.95rem;
+            color: #1e293b;
+            margin-bottom: 2px;
+        }
+
+        .activity-time {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        /* Status badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ── Layout com sidebar de timeline ─────── */
+        .dash-layout {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .dash-main { flex: 1; min-width: 0; }
+
+        .dash-tl-sidebar { width: 240px; flex-shrink: 0; }
+
+        /* ── Timeline ────────────────────────────── */
+        .timeline-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .timeline-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .timeline-header h3 {
+            font-size: 0.95rem;
+            color: #1e293b;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+        }
+
+        .timeline-header h3 i { color: #4a90d9; }
+
+        .timeline-update {
+            font-size: 0.68rem;
+            color: #94a3b8;
+        }
+
+        .timeline-body {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .timeline-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .tl-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-left: 3px solid transparent;
+            transition: background 0.15s;
+            cursor: default;
+        }
+
+        .tl-item + .tl-item { border-top: 1px solid #f1f5f9; }
+        .tl-item:hover { background: #f8fafc; }
+
+        .tl-item.entry  { border-left-color: #10b981; }
+        .tl-item.exit   { border-left-color: #9333ea; }
+        .tl-item.denied { border-left-color: #ef4444; }
+
+        .tl-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .tl-item.entry  .tl-icon { background: #d1fae5; color: #10b981; }
+        .tl-item.exit   .tl-icon { background: #f3e8ff; color: #9333ea; }
+        .tl-item.denied .tl-icon { background: #fee2e2; color: #ef4444; }
+
+        .tl-name {
+            flex: 1;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: #1e293b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .tl-time {
+            font-size: 0.68rem;
+            color: #94a3b8;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .tl-empty {
+            text-align: center;
+            padding: 32px 16px;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .tl-empty i { font-size: 1.5rem; display: block; margin-bottom: 8px; }
+
+        /* ── Responsividade ──────────────────────── */
+
+        /* Telas médias: encolhe sidebar da timeline */
+        @media (max-width: 1280px) {
+            .dash-tl-sidebar { width: 210px; }
+        }
+
+        /* Telas menores: timeline vai para baixo */
+        @media (max-width: 1024px) {
+            .dash-layout { flex-direction: column; }
+            .dash-tl-sidebar { width: 100%; }
+            .timeline-body { max-height: 260px; }
+            .timeline-list { display: flex; flex-direction: column; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Tablet */
+        @media (max-width: 768px) {
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .section-actions { width: 100%; }
+            .section-actions .btn { flex: 1; justify-content: center; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .card-header { flex-direction: column; gap: 8px; align-items: flex-start; }
+        }
+
+        /* Mobile */
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .shortcuts-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .stat-card { padding: 12px; gap: 10px; }
+            .stat-icon { width: 38px; height: 38px; font-size: 1.1rem; }
+            .stat-value { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="dashboard" class="content-section active">
+
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1>Dashboard</h1>
+                            <p>Visão geral do sistema em tempo real</p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary" onclick="refreshDashboard()">
+                                <i class="fas fa-sync-alt"></i> Atualizar
+                            </button>
+                            <button class="btn btn-warning" id="btn-auditoria" onclick="triggerAuditoria()" title="Força o comunicador a verificar quem está em cada equipamento e remover quem não tem permissão">
+                                <i class="fas fa-shield-alt"></i> Auditar Equipamentos
+                            </button>
+                            <button class="btn btn-primary" onclick="window.location.href='relatorios.html'">
+                                <i class="fas fa-file-alt"></i> Relatórios
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Layout: conteúdo principal + timeline sidebar -->
+                    <div class="dash-layout">
+
+                        <!-- Coluna principal -->
+                        <div class="dash-main">
+
+                            <!-- Cards de Estatísticas -->
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-icon primary">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3>Pessoas Cadastradas</h3>
+                                        <p class="stat-value" id="stat-pessoas-cadastradas">0</p>
+                                        <p class="stat-change"><span class="up"><i class="fas fa-arrow-up"></i> <span id="novos-pessoas">0</span></span> novos este mês</p>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-icon success">
+                                        <i class="fas fa-user-check"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3>Pessoas no Local</h3>
+                                        <p class="stat-value" id="stat-pessoas-local">0</p>
+                                        <p class="stat-change"><span class="up"><i class="fas fa-arrow-up"></i> <span id="entradas-pessoas">0</span></span> entradas hoje</p>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-icon warning">
+                                        <i class="fas fa-user-clock"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3>Visitantes no Local</h3>
+                                        <p class="stat-value" id="stat-visitantes-local">0</p>
+                                        <p class="stat-change"><span class="up"><i class="fas fa-arrow-up"></i> <span id="entradas-visitantes">0</span></span> entradas hoje</p>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-icon purple">
+                                        <i class="fas fa-car"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3>Veículos no Local</h3>
+                                        <p class="stat-value" id="stat-veiculos-local">0</p>
+                                        <p class="stat-change"><span class="up"><i class="fas fa-arrow-up"></i> <span id="entradas-veiculos">0</span></span> entradas hoje</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Gráficos -->
+                            <div class="dashboard-grid">
+                                <div class="dashboard-card">
+                                    <div class="card-header">
+                                        <h3><i class="fas fa-chart-line"></i> Acessos na Semana</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="graficoLinha"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="dashboard-card">
+                                    <div class="card-header">
+                                        <h3><i class="fas fa-chart-bar"></i> Acessos na Semana</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="graficoBarras"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div><!-- /.dash-main -->
+
+                        <!-- Sidebar: Timeline de Acessos -->
+                        <div class="dash-tl-sidebar">
+                            <div class="timeline-card">
+                                <div class="timeline-header">
+                                    <h3><i class="fas fa-stream"></i> Últimos Acessos</h3>
+                                    <span class="timeline-update" id="timeline-update-time"></span>
+                                </div>
+                                <div class="timeline-body">
+                                    <ul class="timeline-list" id="timeline-list">
+                                        <li class="tl-empty">
+                                            <i class="fas fa-clock"></i>
+                                            Carregando...
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div><!-- /.dash-tl-sidebar -->
+
+                    </div><!-- /.dash-layout -->
+
+                </section>
+            </div>
+        </div>
+    <!-- Modal de Auditoria -->
+    <div id="modal-auditoria" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.45); align-items:center; justify-content:center;">
+        <div style="background:white; border-radius:14px; width:520px; max-width:95vw; max-height:92vh; display:flex; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,0.25);">
+
+            <!-- Header -->
+            <div style="padding:18px 24px 14px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+                <h3 id="modal-audit-title" style="margin:0; font-size:1rem; color:#1e293b; display:flex; align-items:center; gap:8px;">
+                    <i class="fas fa-shield-alt" style="color:#f59e0b;"></i> Auditar Equipamentos
+                </h3>
+                <button onclick="fecharModalAuditoria()" style="background:none; border:none; font-size:1.3rem; color:#94a3b8; cursor:pointer; padding:4px; line-height:1;">&#x2715;</button>
+            </div>
+
+            <!-- FASE 1: Seleção -->
+            <div id="audit-fase-selecao">
+                <div style="padding:10px 24px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; gap:12px;">
+                    <label style="display:flex; align-items:center; gap:6px; font-size:0.83rem; color:#475569; cursor:pointer;">
+                        <input type="checkbox" id="audit-select-all" onchange="toggleSelecionarTodos(this)"> Selecionar todos
+                    </label>
+                    <span id="audit-contador" style="margin-left:auto; font-size:0.78rem; color:#94a3b8;">0 selecionados</span>
+                </div>
+                <div id="audit-equip-list" style="overflow-y:auto; padding:8px 16px; min-height:100px; max-height:320px;">
+                    <div style="text-align:center; padding:32px; color:#94a3b8;"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>
+                </div>
+                <div style="padding:14px 24px; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; gap:10px;">
+                    <button class="btn btn-secondary btn-sm" onclick="fecharModalAuditoria()">Fechar</button>
+                    <button class="btn btn-warning btn-sm" id="btn-confirmar-auditoria" onclick="confirmarAuditoria()" disabled>
+                        <i class="fas fa-shield-alt"></i> Iniciar Auditoria
+                    </button>
+                </div>
+            </div>
+
+            <!-- FASE 2: Monitoramento -->
+            <div id="audit-fase-monitor" style="display:none; flex-direction:column; flex:1; min-height:0;">
+                <div style="padding:10px 24px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; gap:8px;">
+                    <i class="fas fa-circle-notch fa-spin" id="audit-monitor-spin" style="color:#f59e0b; font-size:0.85rem;"></i>
+                    <span id="audit-monitor-resumo" style="font-size:0.82rem; color:#64748b;">Aguardando comunicador...</span>
+                    <span id="audit-monitor-contador" style="margin-left:auto; font-size:0.75rem; color:#94a3b8;"></span>
+                </div>
+                <div id="audit-monitor-list" style="overflow-y:auto; flex:1; max-height:360px; padding:6px 0;"></div>
+                <div style="padding:14px 24px; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; gap:10px;">
+                    <button class="btn btn-secondary btn-sm" id="btn-cancelar-audit" onclick="cancelarAuditoria()">
+                        <i class="fas fa-ban"></i> Cancelar Pendentes
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="fecharModalAuditoria()">Fechar</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    </div>
+
+    <script src="app.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        // Função para fechar o alerta
+        function fecharAlerta() {
+            document.getElementById('testAlert').classList.add('hidden');
+        }
+
+        // Função para buscar dados do dashboard do backend
+        async function fetchDashboardData() {
+            try {
+                // Priorizar sessionStorage (Impersonation) sobre localStorage
+                const token = sessionStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('mamcontrol_accessToken');
+                let tenantId = sessionStorage.getItem('mamcontrol_tenant') || localStorage.getItem('mamcontrol_tenant') || localStorage.getItem('tenant_id');
+                if (!tenantId) {
+                    // Fallback 2: verificar user_data
+                    try {
+                        const userData = JSON.parse(localStorage.getItem('mamcontrol_user') || '{}');
+                        tenantId = userData.tenant_id || userData.tenant;
+                    } catch (e) { }
+                }
+                if (!tenantId) {
+                    // Fallback 3: usar mamsolucoes como padrão
+                    tenantId = 'mamsolucoes';
+                }
+
+                // Buscar estatísticas (números) - atualiza frequentemente
+                const statsResponse = await fetch('/api/dashboard/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Tenant-ID': tenantId
+                    }
+                });
+
+                if (statsResponse.ok) {
+                    const statsData = await statsResponse.json();
+                    if (statsData.success) {
+                        atualizarEstatisticas(statsData.data);
+                    }
+                }
+
+                // Buscar dados para gráficos - a cada 30 segundos
+                const now = Date.now();
+                if (!window.dashboardLastGraphUpdate || (now - window.dashboardLastGraphUpdate) > 30000) {
+                    const weeklyResponse = await fetch('/api/dashboard/weekly', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'X-Tenant-ID': tenantId
+                        }
+                    });
+
+                    if (weeklyResponse.ok) {
+                        const weeklyData = await weeklyResponse.json();
+                        if (weeklyData.success) {
+                            atualizarGraficos(weeklyData.data);
+                        }
+                    }
+                    window.dashboardLastGraphUpdate = now;
+                }
+            } catch (error) {
+                console.error('[Dashboard] Erro ao buscar dados:', error);
+            }
+        }
+
+        // Função para atualizar estatísticas
+        function atualizarEstatisticas(data) {
+            atualizarNumero('stat-pessoas-cadastradas', 0, data.pessoasCadastradas || 0);
+            atualizarNumero('stat-pessoas-local', 0, data.pessoasNoLocal || 0);
+            atualizarNumero('stat-visitantes-local', 0, data.visitantesNoLocal || 0);
+            atualizarNumero('stat-veiculos-local', 0, data.veiculosNoLocal || 0);
+
+            document.getElementById('novos-pessoas').textContent = data.novosPessoas || 0;
+            document.getElementById('entradas-pessoas').textContent = data.entradasPessoasHoje || 0;
+            document.getElementById('entradas-visitantes').textContent = data.entradasVisitantesHoje || 0;
+            document.getElementById('entradas-veiculos').textContent = data.entradasVeiculosHoje || 0;
+        }
+
+        // Função para atualizar gráficos
+        function atualizarGraficos(data) {
+
+            // Gráfico de Linha
+            if (window.graficoLinhaInstance) {
+
+                // Atualizar dados existentes sem recriar o gráfico
+                window.graficoLinhaInstance.data.labels = data.labels;
+                window.graficoLinhaInstance.data.datasets[0].data = data.acessosPessoas;
+                window.graficoLinhaInstance.data.datasets[1].data = data.acessosVisitantes;
+                window.graficoLinhaInstance.data.datasets[2].data = data.acessosVeiculos;
+
+                window.graficoLinhaInstance.update();
+
+            } else {
+
+                const ctxLinha = document
+                    .getElementById('graficoLinha')
+                    .getContext('2d');
+
+                window.graficoLinhaInstance = new Chart(ctxLinha, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [
+                            {
+                                label: 'Pessoas',
+                                data: data.acessosPessoas,
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                tension: 0.3,
+                                fill: true,
+                                pointBackgroundColor: '#10b981',
+                                pointBorderColor: 'white',
+                                pointBorderWidth: 2,
+                                pointRadius: 4
+                            },
+                            {
+                                label: 'Visitantes',
+                                data: data.acessosVisitantes,
+                                borderColor: '#4a90d9',
+                                backgroundColor: 'rgba(74, 144, 217, 0.1)',
+                                tension: 0.3,
+                                fill: true,
+                                pointBackgroundColor: '#4a90d9',
+                                pointBorderColor: 'white',
+                                pointBorderWidth: 2,
+                                pointRadius: 4
+                            },
+                            {
+                                label: 'Veículos',
+                                data: data.acessosVeiculos,
+                                borderColor: '#f59e0b',
+                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                tension: 0.3,
+                                fill: true,
+                                pointBackgroundColor: '#f59e0b',
+                                pointBorderColor: 'white',
+                                pointBorderWidth: 2,
+                                pointRadius: 4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 20
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: '#1e293b',
+                                titleColor: '#f8fafc',
+                                bodyColor: '#cbd5e1',
+                                borderColor: '#334155',
+                                borderWidth: 1
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#e2e8f0'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+
+            }
+
+        // Gráfico de Barras
+        if (window.graficoBarrasInstance) {
+            window.graficoBarrasInstance.data.labels = data.labels;
+            window.graficoBarrasInstance.data.datasets[0].data = data.acessosPessoas;
+            window.graficoBarrasInstance.data.datasets[1].data = data.acessosVisitantes;
+            window.graficoBarrasInstance.data.datasets[2].data = data.acessosVeiculos;
+            window.graficoBarrasInstance.update();
+        } else {
+            const ctxBarras = document.getElementById('graficoBarras').getContext('2d');
+            window.graficoBarrasInstance = new Chart(ctxBarras, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Pessoas',
+                            data: data.acessosPessoas,
+                            backgroundColor: '#10b981',
+                            borderRadius: 6,
+                            barPercentage: 0.6
+                        },
+                        {
+                            label: 'Visitantes',
+                            data: data.acessosVisitantes,
+                            backgroundColor: '#4a90d9',
+                            borderRadius: 6,
+                            barPercentage: 0.6
+                        },
+                        {
+                            label: 'Veículos',
+                            data: data.acessosVeiculos,
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 6,
+                            barPercentage: 0.6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#f8fafc',
+                            bodyColor: '#cbd5e1',
+                            borderColor: '#334155',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#e2e8f0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    function useMockData() {
+        const dadosDashboard = {
+            pessoasCadastradas: 1250,
+            pessoasNoLocal: 342,
+            visitantesNoLocal: 28,
+            veiculosNoLocal: 156,
+            novosPessoas: 45,
+            entradasPessoasHoje: 78,
+            entradasVisitantesHoje: 23,
+            entradasVeiculosHoje: 56,
+            acessosPessoas: [85, 92, 78, 105, 118, 95, 102],
+            acessosVisitantes: [65, 72, 58, 84, 92, 78, 88],
+            acessosVeiculos: [120, 135, 142, 158, 165, 149, 172],
+            labels: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
+        };
+
+        atualizarEstatisticas(dadosDashboard);
+        atualizarGraficos(dadosDashboard);
+    }
+
+    function refreshDashboard() {
+        fetchDashboardData();
+    }
+
+    function atualizarNumero(elementId, start, end) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            // Atualiza o número diretamente sem animação
+            element.textContent = (end || 0).toLocaleString('pt-BR');
+        }
+
+    function carregarAtividades() {
+            const container = document.getElementById('activity-list');
+            if (!container) return;
+
+            container.innerHTML = dadosDashboard.atividades.map(ativ => `
+                <div class="activity-item">
+                    <div class="activity-icon ${ativ.icone}">
+                        <i class="fas ${ativ.iconClass}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p>${ativ.texto}</p>
+                        <span class="activity-time">${ativ.tempo}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ── Timeline ──────────────────────────────────────────
+        function getAuthHeaders() {
+            const token = sessionStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('mamcontrol_accessToken');
+            let tenantId = sessionStorage.getItem('mamcontrol_tenant') || localStorage.getItem('mamcontrol_tenant') || localStorage.getItem('tenant_id');
+            if (!tenantId) {
+                try { tenantId = JSON.parse(localStorage.getItem('mamcontrol_user') || '{}').tenant_id; } catch (e) {}
+            }
+            return {
+                'Authorization': `Bearer ${token}`,
+                'X-Tenant-ID': tenantId || 'mamsolucoes'
+            };
+        }
+
+        function tlFormatTime(dateStr) {
+            const d = new Date(dateStr);
+            const now = new Date();
+            const diff = Math.floor((now - d) / 1000);
+            if (diff < 60)    return 'agora mesmo';
+            if (diff < 3600)  return `${Math.floor(diff / 60)} min atrás`;
+            if (diff < 86400) return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) +
+                   ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function renderTimeline(logs) {
+            const list = document.getElementById('timeline-list');
+            if (!list) return;
+
+            if (!logs || logs.length === 0) {
+                list.innerHTML = `<li class="tl-empty"><i class="fas fa-inbox"></i>Nenhum acesso hoje</li>`;
+                return;
+            }
+
+            list.innerHTML = logs.map(log => {
+                const cls  = log.status === 'DENIED' ? 'denied' : log.action === 'ENTRY' ? 'entry' : 'exit';
+                const icon = log.action === 'ENTRY' ? 'fa-sign-in-alt' : log.action === 'EXIT' ? 'fa-sign-out-alt' : 'fa-times';
+                const name = log.person_name || log.plate || 'Desconhecido';
+                return `<li class="tl-item ${cls}">
+                    <div class="tl-icon"><i class="fas ${icon}"></i></div>
+                    <span class="tl-name">${name}</span>
+                    <span class="tl-time">${tlFormatTime(log.created_at)}</span>
+                </li>`;
+            }).join('');
+
+            const el = document.getElementById('timeline-update-time');
+            if (el) el.textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        async function fetchTimeline() {
+            try {
+                const resp = await fetch('/api/access-log/logs?limit=20&page=1', { headers: getAuthHeaders() });
+                if (!resp.ok) return;
+                const data = await resp.json();
+                if (data.success) renderTimeline(data.data);
+            } catch (e) {
+                console.error('[Timeline] Erro:', e);
+            }
+        }
+
+        // ── Auditoria Manual ──────────────────────────────────
+        let _auditTaskIds   = [];
+        let _auditPollTimer = null;
+
+        function atualizarContadorAuditoria() {
+            const checks = document.querySelectorAll('.audit-equip-check:checked');
+            const total  = document.querySelectorAll('.audit-equip-check').length;
+            const n = checks.length;
+            document.getElementById('audit-contador').textContent = `${n} de ${total} selecionados`;
+            document.getElementById('btn-confirmar-auditoria').disabled = n === 0;
+            document.getElementById('audit-select-all').indeterminate = n > 0 && n < total;
+            document.getElementById('audit-select-all').checked = n === total && total > 0;
+        }
+
+        function toggleSelecionarTodos(cb) {
+            document.querySelectorAll('.audit-equip-check').forEach(c => c.checked = cb.checked);
+            atualizarContadorAuditoria();
+        }
+
+        function fecharModalAuditoria() {
+            clearInterval(_auditPollTimer);
+            _auditPollTimer = null;
+            document.getElementById('modal-auditoria').style.display = 'none';
+            // Volta para fase de seleção na próxima abertura
+            document.getElementById('audit-fase-selecao').style.display = '';
+            document.getElementById('audit-fase-monitor').style.display = 'none';
+        }
+
+        async function triggerAuditoria() {
+            const modal = document.getElementById('modal-auditoria');
+            const lista = document.getElementById('audit-equip-list');
+            // Garante fase 1 visível
+            document.getElementById('audit-fase-selecao').style.display = '';
+            document.getElementById('audit-fase-monitor').style.display = 'none';
+            modal.style.display = 'flex';
+            lista.innerHTML = '<div style="text-align:center;padding:32px;color:#94a3b8;"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>';
+
+            try {
+                const resp = await fetch('/api/access-tasks/auditable-equipments', { headers: getAuthHeaders() });
+                const data = await resp.json();
+                if (!data.success || !data.data.length) {
+                    lista.innerHTML = '<div style="text-align:center;padding:32px;color:#94a3b8;">Nenhum equipamento ativo.</div>';
+                    return;
+                }
+                lista.innerHTML = data.data.map(e => `
+                    <label style="display:flex;align-items:center;gap:10px;padding:10px 8px;border-radius:8px;cursor:pointer;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
+                        <input type="checkbox" class="audit-equip-check" value="${e.validador}" onchange="atualizarContadorAuditoria()" style="width:16px;height:16px;cursor:pointer;">
+                        <div>
+                            <div style="font-size:0.87rem;font-weight:500;color:#1e293b;">${e.name}</div>
+                            <div style="font-size:0.72rem;color:#94a3b8;">${e.modelo || ''}</div>
+                        </div>
+                    </label>`).join('');
+                atualizarContadorAuditoria();
+            } catch (err) {
+                lista.innerHTML = `<div style="text-align:center;padding:32px;color:#ef4444;">Erro: ${err.message}</div>`;
+            }
+        }
+
+        async function confirmarAuditoria() {
+            const selecionados = [...document.querySelectorAll('.audit-equip-check:checked')].map(c => c.value);
+            if (!selecionados.length) return;
+
+            const btnConfirmar = document.getElementById('btn-confirmar-auditoria');
+            btnConfirmar.disabled = true;
+            btnConfirmar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando...';
+
+            try {
+                const resp = await fetch('/api/access-tasks/trigger-audit', {
+                    method: 'POST',
+                    headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ equip_validators: selecionados })
+                });
+                const data = await resp.json();
+
+                if (!data.success) { alert('Erro: ' + data.message); return; }
+
+                // Salva IDs e muda para fase de monitoramento
+                _auditTaskIds = data.tasks.map(t => t.id);
+                _auditTaskMap = {};
+                data.tasks.forEach(t => _auditTaskMap[t.id] = t.equip_name);
+
+                document.getElementById('audit-fase-selecao').style.display = 'none';
+                document.getElementById('audit-fase-monitor').style.display = 'flex';
+                document.getElementById('modal-audit-title').innerHTML =
+                    '<i class="fas fa-shield-alt" style="color:#f59e0b;"></i> Auditoria em Andamento';
+
+                renderMonitorRows(data.tasks.map(t => ({ ...t, resolved: false, cancelled: false, result: null })));
+                iniciarPollingAuditoria();
+
+            } catch (e) {
+                alert('Erro ao iniciar: ' + e.message);
+            } finally {
+                btnConfirmar.disabled = false;
+                btnConfirmar.innerHTML = '<i class="fas fa-shield-alt"></i> Iniciar Auditoria';
+            }
+        }
+
+        let _auditTaskMap = {};
+
+        function renderMonitorRows(tasks) {
+            const container = document.getElementById('audit-monitor-list');
+            const done  = tasks.filter(t => t.resolved && !t.cancelled).length;
+            const total = tasks.length;
+            const allDone = tasks.every(t => t.resolved || t.cancelled);
+
+            document.getElementById('audit-monitor-contador').textContent = `${done}/${total} concluídos`;
+
+            if (allDone) {
+                document.getElementById('audit-monitor-spin').className = 'fas fa-check-circle';
+                document.getElementById('audit-monitor-spin').style.color = '#10b981';
+                document.getElementById('audit-monitor-resumo').textContent = 'Auditoria concluída.';
+                document.getElementById('btn-cancelar-audit').style.display = 'none';
+                clearInterval(_auditPollTimer);
+                _auditPollTimer = null;
+            } else {
+                document.getElementById('audit-monitor-spin').className = 'fas fa-circle-notch fa-spin';
+                document.getElementById('audit-monitor-spin').style.color = '#f59e0b';
+                document.getElementById('audit-monitor-resumo').textContent = 'Aguardando comunicador...';
+            }
+
+            container.innerHTML = tasks.map(t => {
+                let icon, color, detail;
+                if (t.cancelled) {
+                    icon = 'fa-ban'; color = '#94a3b8'; detail = 'Cancelado';
+                } else if (!t.resolved) {
+                    icon = 'fa-clock'; color = '#f59e0b'; detail = 'Aguardando...';
+                } else if (t.result) {
+                    const r = t.result;
+                    icon = 'fa-check-circle'; color = '#10b981';
+                    const parts = [];
+                    if (r.deleted > 0)         parts.push(`${r.deleted} removido(s)`);
+                    if (r.visitors_exited > 0) parts.push(`${r.visitors_exited} visitante(s) saíram`);
+                    if (!parts.length)         parts.push('Nenhuma alteração');
+                    detail = parts.join(' • ') + ` (${r.total} no equip.)`;
+                } else {
+                    icon = 'fa-check-circle'; color = '#10b981'; detail = 'Concluído';
+                }
+                return `<div style="display:flex;align-items:center;gap:12px;padding:10px 24px;border-bottom:1px solid #f1f5f9;">
+                    <i class="fas ${icon}" style="color:${color}; font-size:1.1rem; flex-shrink:0;"></i>
+                    <div style="flex:1; min-width:0;">
+                        <div style="font-size:0.87rem;font-weight:500;color:#1e293b;">${_auditTaskMap[t.id] || t.equip_name || t.equip_validator}</div>
+                        <div style="font-size:0.75rem;color:#64748b;margin-top:2px;">${detail}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function iniciarPollingAuditoria() {
+            clearInterval(_auditPollTimer);
+            _auditPollTimer = setInterval(async () => {
+                try {
+                    const ids = _auditTaskIds.join(',');
+                    const resp = await fetch(`/api/access-tasks/audit-status?ids=${ids}`, { headers: getAuthHeaders() });
+                    const data = await resp.json();
+                    if (data.success) renderMonitorRows(data.data);
+                } catch {}
+            }, 2000);
+        }
+
+        async function cancelarAuditoria() {
+            try {
+                const pendentes = _auditTaskIds;
+                if (!pendentes.length) return;
+                await fetch('/api/access-tasks/cancel-audit', {
+                    method: 'POST',
+                    headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ids: pendentes })
+                });
+                // Polling vai atualizar o estado em até 2s
+            } catch (e) {
+                alert('Erro ao cancelar: ' + e.message);
+            }
+        }
+
+        document.getElementById('modal-auditoria').addEventListener('click', function(e) {
+            if (e.target === this) fecharModalAuditoria();
+        });
+
+        // ── Inicialização ─────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchDashboardData();
+            fetchTimeline();
+            setInterval(fetchDashboardData, 2000);
+            setInterval(fetchTimeline, 5000);
+        });
+    </script>
+    <script src="components.js"></script>
+</body>
+
+</html>

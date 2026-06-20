@@ -1,0 +1,60 @@
+{
+  "name": "nexis-control-backend",
+  "version": "1.0.0",
+  "description": "Backend API para sistema de controle de acesso MAM Control",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "migrate": "node src/database/migrate.js",
+    "migrate:tenant": "node migrations.js",
+    "seed": "node src/database/seed.js",
+    "prod": "pm2 start server.js --name nexis-backend",
+    "prod:stop": "pm2 stop nexis-backend",
+    "prod:restart": "pm2 restart nexis-backend",
+    "prod:logs": "pm2 logs nexis-backend",
+    "backup:force": "node src/scripts/force-backup.js",
+    "monitor:force": "node src/scripts/force-monitor.js"
+  },
+  "keywords": [
+    "access-control",
+    "api",
+    "multi-tenant"
+  ],
+  "author": "MAM Control",
+  "license": "MIT",
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "archiver": "^7.0.1",
+    "argon2": "^0.44.0",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^12.8.0",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "cron": "^3.1.6",
+    "csv-parse": "^6.2.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.22.1",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^7.0.12",
+    "pdfkit": "^0.18.0",
+    "resend": "^6.9.2",
+    "sharp": "^0.33.2",
+    "sqlite3": "^5.1.7",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0",
+    "xlsx": "^0.18.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

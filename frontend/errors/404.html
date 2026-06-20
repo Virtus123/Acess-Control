@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Não Encontrada - MAM Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; height: 100vh; display: flex; align-items: center; justify-content: center; color: var(--text-primary); }
+        .container { text-align: center; padding: 2rem; max-width: 500px; width: 100%; }
+        .error-code { font-size: 8rem; font-weight: 800; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; margin-bottom: 1rem; }
+        h1 { font-size: 1.5rem; margin-bottom: 1rem; font-weight: 700; }
+        p { color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6; }
+        .btn { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--primary); color: white; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(67, 97, 238, 0.2); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(67, 97, 238, 0.3); background: var(--primary-light); }
+        .icon-box { font-size: 4rem; color: var(--primary); margin-bottom: 1.5rem; opacity: 0.2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon-box"><i class="fas fa-map-marked-alt"></i></div>
+        <div class="error-code">404</div>
+        <h1>Página não encontrada</h1>
+        <p>Desculpe, o caminho que você está tentando acessar não existe ou foi movido permanentemente.</p>
+        <a href="/" class="btn"><i class="fas fa-home"></i> Voltar ao Início</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>MAM Control - Auditoria</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    
+    <style>
+        /* Reset e estilos base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+        /* Section header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        /* Filtros */
+        .filters-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-group label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+        }
+
+        .filter-group input, .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .filter-group input:focus, .filter-group select:focus {
+            border-color: #4a90d9;
+        }
+
+        /* Tabela */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: auto;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+            color: #1e293b;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Badges de Ação */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-create { background: #dcfce7; color: #166534; }
+        .badge-update { background: #dbeafe; color: #1e40af; }
+        .badge-delete { background: #fee2e2; color: #991b1b; }
+        .badge-login { background: #fef3c7; color: #92400e; }
+        .badge-other { background: #f1f5f9; color: #475569; }
+
+        /* Modal Details */
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            max-height: 400px;
+        }
+
+        .diff-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .diff-column h4 {
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            color: #64748b;
+        }
+
+        .btn-view {
+            color: #4a90d9;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1.1rem;
+        }
+
+        .btn-view:hover { color: #3a78c2; }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 24px;
+            padding-bottom: 24px;
+        }
+
+        .btn-page {
+            padding: 8px 16px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-page:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-page.active {
+            background: #4a90d9;
+            color: white;
+            border-color: #4a90d9;
+        }
+
+        .hidden { display: none; }
+
+        /* Modal overlay fix */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .modal-container {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+        }
+        .modal-close {
+            background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #94a3b8;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section class="content-section active">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1>Auditoria de Sistema</h1>
+                            <p>Histórico de alterações e ações dos usuários</p>
+                        </div>
+                    </div>
+
+                    <div class="filters-container">
+                        <div class="filter-group" style="flex: 1; min-width: 250px;">
+                            <label>Buscar</label>
+                            <input type="text" id="filter-search" placeholder="Buscar por nome, detalhes, etc..." onkeyup="if(event.key === 'Enter') loadLogs(1)">
+                        </div>
+                        <div class="filter-group">
+                            <label>Início</label>
+                            <input type="date" id="filter-start">
+                        </div>
+                        <div class="filter-group">
+                            <label>Fim</label>
+                            <input type="date" id="filter-end">
+                        </div>
+                        <div class="filter-group">
+                            <label>ID Usuário</label>
+                            <input type="number" id="filter-user" placeholder="ID...">
+                        </div>
+                        <div class="filter-group">
+                            <label>Ação</label>
+                            <select id="filter-action">
+                                <option value="">Todas</option>
+                                <option value="CREATE">Criação</option>
+                                <option value="UPDATE">Atualização</option>
+                                <option value="DELETE">Exclusão</option>
+                                <option value="LOGIN">Login</option>
+                                <option value="LOGOUT">Logout</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Entidade</label>
+                            <select id="filter-entity">
+                                <option value="">Todas</option>
+                                <option value="person">Pessoas</option>
+                                <option value="visitor">Visitantes</option>
+                                <option value="user">Usuários</option>
+                                <option value="company">Empresas</option>
+                                <option value="group">Grupos</option>
+                                <option value="equipment">Equipamentos</option>
+                                <option value="vehicle">Veículos</option>
+                                <option value="system_config">Configurações</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="loadLogs(1)">
+                            <i class="fas fa-search"></i> Filtrar
+                        </button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 160px;">Data/Hora</th>
+                                    <th>Usuário</th>
+                                    <th>Ação</th>
+                                    <th>Entidade</th>
+                                    <th>Descrição</th>
+                                    <th>IP</th>
+                                    <th style="width: 80px;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-tbody">
+                                <!-- Preenchido via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination" id="pagination">
+                        <!-- Paginação via JS -->
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalhes -->
+    <div id="detailsModal" class="modal-overlay hidden">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-history"></i> Comparação de Alterações</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="modal-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+    <script src="../../auth.js"></script>
+
+    <script>
+        let currentPage = 1;
+        const limit = 20;
+
+        const fieldLabels = {
+            'name': 'Nome',
+            'email': 'Email',
+            'role': 'Perfil',
+            'active': 'Ativo',
+            'cpf': 'CPF',
+            'document': 'Documento',
+            'registration_number': 'Matrícula',
+            'corporate_name': 'Razão Social',
+            'trading_name': 'Nome Fantasia',
+            'cnpj': 'CNPJ',
+            'phone': 'Telefone',
+            'cellphone': 'Celular',
+            'group_id': 'ID do Grupo',
+            'company_id': 'ID da Empresa',
+            'status': 'Status',
+            'plate': 'Placa',
+            'license_plate': 'Placa',
+            'brand': 'Marca',
+            'model': 'Modelo',
+            'color': 'Cor',
+            'year': 'Ano',
+            'ip_address': 'Endereço IP',
+            'config_value': 'Valor da Configuração',
+            'config_key': 'Chave da Configuração'
+        };
+
+        async function loadLogs(page = 1) {
+            currentPage = page;
+            const tbody = document.getElementById('logs-tbody');
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center">Carregando...</td></tr>';
+
+            const search = document.getElementById('filter-search').value;
+            const start = document.getElementById('filter-start').value;
+            const end = document.getElementById('filter-end').value;
+            const user_id = document.getElementById('filter-user').value;
+            const action = document.getElementById('filter-action').value;
+            const entity = document.getElementById('filter-entity').value;
+
+            try {
+                const token = localStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('accessToken');
+                const tenantId = localStorage.getItem('tenant_id') || 'default';
+                
+                let url = `/api/audit?page=${page}&limit=${limit}`;
+                if (search) url += `&search=${encodeURIComponent(search)}`;
+                if (start) url += `&startDate=${start}`;
+                if (end) url += `&endDate=${end}`;
+                if (user_id) url += `&user_id=${user_id}`;
+                if (action) url += `&action=${action}`;
+                if (entity) url += `&entity_type=${entity}`;
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Tenant-ID': tenantId
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    renderLogs(result.data);
+                    renderPagination(result.pagination);
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center">${result.message}</td></tr>`;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar logs:', error);
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">Erro ao conectar com o servidor</td></tr>';
+            }
+        }
+
+        function renderLogs(logs) {
+            const tbody = document.getElementById('logs-tbody');
+            if (logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">Nenhum registro encontrado</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = logs.map(log => {
+                const dateObj = new Date(log.created_at);
+                const date = dateObj.toLocaleDateString('pt-BR');
+                const time = dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                
+                const badgeClass = `badge-${log.action.toLowerCase()}` || 'badge-other';
+                
+                return `
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600;">${date}</div>
+                            <div style="font-size: 0.75rem; color: #64748b;">${time}</div>
+                        </td>
+                        <td>
+                            <div style="font-weight: 600;">${log.user_name || 'Sistema'}</div>
+                            <div style="font-size: 0.75rem; color: #94a3b8;">ID: ${log.user_id || '-'}</div>
+                        </td>
+                        <td><span class="badge ${badgeClass}">${log.action}</span></td>
+                        <td>${formatEntity(log.entity_type)}</td>
+                        <td>${log.description || '-'}</td>
+                        <td><small>${log.ip_address || '-'}</small></td>
+                        <td class="text-center">
+                            ${(log.old_values || log.new_values) ? 
+                                `<button class="btn-view" onclick="viewDetails(${log.id})" title="Ver Detalhes"><i class="fas fa-eye"></i></button>` : 
+                                '-'}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function formatEntity(type) {
+            const maps = {
+                'person': 'Pessoa',
+                'visitor': 'Visitante',
+                'user': 'Usuário',
+                'company': 'Empresa',
+                'group': 'Grupo',
+                'equipment': 'Equipamento',
+                'vehicle': 'Veículo',
+                'system_config': 'Configuração'
+            };
+            return maps[type] || type;
+        }
+
+        function renderPagination(p) {
+            const div = document.getElementById('pagination');
+            let html = `
+                <button class="btn-page" ${p.page <= 1 ? 'disabled' : ''} onclick="loadLogs(${p.page - 1})">Anterior</button>
+                <span>Página ${p.page} de ${p.totalPages}</span>
+                <button class="btn-page" ${p.page >= p.totalPages ? 'disabled' : ''} onclick="loadLogs(${p.page + 1})">Próxima</button>
+            `;
+            div.innerHTML = html;
+        }
+
+        async function viewDetails(id) {
+            try {
+                const token = localStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('accessToken');
+                const tenantId = localStorage.getItem('tenant_id') || 'default';
+                
+                const response = await fetch(`/api/audit/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Tenant-ID': tenantId
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    const log = result.data;
+                    const oldVals = log.old_values ? JSON.parse(log.old_values) : null;
+                    const newVals = log.new_values ? JSON.parse(log.new_values) : null;
+
+                    let content = '';
+                    
+                    if (log.action === 'UPDATE' && oldVals && newVals) {
+                        content = renderDiff(oldVals, newVals);
+                    } else {
+                        const data = newVals || oldVals;
+                        content = renderSingleObject(data, log.action === 'CREATE' ? 'Valores Iniciais' : 'Valores Finais');
+                    }
+
+                    document.getElementById('modal-content').innerHTML = content;
+                    document.getElementById('detailsModal').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Erro ao carregar detalhes');
+            }
+        }
+
+        function renderDiff(oldData, newData) {
+            let html = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Campo</th>
+                            <th>De</th>
+                            <th>Para</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            // Obter todas as chaves únicas de ambos os objetos
+            const keys = new Set([...Object.keys(oldData), ...Object.keys(newData)]);
+            let hasChanges = false;
+
+            keys.forEach(key => {
+                if (key === 'updated_at' || key === 'created_at' || key === 'password_hash') return;
+
+                const oldVal = oldData[key];
+                const newVal = newData[key];
+
+                if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
+                    hasChanges = true;
+                    html += `
+                        <tr>
+                            <td style="font-weight: 600;">${fieldLabels[key] || key}</td>
+                            <td style="color: #991b1b; text-decoration: line-through; background: #fee2e2;">${formatValue(oldVal)}</td>
+                            <td style="color: #166534; background: #dcfce7; font-weight: 500;">${formatValue(newVal)}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            if (!hasChanges) {
+                html += '<tr><td colspan="3" class="text-center">Nenhuma alteração detectada nos campos principais</td></tr>';
+            }
+
+            html += `</tbody></table>`;
+            return html;
+        }
+
+        function renderSingleObject(data, title) {
+            let html = `<h4>${title}</h4><table class="data-table"><thead><tr><th>Campo</th><th>Valor</th></tr></thead><tbody>`;
+            
+            Object.entries(data).forEach(([key, value]) => {
+                if (key === 'password_hash' || key === 'face_embedding' || value === null || value === undefined) return;
+                
+                html += `
+                    <tr>
+                        <td style="font-weight: 600; width: 30%;">${fieldLabels[key] || key}</td>
+                        <td>${formatValue(value)}</td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table>`;
+            return html;
+        }
+
+        function formatValue(val) {
+            if (val === null || val === undefined) return '<em style="color: grey;">Nulo</em>';
+            if (typeof val === 'object') return '<pre style="max-height: 100px; padding: 4px; font-size: 0.7rem;">' + JSON.stringify(val, null, 2) + '</pre>';
+            if (val === 1 && typeof val === 'number') return 'Sim / Ativo';
+            if (val === 0 && typeof val === 'number') return 'Não / Inativo';
+            return String(val);
+        }
+
+        function closeModal() {
+            document.getElementById('detailsModal').classList.add('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLogs();
+        });
+    </script>
+</body>
+</html>

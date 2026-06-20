@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema em Manutenção - MAM Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; height: 100vh; display: flex; align-items: center; justify-content: center; color: var(--text-primary); }
+        .container { text-align: center; padding: 2rem; max-width: 500px; width: 100%; }
+        .maintenance-icon { font-size: 5rem; margin-bottom: 2rem; display: inline-block; position: relative; }
+        .maintenance-icon .fa-gear { color: var(--primary); animation: spin 4s linear infinite; }
+        .maintenance-icon .fa-tools { position: absolute; bottom: -5px; right: -10px; font-size: 2.5rem; color: var(--primary-light); }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        h1 { font-size: 1.75rem; margin-bottom: 1rem; font-weight: 700; }
+        p { color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6; }
+        .status-box { background: white; border: 1px solid #e2e8f0; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .status-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: #fef3c7; color: #92400e; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; margin-bottom: 1rem; text-transform: uppercase; }
+        .pulse { width: 8px; height: 8px; background: #f59e0b; border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
+        .logo { margin-top: 3rem; opacity: 0.5; font-weight: 700; letter-spacing: -0.5px; font-size: 1.25rem; }
+        .logo span { color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="maintenance-icon">
+            <i class="fas fa-gear"></i>
+            <i class="fas fa-tools"></i>
+        </div>
+        <div class="status-box">
+            <div class="status-badge"><div class="pulse"></div> Manutenção em curso</div>
+            <h1>Sistema em Atualização</h1>
+            <p>Estamos realizando melhorias programadas para garantir a melhor experiência e segurança do sistema. Voltaremos em breve!</p>
+        </div>
+        <div class="logo">MAM <span>Control</span></div>
+    </div>
+</body>
+</html>

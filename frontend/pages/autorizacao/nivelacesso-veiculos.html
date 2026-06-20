@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>MAM Control - Nível de Acesso Veículos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+
+    <style>
+        /* Reset e estilos base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+        /* Cards */
+        .content-box {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Grid de formulário */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .grid-col-full {
+            grid-column: 1 / -1;
+        }
+
+        /* Form groups */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #ffffff;
+            font-family: inherit;
+        }
+
+        .form-group input:hover,
+        .form-group select:hover,
+        .form-group textarea:hover {
+            border-color: #94a3b8;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .form-group input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .form-group input[type="number"]::-webkit-inner-spin-button,
+        .form-group input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .required:after {
+            content: " *";
+            color: #e53e3e;
+        }
+
+        /* Form hint */
+        .form-hint {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* Botões */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.2);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Section header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-header-compact {
+            margin-bottom: 20px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title h2 {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Tabela */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: auto;
+            margin-bottom: 20px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            color: #1e293b;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        /* Seções de seleção */
+        .selecao-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .selecao-section h3 {
+            margin-bottom: 16px;
+            color: #1e293b;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selecao-section h3 i {
+            color: #4a90d9;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #4a90d9;
+        }
+
+        .selecao-items {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .selecao-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .selecao-item:last-child {
+            border-bottom: none;
+        }
+
+        .selecao-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #4a90d9;
+        }
+
+        .selecao-item span {
+            flex: 1;
+            font-size: 0.95rem;
+        }
+
+        .selecao-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .selecao-header .btn-sm {
+            padding: 4px 8px;
+        }
+
+        /* Busca dentro das seções */
+        .selecao-search {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 0 8px;
+        }
+
+        .selecao-search i {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .selecao-search input {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            background: none;
+            font-size: 0.9rem;
+        }
+
+        .selecao-search input:focus {
+            outline: none;
+        }
+
+        /* Badge de contador */
+        .contador-badge {
+            background: #e2e8f0;
+            color: #475569;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Toggle switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e2e8f0;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked+.toggle-slider {
+            background-color: #4a90d9;
+        }
+
+        input:checked+.toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        /* Ações do formulário */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Garantir que o formulário seja visível quando não hidden */
+        #nivelacesso-veiculos-form:not(.hidden) {
+            display: block !important;
+        }
+
+        /* Texto centralizado */
+        .text-center {
+            text-align: center;
+        }
+
+        /* Mensagem vazia */
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+
+        .empty-message i {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* Grid de controles */
+        .controle-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: center;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .selecao-section {
+                padding: 16px;
+            }
+
+            .controle-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <!-- LIST VIEW -->
+                <section id="nivelacesso-veiculos-list" class="content-section active">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1>Nível de Acesso - Veículos</h1>
+                            <p>Definir níveis de acesso para veículos</p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary" onclick="carregarNiveis()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button class="btn btn-primary" onclick="mostrarFormulario()">
+                                <i class="fas fa-plus"></i> Novo Nível
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="content-box">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nível</th>
+                                    <th>Descrição</th>
+                                    <th>Estacionamentos</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="niveis-table-body">
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="empty-message">
+                                            <i class="fas fa-car"></i>
+                                            <p>Nenhum nível de acesso cadastrado</p>
+                                            <button class="btn btn-primary btn-sm" onclick="mostrarFormulario()"
+                                                style="margin-top: 12px;">
+                                                <i class="fas fa-plus"></i> Cadastrar primeiro nível
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- FORM VIEW -->
+                <section id="nivelacesso-veiculos-form" class="content-section hidden">
+                    <div class="section-header section-header-compact">
+                        <div class="section-title">
+                            <h2 id="form-titulo">Novo Nível de Acesso - Veículos</h2>
+                            <p>Configure as permissões de acesso para veículos</p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary" onclick="mostrarLista()">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="nivelacessoForm" onsubmit="salvarNivel(event)">
+                        <input type="hidden" id="nivel-id">
+
+                        <!-- Dados do Nível -->
+                        <div class="content-box" style="margin-bottom: 20px;">
+                            <h3
+                                style="margin-bottom: 20px; color: #1e293b; font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-car" style="color: #4a90d9;"></i> Dados do Nível
+                            </h3>
+
+                            <div class="form-grid">
+                                <div class="form-group grid-col-full">
+                                    <label for="nivel-nome" class="required">Nome do Nível</label>
+                                    <input type="text" id="nivel-nome" required
+                                        placeholder="Ex: Acesso Funcionários, Visitantes, Serviços">
+                                </div>
+
+                                <div class="form-group grid-col-full">
+                                    <label for="nivel-descricao">Descrição</label>
+                                    <textarea id="nivel-descricao" rows="2"
+                                        placeholder="Descrição do nível de acesso (opcional)"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quem pode acessar -->
+                        <div class="content-box" style="margin-bottom: 20px;">
+                            <div class="selecao-section">
+                                <h3><i class="fas fa-users"></i> Quem pode acessar?</h3>
+
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="tipo-acesso" value="pessoas-especificas" checked
+                                            onchange="toggleTipoAcesso()">
+                                        <span>Pessoas Específicas</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="tipo-acesso" value="pessoas-geral"
+                                            onchange="toggleTipoAcesso()">
+                                        <span>Pessoas (em geral)</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="tipo-acesso" value="visitantes-geral"
+                                            onchange="toggleTipoAcesso()">
+                                        <span>Visitantes (em geral)</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="tipo-acesso" value="empresas"
+                                            onchange="toggleTipoAcesso()">
+                                        <span>Empresas</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="tipo-acesso" value="grupos"
+                                            onchange="toggleTipoAcesso()">
+                                        <span>Grupos</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="tipo-acesso" value="veiculos"
+                                            onchange="toggleTipoAcesso()">
+                                        <span>Veículos</span>
+                                    </label>
+                                </div>
+
+                                <!-- Container para Pessoas Espec?ficas -->
+                                <div id="container-pessoas-especificas" class="selecao-items">
+                                    <div class="selecao-header">
+                                        <span class="contador-badge" id="pessoas-count">0 selecionadas</span>
+                                        <button type="button" class="btn btn-sm btn-secondary"
+                                            onclick="selecionarTodasPessoas()">
+                                            <i class="fas fa-check-double"></i> Selecionar todas
+                                        </button>
+                                    </div>
+                                    <div class="selecao-search">
+                                        <i class="fas fa-search"></i>
+                                        <input type="text" placeholder="Buscar pessoa..."
+                                            onkeyup="buscarPessoas(this.value)">
+                                    </div>
+                                    <div id="pessoas-lista">
+                                        <!-- Lista de pessoas ser?o carregadas via JS -->
+                                        
+                                    </div>
+                                </div>
+
+                                <!-- Container para Veículos -->
+                                <div id="container-veiculos" class="selecao-items hidden">
+                                    <div class="selecao-header">
+                                        <span class="contador-badge" id="veiculos-count">0 selecionados</span>
+                                        <button type="button" class="btn btn-sm btn-secondary"
+                                            onclick="selecionarTodosVeiculos()">
+                                            <i class="fas fa-check-double"></i> Selecionar todos
+                                        </button>
+                                    </div>
+                                    <div class="selecao-search">
+                                        <i class="fas fa-search"></i>
+                                        <input type="text" placeholder="Buscar veículo..."
+                                            onkeyup="buscarVeiculos(this.value)">
+                                    </div>
+                                    <div id="veiculos-lista">
+                                        <!-- Lista de veículos serão carregados via JS -->
+                                    </div>
+                                </div>
+
+                                <!-- Container para Pessoas em Geral -->
+                                <div id="container-pessoas-geral" class="selecao-items hidden"
+                                    style="background: #f0f9ff; border-color: #4a90d9;">
+                                    <div style="padding: 20px; text-align: center;">
+                                        <i class="fas fa-users"
+                                            style="font-size: 2rem; color: #4a90d9; margin-bottom: 10px;"></i>
+                                        <p style="font-weight: 600; color: #1e293b; margin-bottom: 5px;">Todas as
+                                            pessoas est?o inclu?das</p>
+                                        <p style="font-size: 0.85rem; color: #64748b;">Esta regra se aplica a todos os
+                                            funcion?rios cadastrados</p>
+                                    </div>
+                                </div>
+
+
+                                <!-- Container para Visitantes em Geral -->
+                                <div id="container-visitantes-geral" class="selecao-items hidden"
+                                    style="background: #f0f9ff; border-color: #4a90d9;">
+                                    <div style="padding: 20px; text-align: center;">
+                                        <i class="fas fa-user-friends"
+                                            style="font-size: 2rem; color: #4a90d9; margin-bottom: 10px;"></i>
+                                        <p style="font-weight: 600; color: #1e293b; margin-bottom: 5px;">Todos os
+                                            visitantes est?o inclu?dos</p>
+                                        <p style="font-size: 0.85rem; color: #64748b;">Esta regra se aplica a todos os
+                                            visitantes</p>
+                                    </div>
+                                </div>
+
+                                <!-- Container para Empresas -->
+                                <div id="container-empresas" class="selecao-items hidden">
+                                    <div class="selecao-header">
+                                        <span class="contador-badge" id="empresas-count">0 selecionadas</span>
+                                        <button type="button" class="btn btn-sm btn-secondary"
+                                            onclick="selecionarTodasEmpresas()">
+                                            <i class="fas fa-check-double"></i> Selecionar todas
+                                        </button>
+                                    </div>
+                                    <div class="selecao-search">
+                                        <i class="fas fa-search"></i>
+                                        <input type="text" placeholder="Buscar empresa..."
+                                            onkeyup="buscarEmpresas(this.value)">
+                                    </div>
+                                    <div id="empresas-lista">
+                                        <!-- Lista de empresas ser?o carregados via api pelo backend -->
+                                    </div>
+                                </div>
+
+                                <!-- Container para grupos -->
+                                <div id="container-grupos" class="selecao-items hidden">
+                                    <div class="selecao-header">
+                                        <span class="contador-badge" id="grupos-count">0 selecionados</span>
+                                        <button type="button" class="btn btn-sm btn-secondary"
+                                            onclick="selecionarTodosGrupos()">
+                                            <i class="fas fa-check-double"></i> Selecionar todas
+                                        </button>
+                                    </div>
+                                    <div class="selecao-search">
+                                        <i class="fas fa-search"></i>
+                                        <input type="text" placeholder="Buscar grupo..."
+                                            onkeyup="buscarGrupos(this.value)">
+                                    </div>
+                                    <div id="grupos-lista">
+                                        <!-- Lista de grupos ser?o carregados via api pelo backend -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Configurações de Estacionamento -->
+                        <div class="content-box" style="margin-bottom: 20px;">
+                            <div class="selecao-section">
+                                <h3><i class="fas fa-car"></i> Configurações de Estacionamento</h3>
+                                
+                                <div class="form-group" style="margin-bottom: 16px;">
+                                    <label class="toggle-label">
+                                        <span style="font-size: 0.95rem; color: #1e293b; font-weight: 500;">Habilitar controle de vagas?</span>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="controle-vagas" onchange="toggleVagas()">
+                                            <span class="toggle-slider"></span>
+                                        </div>
+                                    </label>
+                                    <small style="color: #64748b; display: block; margin-top: 4px;">
+                                        Quando enabled, o sistema verificará a quantidade de vagas disponíveis no cadastro do estacionamento
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Estacionamentos -->
+                        <div class="content-box" style="margin-bottom: 20px;">
+                            <div class="selecao-section">
+                                <h3><i class="fas fa-parking"></i> Estacionamentos</h3>
+
+                                <div class="selecao-header" style="margin-bottom: 16px;">
+                                    <span class="contador-badge" id="estacionamentos-count">0 selecionados</span>
+                                    <button type="button" class="btn btn-sm btn-secondary"
+                                        onclick="selecionarTodosEstacionamentos()">
+                                        <i class="fas fa-check-double"></i> Selecionar todos
+                                    </button>
+                                </div>
+
+                                <div class="selecao-search" style="margin-bottom: 16px;">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" placeholder="Buscar estacionamento..."
+                                        onkeyup="buscarEstacionamentos(this.value)">
+                                </div>
+
+                                <div class="selecao-items" id="estacionamentos-lista">
+                                    <!-- Lista de estacionamentos serão carregados via JS do banco de dados -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Equipamentos -->
+                        <div class="content-box" style="margin-bottom: 20px;">
+                            <div class="selecao-section">
+                                <h3><i class="fas fa-microchip"></i> Equipamentos (Catracas/Controle)</h3>
+
+                                <div class="selecao-header" style="margin-bottom: 16px;">
+                                    <span class="contador-badge" id="equipamentos-count">0 selecionados</span>
+                                    <button type="button" class="btn btn-sm btn-secondary"
+                                        onclick="selecionarTodosEquipamentos()">
+                                        <i class="fas fa-check-double"></i> Selecionar todos
+                                    </button>
+                                </div>
+
+                                <div class="selecao-search" style="margin-bottom: 16px;">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" placeholder="Buscar equipamento..."
+                                        onkeyup="buscarEquipamentos(this.value)">
+                                </div>
+
+                                <div class="selecao-items" id="equipamentos-lista">
+                                    <!-- Lista de equipamentos serão carregados via JS do banco de dados -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Horários -->
+                        <div class="content-box" style="margin-bottom: 20px;">
+                            <div class="selecao-section">
+                                <h3><i class="fas fa-clock"></i> Horários Permitidos</h3>
+
+                                <div class="radio-group" style="margin-bottom: 16px;">
+                                    <label class="radio-option">
+                                        <input type="radio" name="tipo-horario" value="especifico" checked
+                                            onchange="toggleHorario()">
+                                        <span>Horários Específicos</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="tipo-horario" value="livre"
+                                            onchange="toggleHorario()">
+                                        <span>Livre (24/7)</span>
+                                    </label>
+                                </div>
+
+                                <div id="selecao-horarios">
+                                    <div class="selecao-header" style="margin-bottom: 16px;">
+                                        <span class="contador-badge" id="horarios-count">0 selecionados</span>
+                                        <button type="button" class="btn btn-sm btn-secondary"
+                                            onclick="selecionarTodosHorarios()">
+                                            <i class="fas fa-check-double"></i> Selecionar todos
+                                        </button>
+                                    </div>
+
+                                    <div class="selecao-search" style="margin-bottom: 16px;">
+                                        <i class="fas fa-search"></i>
+                                        <input type="text" placeholder="Buscar horário..."
+                                            onkeyup="buscarHorarios(this.value)">
+                                    </div>
+
+                                    <div class="selecao-items" id="horarios-lista">
+                                        <!-- Lista de pessoas serão carregadas via JS do banco de dados -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Controle de Vagas -->
+                        <div class="content-box" style="margin-bottom: 20px;">
+                            <div class="selecao-section">
+                                <h3><i class="fas fa-layer-group"></i> Controle de Vagas</h3>
+
+                                <div class="controle-grid">
+                                    <div class="form-group">
+                                        <label class="toggle-label">
+                                            <span
+                                                style="font-size: 0.95rem; color: #1e293b; font-weight: 500;">Habilitar
+                                                controle de vagas?</span>
+                                            <div class="toggle-switch">
+                                                <input type="checkbox" id="controle-vagas" onchange="toggleVagas()">
+                                                <span class="toggle-slider"></span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ações -->
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="mostrarLista()">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Salvar Nível
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+    <script src="../../auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+    <script>
+        // Estado da aplicação
+        let niveis = [];
+        let editandoId = null;
+
+        // Dados mockados
+        const niveisExemplo = [];
+
+        // API Service - usa o objeto global do app.js
+        // O objeto 'api' já está disponível globalmente de app.js
+        
+        // Carregar veículos do banco
+        async function carregarVeiculos() {
+            try {
+                console.log('[DEBUG] Carregando veículos...');
+                const data = await api.getAllVehicles();
+                const veiculos = Array.isArray(data) ? data : (data && data.data && Array.isArray(data.data) ? data.data : []);
+                console.log('[DEBUG] Veículos carregados:', veiculos.length);
+                const container = document.getElementById('veiculos-lista');
+                
+                if (container) {
+                    if (veiculos.length === 0) {
+                        container.innerHTML = '<p style="padding: 10px; color: #666;">Nenhum veículo cadastrado</p>';
+                    } else {
+                        container.innerHTML = veiculos.map(v => {
+                            const nomeExibicao = v.plate || v.license_plate || v.model || 'Sem placa';
+                            return `<div class="selecao-item"><input type="checkbox" value="${v.id}" onchange="atualizarContadores()"><span>${nomeExibicao}</span></div>`;
+                        }).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('[DEBUG] Erro ao carregar veículos:', error);
+            }
+        }
+        
+        // Carregar empresas do banco
+        async function carregarEmpresas() {
+            try {
+                console.log('[DEBUG] Carregando empresas...');
+                const data = await api.getAllCompanies();
+                const empresas = Array.isArray(data) ? data : (data && data.data && Array.isArray(data.data) ? data.data : []);
+                console.log('[DEBUG] Empresas carregadas:', empresas.length);
+                const container = document.getElementById('empresas-lista');
+                
+                if (container) {
+                    if (empresas.length === 0) {
+                        container.innerHTML = '<p style="padding: 10px; color: #666;">Nenhuma empresa cadastrada</p>';
+                    } else {
+                        container.innerHTML = empresas.map(e => {
+                            const nomeExibicao = e.name || e.nome || e.corporate_name || e.trading_name || 'Sem nome';
+                            return `<div class="selecao-item"><input type="checkbox" value="${e.id}" onchange="atualizarContadores()"><span>${nomeExibicao}</span></div>`;
+                        }).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('[DEBUG] Erro ao carregar empresas:', error);
+            }
+        }
+        
+        // Carregar estacionamentos do banco
+        async function carregarEstacionamentos() {
+            try {
+                console.log('[DEBUG] Carregando estacionamentos...');
+                const data = await api.getParkings();
+                const estacionamentos = Array.isArray(data) ? data : (data && data.data && Array.isArray(data.data) ? data.data : []);
+                console.log('[DEBUG] Estacionamentos carregados:', estacionamentos.length);
+                const container = document.getElementById('estacionamentos-lista');
+                
+                if (container) {
+                    if (estacionamentos.length === 0) {
+                        container.innerHTML = '<p style="padding: 10px; color: #666;">Nenhum estacionamento cadastrado</p>';
+                    } else {
+                        container.innerHTML = estacionamentos.map(p => {
+                            const nomeExibicao = p.name || p.nome || 'Sem nome';
+                            return `<div class="selecao-item"><input type="checkbox" value="${p.id}" onchange="atualizarContadores()"><span>${nomeExibicao}</span></div>`;
+                        }).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('[DEBUG] Erro ao carregar estacionamentos:', error);
+            }
+        }
+        
+        // Carregar horários do banco
+        async function carregarHorarios() {
+            try {
+                console.log('[DEBUG] Carregando horários...');
+                const data = await api.getSchedules();
+                const horarios = Array.isArray(data) ? data : (data && data.data && Array.isArray(data.data) ? data.data : []);
+                console.log('[DEBUG] Horários carregados:', horarios.length);
+                const container = document.getElementById('horarios-lista');
+                
+                if (container) {
+                    if (horarios.length === 0) {
+                        container.innerHTML = '<p style="padding: 10px; color: #666;">Nenhum horário cadastrado</p>';
+                    } else {
+                        container.innerHTML = horarios.map(h => {
+                            const nomeExibicao = h.name || h.nome || h.schedule_name || 'Sem nome';
+                            return `<div class="selecao-item"><input type="checkbox" value="${h.id}" onchange="atualizarContadores()"><span>${nomeExibicao}</span></div>`;
+                        }).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('[DEBUG] Erro ao carregar horários:', error);
+            }
+        }
+        
+        // Carregar equipamentos do banco
+        async function carregarEquipamentos() {
+            try {
+                console.log('[DEBUG] Carregando equipamentos...');
+                const data = await api.getEquipments();
+                const equipamentos = Array.isArray(data) ? data : (data && data.data && Array.isArray(data.data) ? data.data : []);
+                console.log('[DEBUG] Equipamentos carregados:', equipamentos.length);
+                const container = document.getElementById('equipamentos-lista');
+                
+                if (container) {
+                    if (equipamentos.length === 0) {
+                        container.innerHTML = '<p style="padding: 10px; color: #666;">Nenhum equipamento cadastrado</p>';
+                    } else {
+                        container.innerHTML = equipamentos.map(e => {
+                            const nomeExibicao = e.name || e.nome || 'Sem nome';
+                            return `<div class="selecao-item"><input type="checkbox" value="${e.id}" onchange="atualizarContadores()"><span>${nomeExibicao}</span></div>`;
+                        }).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('[DEBUG] Erro ao carregar equipamentos:', error);
+            }
+        }
+        
+        // Carregar todas as listas necessárias
+        async function carregarListas() {
+            console.log('[DEBUG] Carregando todas as listas...');
+            await Promise.all([
+                carregarPessoas(),
+                carregarGrupos(),
+                carregarVeiculos(),
+                carregarEmpresas(),
+                carregarEstacionamentos(),
+                carregarHorarios(),
+                carregarEquipamentos()
+            ]);
+            console.log('[DEBUG] Todas as listas carregadas!');
+        }
+
+        // Carregar pessoas do banco
+        async function carregarPessoas() {
+            try {
+                console.log('[DEBUG] Carregando pessoas...');
+                const data = await api.getPersons();
+                const pessoas = Array.isArray(data) ? data : (data && data.data && Array.isArray(data.data) ? data.data : []);
+                console.log('[DEBUG] Pessoas carregadas:', pessoas.length);
+                const container = document.getElementById('pessoas-lista');
+                
+                if (container) {
+                    if (pessoas.length === 0) {
+                        container.innerHTML = '<p style="padding: 10px; color: #666;">Nenhuma pessoa cadastrada</p>';
+                    } else {
+                        container.innerHTML = pessoas.map(p => {
+                            const nomeExibicao = p.name || p.nome || p.nome_pessoa || 'Sem nome';
+                            return `<div class="selecao-item"><input type="checkbox" value="${p.id}" onchange="atualizarContadores()"><span>${nomeExibicao}</span></div>`;
+                        }).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('[DEBUG] Erro ao carregar pessoas:', error);
+            }
+        }
+
+        // Carregar grupos do banco
+        async function carregarGrupos() {
+            try {
+                console.log('[DEBUG] Carregando grupos...');
+                const data = await api.getGroups();
+                const grupos = Array.isArray(data) ? data : (data && data.data && Array.isArray(data.data) ? data.data : []);
+                console.log('[DEBUG] Grupos carregados:', grupos.length);
+                const container = document.getElementById('grupos-lista');
+                
+                if (container) {
+                    if (grupos.length === 0) {
+                        container.innerHTML = '<p style="padding: 10px; color: #666;">Nenhum grupo cadastrado</p>';
+                    } else {
+                        container.innerHTML = grupos.map(g => {
+                            const nomeExibicao = g.name || g.nome || 'Sem nome';
+                            return `<div class="selecao-item"><input type="checkbox" value="${g.id}" onchange="atualizarContadores()"><span>${nomeExibicao}</span></div>`;
+                        }).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('[DEBUG] Erro ao carregar grupos:', error);
+            }
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', async function () {
+            console.log('DOM carregado');
+            await carregarNiveis();
+            renderizarLista();
+            await carregarListas(); // Carregar veículos, empresas, estacionamentos, horários e equipamentos
+
+            document.getElementById('nivelacesso-veiculos-list').classList.remove('hidden');
+            document.getElementById('nivelacesso-veiculos-form').classList.add('hidden');
+        });
+
+        // Navegação
+        async function mostrarFormulario() {
+            console.log('[DEBUG] ===== MOSTRANDO FORMULÁRIO =====');
+            const lista = document.getElementById('nivelacesso-veiculos-list');
+            const form = document.getElementById('nivelacesso-veiculos-form');
+            console.log('[DEBUG] Elementos - lista:', lista, 'form:', form);
+
+            if (lista && form) {
+                lista.classList.add('hidden');
+                form.classList.remove('hidden');
+
+                document.getElementById('form-titulo').textContent = 'Novo Nível de Acesso - Veículos';
+                document.getElementById('nivelacessoForm').reset();
+                document.getElementById('nivel-id').value = '';
+                document.getElementById('controle-vagas').checked = false;
+                editandoId = null;
+
+                const radioGrupos = document.querySelector('input[name="tipo-acesso"][value="grupos"]');
+                if (radioGrupos) radioGrupos.checked = true;
+
+                const radioHorario = document.querySelector('input[name="tipo-horario"][value="especifico"]');
+                if (radioHorario) radioHorario.checked = true;
+
+                toggleTipoAcesso();
+                toggleHorario();
+                toggleVagas();
+                toggleVagas();
+                atualizarContadores();
+                
+                // Carregar listas do banco
+                console.log('[DEBUG] Chamando carregarListas()...');
+                await carregarListas();
+                console.log('[DEBUG] carregarListas() concluído!');
+            } else {
+                console.error('[DEBUG] Elementos não encontrados!');
+            }
+        }
+
+        function mostrarLista() {
+            console.log('Mostrando lista');
+            const lista = document.getElementById('nivelacesso-veiculos-list');
+            const form = document.getElementById('nivelacesso-veiculos-form');
+
+            if (lista && form) {
+                lista.classList.remove('hidden');
+                form.classList.add('hidden');
+                editandoId = null;
+            }
+        }
+
+        async function carregarNiveis() {
+            console.log('Carregando níveis da API');
+            try {
+                const response = await api.request('/access-rules?access_target=vehicles');
+                if (response.success) {
+                    niveis = response.data || [];
+                    console.log('Níveis carregados:', niveis.length);
+                } else {
+                    console.error('Erro ao carregar níveis:', response.message);
+                    niveis = [];
+                }
+            } catch (error) {
+                console.error('Erro ao carregar níveis:', error);
+                niveis = [];
+            }
+            renderizarLista();
+        }
+
+        // Toggle de seções
+        function toggleTipoAcesso() {
+            const tipo = document.querySelector('input[name="tipo-acesso"]:checked')?.value;
+            console.log('Tipo selecionado:', tipo);
+
+            if (!tipo) return;
+
+            const secoes = {
+                'pessoas-especificas': document.getElementById('container-pessoas-especificas'),
+                'pessoas-geral': document.getElementById('container-pessoas-geral'),
+                'visitantes-geral': document.getElementById('container-visitantes-geral'),
+                'empresas': document.getElementById('container-empresas'),
+                'grupos': document.getElementById('container-grupos'),
+                'veiculos': document.getElementById('container-veiculos')
+            };
+
+            Object.values(secoes).forEach(sec => {
+                if (sec) sec.classList.add('hidden');
+            });
+
+            if (tipo !== 'todos' && secoes[tipo]) {
+                secoes[tipo].classList.remove('hidden');
+            }
+        }
+
+        function toggleHorario() {
+            const tipo = document.querySelector('input[name="tipo-horario"]:checked')?.value;
+            const horarios = document.getElementById('selecao-horarios');
+
+            if (!horarios) {
+                console.log('[DEBUG] Elemento selecao-horarios não encontrado');
+                return;
+            }
+
+            if (tipo === 'especifico') {
+                horarios.style.display = 'block';
+            } else {
+                horarios.style.display = 'none';
+            }
+        }
+
+        function toggleVagas() {
+            // O controle de vagas agora é baseado no cadastro do estacionamento
+            // Não precisa fazer nada aqui
+        }
+
+        // Funções de seleção em massa
+        function selecionarTodosGrupos() {
+            const checkboxes = document.querySelectorAll('#grupos-lista input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+            atualizarContadores();
+        }
+
+        function selecionarTodasEmpresas() {
+            const checkboxes = document.querySelectorAll('#empresas-lista input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+            atualizarContadores();
+        }
+
+        function selecionarTodosVeiculos() {
+            const checkboxes = document.querySelectorAll('#veiculos-lista input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+            atualizarContadores();
+        }
+
+        function selecionarTodosVisitantes() {
+            const checkboxes = document.querySelectorAll('#visitantes-lista input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+            atualizarContadores();
+        }
+
+        function selecionarTodosEstacionamentos() {
+            const checkboxes = document.querySelectorAll('#estacionamentos-lista input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+            atualizarContadores();
+        }
+
+        function selecionarTodosHorarios() {
+            const checkboxes = document.querySelectorAll('#horarios-lista input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+            atualizarContadores();
+        }
+
+        // Busca
+        function buscarGrupos(termo) {
+            console.log('Buscando grupos:', termo);
+        }
+
+        function buscarEmpresas(termo) {
+            console.log('Buscando empresas:', termo);
+            const container = document.getElementById('empresas-lista');
+            if (!container) return;
+            
+            const termoLower = termo.toLowerCase();
+            const items = container.querySelectorAll('.selecao-item');
+            
+            items.forEach(item => {
+                const texto = item.textContent.toLowerCase();
+                if (texto.includes(termoLower)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function buscarVeiculos(termo) {
+            console.log('Buscando veículos:', termo);
+            const container = document.getElementById('veiculos-lista');
+            if (!container) return;
+            
+            const termoLower = termo.toLowerCase();
+            const items = container.querySelectorAll('.selecao-item');
+            
+            items.forEach(item => {
+                const texto = item.textContent.toLowerCase();
+                if (texto.includes(termoLower)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function buscarEquipamentos(termo) {
+            console.log('Buscando equipamentos:', termo);
+            const container = document.getElementById('equipamentos-lista');
+            if (!container) return;
+            
+            const termoLower = termo.toLowerCase();
+            const items = container.querySelectorAll('.selecao-item');
+            
+            items.forEach(item => {
+                const texto = item.textContent.toLowerCase();
+                if (texto.includes(termoLower)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function buscarVisitantes(termo) {
+            console.log('Buscando visitantes:', termo);
+        }
+
+        function buscarEstacionamentos(termo) {
+            console.log('Buscando estacionamentos:', termo);
+            const container = document.getElementById('estacionamentos-lista');
+            if (!container) return;
+            
+            const termoLower = termo.toLowerCase();
+            const items = container.querySelectorAll('.selecao-item');
+            
+            items.forEach(item => {
+                const texto = item.textContent.toLowerCase();
+                if (texto.includes(termoLower)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function buscarHorarios(termo) {
+            console.log('Buscando horários:', termo);
+        }
+
+        function selecionarTodosEquipamentos() {
+            const checkboxes = document.querySelectorAll('#equipamentos-lista input[type="checkbox"]');
+            const todosMarcados = Array.from(checkboxes).every(cb => cb.checked);
+            checkboxes.forEach(cb => cb.checked = !todosMarcados);
+            atualizarContadores();
+        }
+
+        // Atualizar contadores
+        function atualizarContadores() {
+            const gruposCount = document.querySelectorAll('#grupos-lista input[type="checkbox"]:checked').length;
+            const gruposEl = document.getElementById('grupos-count');
+            if (gruposEl) gruposEl.textContent = gruposCount + ' selecionados';
+
+            const empresasCount = document.querySelectorAll('#empresas-lista input[type="checkbox"]:checked').length;
+            const empresasEl = document.getElementById('empresas-count');
+            if (empresasEl) empresasEl.textContent = empresasCount + ' selecionadas';
+
+            const veiculosCount = document.querySelectorAll('#veiculos-lista input[type="checkbox"]:checked').length;
+            const veiculosEl = document.getElementById('veiculos-count');
+            if (veiculosEl) veiculosEl.textContent = veiculosCount + ' selecionados';
+
+            const visitantesCount = document.querySelectorAll('#visitantes-lista input[type="checkbox"]:checked').length;
+            const visitantesEl = document.getElementById('visitantes-count');
+            if (visitantesEl) visitantesEl.textContent = visitantesCount + ' selecionados';
+
+            const estacionamentosCount = document.querySelectorAll('#estacionamentos-lista input[type="checkbox"]:checked').length;
+            const estacionamentosEl = document.getElementById('estacionamentos-count');
+            if (estacionamentosEl) estacionamentosEl.textContent = estacionamentosCount + ' selecionados';
+
+            const horariosCount = document.querySelectorAll('#horarios-lista input[type="checkbox"]:checked').length;
+            const horariosEl = document.getElementById('horarios-count');
+            if (horariosEl) horariosEl.textContent = horariosCount + ' selecionados';
+
+            const equipamentosCount = document.querySelectorAll('#equipamentos-lista input[type="checkbox"]:checked').length;
+            const equipamentosEl = document.getElementById('equipamentos-count');
+            if (equipamentosEl) equipamentosEl.textContent = equipamentosCount + ' selecionados';
+        }
+
+        document.addEventListener('change', function (e) {
+            if (e.target.matches('input[type="checkbox"]')) {
+                atualizarContadores();
+            }
+        });
+
+        // Salvar nível
+        async function salvarNivel(e) {
+            e.preventDefault();
+            console.log('Salvando nível');
+
+            const nome = document.getElementById('nivel-nome')?.value;
+            if (!nome) {
+                alert('Digite um nome para o nível!');
+                return;
+            }
+
+            // Coletar pessoas selecionadas
+            const pessoasSelecionadas = Array.from(
+                document.querySelectorAll('#pessoas-lista input[type="checkbox"]:checked')
+            ).map(cb => cb.value);
+
+            // Coletar grupos selecionados
+            const gruposSelecionados = Array.from(
+                document.querySelectorAll('#grupos-lista input[type="checkbox"]:checked')
+            ).map(cb => cb.value);
+
+            // Coletar veículos selecionados
+            const veiculosSelecionados = Array.from(
+                document.querySelectorAll('#veiculos-lista input[type="checkbox"]:checked')
+            ).map(cb => cb.value);
+
+            // Coletar empresas selecionadas
+            const empresasSelecionadas = Array.from(
+                document.querySelectorAll('#empresas-lista input[type="checkbox"]:checked')
+            ).map(cb => cb.value);
+
+            // Coletar estacionamentos selecionados
+            const estacionamentosSelecionados = Array.from(
+                document.querySelectorAll('#estacionamentos-lista input[type="checkbox"]:checked')
+            ).map(cb => cb.value);
+
+            // Coletar equipamentos selecionados
+            const equipamentosSelecionados = Array.from(
+                document.querySelectorAll('#equipamentos-lista input[type="checkbox"]:checked')
+            ).map(cb => cb.value);
+
+            // Coletar horários selecionados
+            const horariosSelecionados = Array.from(
+                document.querySelectorAll('#horarios-lista input[type="checkbox"]:checked')
+            ).map(cb => cb.value);
+
+            // Tipo de acesso (pessoas-especificas, pessoas-geral, visitantes-geral, empresas, grupos, veiculos)
+            const tipoAcesso = document.querySelector('input[name="tipo-acesso"]:checked')?.value || 'pessoas-especificas';
+            console.log('[DEBUG] tipoAcesso:', tipoAcesso);
+
+            // Tipo de horário (especifico, livre)
+            const tipoHorario = document.querySelector('input[name="tipo-horario"]:checked')?.value || 'especifico';
+            console.log('[DEBUG] tipoHorario:', tipoHorario);
+
+            // Controle de vagas - enviar 1 se ativado, null se desativado (para salvar no banco)
+            const controleVagasAtivo = document.getElementById('controle-vagas')?.checked || false;
+            const maxVeiculos = controleVagasAtivo ? 1 : null;
+            console.log('[DEBUG] maxVeiculos:', maxVeiculos);
+
+            const nivelData = {
+                name: nome,
+                description: document.getElementById('nivel-descricao').value,
+                access_target: 'vehicles',
+                access_type: tipoAcesso,
+                schedule_type: tipoHorario,
+                persons: pessoasSelecionadas,
+                groups: gruposSelecionados,
+                vehicles: veiculosSelecionados,
+                vehicle_companies: empresasSelecionadas,
+                parkings: estacionamentosSelecionados,
+                equipments: equipamentosSelecionados,
+                max_vehicles: maxVeiculos,
+                schedules: horariosSelecionados,
+                status: 1
+            };
+
+            console.log('[DEBUG] Enviando dados para API:', nivelData);
+
+            try {
+                let response;
+                if (editandoId) {
+                    response = await api.request(`/access-rules/${editandoId}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(nivelData)
+                    });
+                } else {
+                    response = await api.request('/access-rules', {
+                        method: 'POST',
+                        body: JSON.stringify(nivelData)
+                    });
+                }
+
+                if (response.success) {
+                    alert(editandoId ? 'Nível atualizado com sucesso!' : 'Nível cadastrado com sucesso!');
+                    await carregarNiveis();
+                    mostrarLista();
+                } else {
+                    alert('Erro: ' + response.message);
+                }
+            } catch (error) {
+                console.error('Erro ao salvar nível:', error);
+                alert('Erro ao salvar nível. Verifique o console para detalhes.');
+            }
+        }
+
+        // Editar nível
+        async function editarNivel(id) {
+            console.log('Editando nível:', id);
+            const nivel = niveis.find(n => n.id === id);
+            if (!nivel) return;
+
+            // Primeiro carrega as listas se ainda não foram carregadas
+            await carregarListas();
+
+            editandoId = id;
+            document.getElementById('nivel-nome').value = nivel.name || nivel.nome;
+            document.getElementById('nivel-descricao').value = nivel.description || nivel.descricao || '';
+            document.getElementById('nivel-id').value = id;
+            document.getElementById('form-titulo').textContent = 'Editar Nível de Acesso';
+
+            // Controle de vagas - carregar do banco baseado em max_vehicles
+            // Aceita tanto null quanto 0 como "desmarcado"
+            const temMaxVeiculos = nivel.max_vehicles && nivel.max_vehicles > 0;
+            console.log('[DEBUG] max_vehicles do banco:', nivel.max_vehicles, '-> temMaxVeiculos:', temMaxVeiculos);
+            document.getElementById('controle-vagas').checked = temMaxVeiculos;
+            toggleVagas();
+
+            // Selecionar pessoas específicas
+            if (nivel.persons) {
+                nivel.persons.forEach(p => {
+                    const cb = document.querySelector(`#pessoas-lista input[value="${p}"]`);
+                    if (cb) cb.checked = true;
+                });
+            }
+
+            // Selecionar grupos
+            if (nivel.groups) {
+                nivel.groups.forEach(g => {
+                    const cb = document.querySelector(`#grupos-lista input[value="${g}"]`);
+                    if (cb) cb.checked = true;
+                });
+            }
+
+            // Selecionar veículos
+            if (nivel.vehicles) {
+                nivel.vehicles.forEach(v => {
+                    const cb = document.querySelector(`#veiculos-lista input[value="${v}"]`);
+                    if (cb) cb.checked = true;
+                });
+            }
+
+            // Selecionar empresas
+            if (nivel.vehicle_companies) {
+                nivel.vehicle_companies.forEach(c => {
+                    const cb = document.querySelector(`#empresas-lista input[value="${c}"]`);
+                    if (cb) cb.checked = true;
+                });
+            }
+
+            // Selecionar estacionamentos
+            if (nivel.parkings) {
+                nivel.parkings.forEach(p => {
+                    const cb = document.querySelector(`#estacionamentos-lista input[value="${p}"]`);
+                    if (cb) cb.checked = true;
+                });
+            }
+
+            // Selecionar equipamentos
+            if (nivel.equipments) {
+                nivel.equipments.forEach(e => {
+                    const cb = document.querySelector(`#equipamentos-lista input[value="${e}"]`);
+                    if (cb) cb.checked = true;
+                });
+            }
+
+            // Selecionar horários
+            if (nivel.schedules) {
+                nivel.schedules.forEach(s => {
+                    const cb = document.querySelector(`#horarios-lista input[value="${s}"]`);
+                    if (cb) cb.checked = true;
+                });
+            }
+
+            // Carregar tipo de acesso (access_type)
+            if (nivel.access_type) {
+                const radioTipoAcesso = document.querySelector(`input[name="tipo-acesso"][value="${nivel.access_type}"]`);
+                if (radioTipoAcesso) {
+                    radioTipoAcesso.checked = true;
+                }
+            }
+
+            // Carregar tipo de horário (schedule_type)
+            if (nivel.schedule_type) {
+                const radioTipoHorario = document.querySelector(`input[name="tipo-horario"][value="${nivel.schedule_type}"]`);
+                if (radioTipoHorario) {
+                    radioTipoHorario.checked = true;
+                }
+            }
+
+            atualizarContadores();
+            
+            // Mostrar formulário SEM chamar carregarListas() novamente
+            const lista = document.getElementById('nivelacesso-veiculos-list');
+            const form = document.getElementById('nivelacesso-veiculos-form');
+            
+            if (lista && form) {
+                lista.classList.add('hidden');
+                form.classList.remove('hidden');
+                toggleTipoAcesso();
+                toggleHorario();
+            }
+        }
+
+        // Excluir nível
+        async function excluirNivel(id) {
+            console.log('Excluindo nível:', id);
+            if (confirm('Deseja realmente excluir este nível de acesso?')) {
+                try {
+                    const response = await api.request(`/access-rules/${id}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.success) {
+                        alert('Nível excluído com sucesso!');
+                        await carregarNiveis();
+                    } else {
+                        alert('Erro: ' + response.message);
+                    }
+                } catch (error) {
+                    console.error('Erro ao excluir nível:', error);
+                    alert('Erro ao excluir nível. Verifique o console para detalhes.');
+                }
+            }
+        }
+
+        // Renderizar lista
+        function renderizarLista() {
+            console.log('Renderizando lista');
+            const tbody = document.getElementById('niveis-table-body');
+
+            if (!tbody) {
+                console.error('Elemento tbody não encontrado');
+                return;
+            }
+
+            if (niveis.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4">
+                            <div class="empty-message">
+                                <i class="fas fa-car"></i>
+                                <p>Nenhum nível de acesso cadastrado</p>
+                                <button class="btn btn-primary btn-sm" onclick="mostrarFormulario()" style="margin-top: 12px;">
+                                    <i class="fas fa-plus"></i> Cadastrar primeiro nível
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = niveis.map(n => {
+                return `
+                    <tr>
+                        <td><strong>${n.name || n.nome}</strong></td>
+                        <td>${n.description || n.descricao || '-'}</td>
+                        <td>${n.parkings && n.parkings.length > 0 ? 'Sim' : 'Não'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="editarNivel(${n.id})" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="excluirNivel(${n.id})" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Função para o botão Novo Nível (da página original)
+        function addNivelAcessoVeiculo() {
+            mostrarFormulario();
+        }
+
+        // Expor funções para o escopo global
+        window.mostrarFormulario = mostrarFormulario;
+        window.mostrarLista = mostrarLista;
+        window.carregarNiveis = carregarNiveis;
+        window.editarNivel = editarNivel;
+        window.excluirNivel = excluirNivel;
+        window.salvarNivel = salvarNivel;
+        window.addNivelAcessoVeiculo = addNivelAcessoVeiculo;
+        window.selecionarTodosGrupos = selecionarTodosGrupos;
+        window.selecionarTodasEmpresas = selecionarTodasEmpresas;
+        window.selecionarTodosVeiculos = selecionarTodosVeiculos;
+        window.selecionarTodosVisitantes = selecionarTodosVisitantes;
+        window.selecionarTodosEstacionamentos = selecionarTodosEstacionamentos;
+        window.selecionarTodosHorarios = selecionarTodosHorarios;
+        window.carregarVeiculos = carregarVeiculos;
+        window.carregarEmpresas = carregarEmpresas;
+        window.carregarEstacionamentos = carregarEstacionamentos;
+        window.carregarHorarios = carregarHorarios;
+        window.carregarEquipamentos = carregarEquipamentos;
+        window.carregarListas = carregarListas;
+        window.atualizarContadores = atualizarContadores;
+        window.toggleTipoAcesso = toggleTipoAcesso;
+        window.toggleHorario = toggleHorario;
+        window.toggleVagas = toggleVagas;
+        window.buscarVeiculos = buscarVeiculos;
+        window.buscarEmpresas = buscarEmpresas;
+        window.buscarEstacionamentos = buscarEstacionamentos;
+        window.buscarHorarios = buscarHorarios;
+    </script>
+</body>
+
+</html>

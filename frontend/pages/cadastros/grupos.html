@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>MAM Control - Grupos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <style>
+        /* Reset e estilos base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+        /* Cards */
+        .content-box {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Grid de formulário - 3 colunas */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Form groups */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #ffffff;
+            font-family: inherit;
+        }
+
+        .form-group input:hover,
+        .form-group select:hover,
+        .form-group textarea:hover {
+            border-color: #94a3b8;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .required:after {
+            content: " *";
+            color: #e53e3e;
+        }
+
+
+        /* Botões */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.2);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Section header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-header-compact {
+            margin-bottom: 20px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title h2 {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Search e filtros */
+        .search-filter {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0 12px;
+        }
+
+        .search-box i {
+            color: #94a3b8;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            background: none;
+            font-size: 0.95rem;
+        }
+
+        .search-box input:focus {
+            outline: none;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .grupo-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .grupo-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-color: #4a90d9;
+        }
+
+        .grupo-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .grupo-card h3 {
+            font-size: 1.2rem;
+            color: #1e293b;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .grupo-card-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .grupo-card-content {
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            min-height: 60px;
+        }
+
+        .grupo-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #e2e8f0;
+            margin-top: auto;
+        }
+
+        .grupo-card-info {
+            display: flex;
+            gap: 16px;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .grupo-card-info i {
+            margin-right: 4px;
+        }
+
+        .grupo-card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Tabela */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: auto;
+            margin-bottom: 20px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            color: #1e293b;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Table footer */
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .table-info {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* No data */
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+            grid-column: 1 / -1;
+        }
+
+        .no-data i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .no-data p {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            color: #64748b;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .badge-block {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-room {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-department {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-unit {
+            background: #fae8ff;
+            color: #86198f;
+        }
+
+        .badge-other {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        /* Form actions */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Text center */
+        .text-center {
+            text-align: center;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .search-filter {
+                flex-direction: column;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .emails-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="grupos" class="content-section active">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1 class="label-grupos">Grupos</h1>
+                            <p id="label-grupos-desc">Organize pessoas em grupos como Blocos, Salas, etc.</p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary" onclick="refreshGrupos()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button class="btn btn-primary" onclick="showGrupoForm()">
+                                <i class="fas fa-plus"></i> Novo Grupo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- GRUPOS LIST VIEW -->
+                    <div id="grupos-list">
+                        <div class="search-filter">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="search-grupos" placeholder="Buscar por nome..."
+                                    onkeyup="filterGrupos()">
+                            </div>
+                            <div class="filter-options">
+                                <button type="button" class="btn btn-sm btn-secondary" id="grupos-layout-toggle"
+                                    onclick="GrupoManager.toggleLayout()" title="Alternar layout">
+                                    <i class="fas fa-th" id="grupos-layout-icon"></i>
+                                    <span id="grupos-layout-text">Cards</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="cards-grid" id="grupos-cards-container">
+                            <div class="no-data">
+                                <i class="fas fa-layer-group"></i>
+                                <p>Nenhum grupo cadastrado</p>
+                                <button class="btn btn-primary" onclick="showGrupoForm()">
+                                    Criar primeiro grupo
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Container para visualização em lista -->
+                        <div class="table-container hidden" id="grupos-list-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Tipo</th>
+                                        <th>Pessoas</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="grupos-table-body">
+                                    <tr>
+                                        <td colspan="6" class="text-center">Nenhum grupo cadastrado</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="table-footer hidden" id="grupos-pagination-container">
+                            <div class="table-info">
+                                <span id="grupos-count">0</span> registros encontrados
+                            </div>
+                            <div class="pagination">
+                                <button class="btn btn-sm btn-secondary" disabled>
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span>Página 1 de 1</span>
+                                <button class="btn btn-sm btn-secondary" disabled>
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GRUPOS FORM VIEW -->
+                    <div id="grupos-form" class="hidden">
+                        <div class="section-header section-header-compact">
+                            <div class="section-title">
+                                <h2 id="grupo-form-title">Cadastro de Grupo</h2>
+                                <p>Crie um novo grupo ou departamento</p>
+                            </div>
+                            <div class="section-actions">
+                                <button class="btn btn-secondary" onclick="showGruposList()">
+                                    <i class="fas fa-arrow-left"></i> Voltar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="content-box">
+                            <form id="form-grupo" onsubmit="saveGrupo(event)">
+                                <input type="hidden" id="grupo-id">
+
+                                <!-- Dados básicos do grupo -->
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="grupo-nome" class="required">Nome do Grupo</label>
+                                        <input type="text" id="grupo-nome" placeholder="Ex: BLOCO A, SALA 806" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="grupo-tipo">Tipo de Grupo</label>
+                                        <select id="grupo-tipo">
+                                            <option value="">Selecione...</option>
+                                            <option value="block">Bloco</option>
+                                            <option value="room">Sala</option>
+                                            <option value="department">Departamento</option>
+                                            <option value="unit">Unidade</option>
+                                            <option value="other">Outro</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="grupo-descricao">Descrição</label>
+                                        <textarea id="grupo-descricao" rows="3"
+                                            placeholder="Descrição opcional do grupo"></textarea>
+                                    </div>
+                                </div>
+
+
+                                <!-- Form Actions -->
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-secondary" onclick="showGruposList()">
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Salvar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+    <script src="../../auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+
+        // Sobrescrever a função saveGrupo original para incluir e-mails e salvar no backend
+        const originalSaveGrupo = saveGrupo;
+        saveGrupo = async function(event) {
+            event.preventDefault();
+            
+            // Obter dados básicos
+            const grupoId = document.getElementById('grupo-id').value;
+            const grupoNome = document.getElementById('grupo-nome').value;
+            const grupotipo = document.getElementById('grupo-tipo').value;
+            const grupoDescricao = document.getElementById('grupo-descricao').value;
+            
+            // Criar objeto do grupo
+            const grupo = {
+                id: grupoId ? parseInt(grupoId) : null,
+                nome: grupoNome,
+                tipo: grupotipo,
+                descricao: grupoDescricao
+            };
+            console.log('saveGrupo - grupo a salvar:', grupo);
+            
+            try {
+                // Salvar no backend usando a API
+                if (typeof storage !== 'undefined' && typeof storage.saveGrupo === 'function') {
+                    const savedGrupo = await storage.saveGrupo(grupo);
+                    console.log('saveGrupo - grupo salvo no backend:', savedGrupo);
+                    
+                    NotificationSystem.showToast(
+                        'success',
+                        grupoId ? 'Grupo Atualizado' : 'Grupo Criado',
+                        `Grupo "${savedGrupo.nome}" foi ${grupoId ? 'atualizado' : 'criado'} com sucesso!`
+                    );
+                } else {
+                    // Fallback: salvar no localStorage
+                    console.log('saveGrupo - storage.saveGrupo não encontrado, usando fallback localStorage');
+                    if (typeof GrupoManager !== 'undefined' && GrupoManager.grupos) {
+                        if (grupoId) {
+                            const index = GrupoManager.grupos.findIndex(g => g.id == grupoId);
+                            if (index !== -1) {
+                                GrupoManager.grupos[index] = { ...grupo, id: parseInt(grupoId) };
+                            }
+                        } else {
+                            grupo.id = Date.now();
+                            GrupoManager.grupos.push(grupo);
+                        }
+                    }
+                    alert('Grupo salvo com sucesso! (modo local)');
+                }
+                
+                showGruposList();
+                
+                // Recarregar dados do backend
+                if (typeof GrupoManager !== 'undefined' && typeof GrupoManager.loadList === 'function') {
+                    GrupoManager.loadList();
+                }
+            } catch (error) {
+                console.error('saveGrupo - erro ao salvar:', error);
+                alert('Erro ao salvar grupo: ' + error.message);
+            }
+        };
+
+        // Sobrescrever a função editarGrupo original para carregar e-mails do backend
+        if (typeof editarGrupo !== 'undefined') {
+            const originalEditarGrupo = editarGrupo;
+            editarGrupo = async function(id) {
+                console.log('editarGrupo - carregando grupo ID:', id);
+                
+                // Tentar carregar do backend
+                if (typeof storage !== 'undefined' && typeof storage.getGrupo === 'function') {
+                    try {
+                        const grupo = await storage.getGrupo(id);
+                        console.log('editarGrupo - dados do backend:', grupo);
+                        
+                        if (grupo) {
+                            // Preencher dados básicos
+                            document.getElementById('grupo-id').value = grupo.id;
+                            document.getElementById('grupo-nome').value = grupo.name || grupo.nome || '';
+                            document.getElementById('grupo-tipo').value = grupo.type || grupo.tipo || '';
+                            document.getElementById('grupo-descricao').value = grupo.description || grupo.descricao || '';
+                            
+                            document.getElementById('grupo-form-title').textContent = 'Editar Grupo';
+                            showGrupoForm();
+                            return;
+                        }
+                    } catch (error) {
+                        console.error('editarGrupo - erro ao carregar do backend:', error);
+                    }
+                }
+                
+                // Fallback: carregar do localStorage
+                if (typeof GrupoManager !== 'undefined' && GrupoManager.grupos) {
+                    const grupo = GrupoManager.grupos.find(g => g.id == id);
+                    if (grupo) {
+                        // Preencher dados básicos
+                        document.getElementById('grupo-id').value = grupo.id;
+                        document.getElementById('grupo-nome').value = grupo.nome || '';
+                        document.getElementById('grupo-tipo').value = grupo.tipo || '';
+                        document.getElementById('grupo-descricao').value = grupo.descricao || '';
+                        
+                        document.getElementById('grupo-form-title').textContent = 'Editar Grupo';
+                        showGrupoForm();
+                    }
+                }
+            };
+        }
+
+        // Sobrescrever a função showGrupoForm original para limpar e-mails
+        const originalShowGrupoForm = showGrupoForm;
+        showGrupoForm = function() {
+            if (originalShowGrupoForm) {
+                originalShowGrupoForm();
+            }
+            
+            // Resetar título
+            document.getElementById('grupo-form-title').textContent = 'Cadastro de Grupo';
+        };
+
+        // Sobrescrever a função renderizarLista para mostrar grupos (se existir)
+        if (typeof renderizarLista !== 'undefined') {
+            const originalRenderizarLista = renderizarLista;
+            renderizarLista = function() {
+                const tbody = document.getElementById('grupos-table-body');
+                if (!tbody) return;
+                
+                if (typeof GrupoManager !== 'undefined' && GrupoManager.grupos && GrupoManager.grupos.length > 0) {
+                    tbody.innerHTML = GrupoManager.grupos.map(g => {
+                        const tipoLabel = {
+                            'block': 'Bloco',
+                            'room': 'Sala',
+                            'department': 'Departamento',
+                            'unit': 'Unidade',
+                            'other': 'Outro'
+                        };
+                        
+                        const tipoClass = {
+                            'block': 'badge-block',
+                            'room': 'badge-room',
+                            'department': 'badge-department',
+                            'unit': 'badge-unit',
+                            'other': 'badge-other'
+                        };
+                        
+                        return `
+                            <tr>
+                                <td><strong>${g.nome}</strong></td>
+                                <td><span class="badge ${tipoClass[g.tipo] || ''}">${tipoLabel[g.tipo] || g.tipo}</span></td>
+                                <td>${g.pessoas || 0} pessoas</td>
+                                <td>${new Date(g.dataCriacao).toLocaleDateString('pt-BR')}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary" onclick="editarGrupo(${g.id})" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="excluirGrupo(${g.id})" title="Excluir">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                } else if (originalRenderizarLista) {
+                    originalRenderizarLista();
+                }
+            };
+        }
+
+        // Inicialização automática ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (typeof GrupoManager !== 'undefined') {
+                    GrupoManager.loadLayoutPreference();
+                    GrupoManager.loadList();
+                }
+            }, 100);
+        });
+
+        // Melhorias no GrupoManager para salvar preferência de layout
+        if (typeof GrupoManager !== 'undefined') {
+            const originalToggleLayout = GrupoManager.toggleLayout;
+            
+            GrupoManager.toggleLayout = function() {
+                if (originalToggleLayout) {
+                    originalToggleLayout.call(this);
+                }
+                
+                const cardsContainer = document.getElementById('grupos-cards-container');
+                const listContainer = document.getElementById('grupos-list-container');
+                const layoutIcon = document.getElementById('grupos-layout-icon');
+                const layoutText = document.getElementById('grupos-layout-text');
+                
+                const isCardsHidden = cardsContainer.classList.contains('hidden');
+                const layoutPreference = isCardsHidden ? 'list' : 'cards';
+                
+                localStorage.setItem('gruposLayoutPreference', layoutPreference);
+                
+                if (layoutIcon) {
+                    layoutIcon.className = isCardsHidden ? 'fas fa-list' : 'fas fa-th';
+                }
+                if (layoutText) {
+                    layoutText.textContent = isCardsHidden ? 'Lista' : 'Cards';
+                }
+            };
+            
+            GrupoManager.loadLayoutPreference = function() {
+                const savedLayout = localStorage.getItem('gruposLayoutPreference');
+                
+                if (savedLayout) {
+                    const cardsContainer = document.getElementById('grupos-cards-container');
+                    const listContainer = document.getElementById('grupos-list-container');
+                    const layoutIcon = document.getElementById('grupos-layout-icon');
+                    const layoutText = document.getElementById('grupos-layout-text');
+                    
+                    if (savedLayout === 'list') {
+                        cardsContainer.classList.add('hidden');
+                        listContainer.classList.remove('hidden');
+                        if (layoutIcon) layoutIcon.className = 'fas fa-list';
+                        if (layoutText) layoutText.textContent = 'Lista';
+                    } else {
+                        cardsContainer.classList.remove('hidden');
+                        listContainer.classList.add('hidden');
+                        if (layoutIcon) layoutIcon.className = 'fas fa-th';
+                        if (layoutText) layoutText.textContent = 'Cards';
+                    }
+                }
+                
+                // Garantir que os dados sejam renderizados no container correto
+                if (typeof GrupoManager !== 'undefined' && typeof GrupoManager.loadList === 'function') {
+                    GrupoManager.loadList();
+                }
+            };
+        }
+        
+        // Chamar refreshGrupos ao carregar a página
+        setTimeout(function() {
+            console.log('Tentando carregar grupos...');
+            if (typeof GrupoManager !== 'undefined' && typeof GrupoManager.loadList === 'function') {
+                console.log('Chamando GrupoManager.loadList()');
+                GrupoManager.loadList();
+            } else if (typeof refreshGrupos === 'function') {
+                console.log('Chamando refreshGrupos()');
+                refreshGrupos();
+            } else {
+                console.log('Função não encontrada - GrupoManager:', typeof GrupoManager, 'loadList:', typeof GrupoManager?.loadList);
+            }
+        }, 500);
+    </script>
+</body>
+</html>

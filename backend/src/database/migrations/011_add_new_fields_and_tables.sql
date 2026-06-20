@@ -1,0 +1,8 @@
+-- =====================================================
+-- MIGRAÇÃO 011: Novos campos e tabelas para o sistema
+-- Data: 2026-02-17
+-- 
+-- NOTA: As colunas críticas são adicionadas automaticamente
+-- pelo sistema de migração em migrate.js para evitar erros
+-- de colunas duplicadas.
+-- =====================================================

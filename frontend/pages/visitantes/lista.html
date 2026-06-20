@@ -1,0 +1,2143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>MAM Control - Visitantes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+
+    <style>
+        /* Reset e estilos base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+        /* Cards */
+        .content-box {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Section header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-header-compact {
+            margin-bottom: 20px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title h2 {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* BotÃµes */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.2);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Search e filtros */
+        .search-filter {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0 12px;
+        }
+
+        .search-box i {
+            color: #94a3b8;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            background: none;
+            font-size: 0.95rem;
+        }
+
+        .search-box input:focus {
+            outline: none;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .filter-options select,
+        .filter-options input {
+            padding: 8px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 6px;
+            background: white;
+        }
+
+        /* Tabela */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: auto;
+            margin-bottom: 20px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            color: #1e293b;
+            vertical-align: middle;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Foto na tabela */
+        .foto-table {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #f1f5f9;
+        }
+
+        .foto-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 1.2rem;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        /* Badge para cartÃ£o */
+        .badge-cartao {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+        }
+
+        .badge-cartao i {
+            color: #4a90d9;
+            font-size: 0.7rem;
+        }
+
+        /* Checkbox na tabela */
+        .nao-baixa-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #ef4444;
+            font-size: 0.8rem;
+            margin-left: 8px;
+        }
+
+        .nao-baixa-indicator i {
+            font-size: 0.9rem;
+        }
+
+        /* Table footer */
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .table-info {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            margin-top: 20px;
+        }
+
+        .tabs-nav {
+            display: flex;
+            gap: 8px;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #64748b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn i {
+            font-size: 1rem;
+        }
+
+        .tab-btn:hover {
+            color: #4a90d9;
+        }
+
+        .tab-btn.active {
+            color: #ffffff;
+            border-bottom-color: #4a90d9;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Foto centralizada */
+        .foto-centralizada {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 32px;
+            width: 100%;
+        }
+
+        .photo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .photo-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 3px dashed #cbd5e0;
+            background: #f8fafc;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .photo-circle:hover {
+            border-color: #4a90d9;
+            background: #ebf5ff;
+        }
+
+        .photo-circle.has-image {
+            border-style: solid;
+            border-color: #4a90d9;
+        }
+
+        .photo-circle.has-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-circle-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #94a3b8;
+            text-align: center;
+        }
+
+        .photo-circle-placeholder i {
+            font-size: 2.5rem;
+            margin-bottom: 4px;
+        }
+
+        .photo-circle-placeholder span {
+            font-size: 0.75rem;
+        }
+
+        .photo-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+        }
+
+        /* Grid de 3 colunas */
+        .campos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        /* Form groups */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #ffffff;
+            font-family: inherit;
+        }
+
+        .form-group input:hover,
+        .form-group select:hover,
+        .form-group textarea:hover {
+            border-color: #94a3b8;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .required:after {
+            content: " *";
+            color: #e53e3e;
+        }
+
+        .form-hint {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* SeÃ§Ã£o de cartÃ£o */
+        .cartao-section {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            margin-top: 8px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #4a90d9;
+        }
+
+        .tag-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .tag-input-group input {
+            flex: 1;
+        }
+
+        /* Checkbox customizado */
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 16px 0 8px;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #4a90d9;
+        }
+
+        .checkbox-wrapper label {
+            font-size: 0.95rem;
+            color: #1e293b;
+            cursor: pointer;
+            font-weight: 500;
+            text-transform: none;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transform: scale(0.95);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.2rem;
+            color: #1e293b;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #ef4444;
+        }
+
+        .modal-body {
+            padding: 24px;
+            text-align: center;
+        }
+
+        .modal-body i {
+            font-size: 3rem;
+            color: #4a90d9;
+            margin-bottom: 16px;
+        }
+
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* Form actions */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Text center */
+        .text-center {
+            text-align: center;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .campos-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs-nav {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .search-filter {
+                flex-direction: column;
+            }
+
+            .filter-options {
+                flex-direction: column;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .photo-circle {
+                width: 120px;
+                height: 120px;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .tag-input-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <!-- CSS Modal Promover Visitante -->
+    <style>
+        /* ── Modal Promover Visitante ── */
+        /* ── Modal Promover Visitante (CORRIGIDO) ── */
+        /* ── Modal Promover Visitante (CORRIGIDO) ── */
+        #promote-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, .55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity .25s, visibility .25s;
+        }
+
+        #promote-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #promote-modal {
+            background: #fff;
+            border-radius: 14px;
+            width: 92%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 48px rgba(0, 0, 0, .22);
+            transform: scale(0.95);
+            transition: transform .25s;
+            /* Garantir que o modal fique centralizado */
+            margin: 0 auto;
+            position: relative;
+        }
+
+        #promote-modal-overlay.active #promote-modal {
+            transform: scale(1);
+        }
+
+        /* Garantir que o overlay ocupe toda a tela */
+        #promote-modal-overlay {
+            width: 100%;
+            height: 100%;
+        }
+
+        .pm-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px;
+            border-bottom: 1.5px solid #e2e8f0;
+        }
+
+        .pm-header h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pm-header h3 i {
+            color: #4a90d9;
+        }
+
+        .pm-close {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: color .15s;
+        }
+
+        .pm-close:hover {
+            color: #ef4444;
+        }
+
+        .pm-body {
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .pm-visitor-info {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pm-visitor-info .pm-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .pm-visitor-info .pm-avatar-placeholder {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            flex-shrink: 0;
+        }
+
+        .pm-visitor-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: .95rem;
+        }
+
+        .pm-visitor-doc {
+            font-size: .8rem;
+            color: #64748b;
+        }
+
+        /* Combobox styles */
+        .pm-combobox-container {
+            position: relative;
+        }
+
+        .pm-combobox-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .pm-combobox-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .pm-combobox-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .pm-combobox-dropdown.active {
+            display: block;
+        }
+
+        .pm-combobox-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .pm-combobox-item:hover {
+            background: #f8fafc;
+        }
+
+        .pm-combobox-item:last-child {
+            border-bottom: none;
+        }
+
+        .pm-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .pm-field label {
+            font-size: .8rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+        }
+
+        .pm-field select,
+        .pm-field input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: .95rem;
+            background: #fff;
+            font-family: inherit;
+            transition: border-color .2s;
+        }
+
+        .pm-field select:focus,
+        .pm-field input:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, .1);
+        }
+
+        .pm-hint {
+            font-size: .78rem;
+            color: #64748b;
+        }
+
+        .pm-warning {
+            background: #fef9c3;
+            border: 1px solid #fde047;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: .83rem;
+            color: #713f12;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .pm-footer {
+            padding: 16px 22px;
+            border-top: 1.5px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="visitantes" class="content-section active">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1>Visitantes</h1>
+                            <p>Controle de entrada e saí­da de visitantes</p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary" onclick="refreshVisitantes()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button class="btn" onclick="inativarSelecionados()" id="btn-confirm-mass-inactivate"
+                                style="display:none;background:#ef4444;color:#fff">
+                                <i class="fas fa-check"></i> CONFIRMAR INATIVAÇÃO
+                            </button>
+                            <button class="btn btn-warning" onclick="toggleMassInactivation()" id="btn-mass-inactivate"
+                                style="display:none;background:#f59e0b;color:#fff">
+                                <i class="fas fa-ban"></i> INATIVAR EM MASSA
+                            </button>
+                            <button class="btn btn-primary" onclick="showVisitanteForm()">
+                                <i class="fas fa-plus"></i> Novo Visitante
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- VISITANTES LIST VIEW -->
+                    <div id="visitantes-list">
+                        <div class="search-filter">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="search-visitantes" placeholder="Buscar por nome, documento..."
+                                    onkeyup="filterVisitantes()">
+                            </div>
+                            <div class="filter-options">
+                                <select id="filter-visitante-status" onchange="filterVisitantes()">
+                                    <option value="">Todos os status</option>
+                                    <option value="on_premises" selected>Ativos</option>
+                                    <option value="exited">Inativos</option>
+                                    <option value="inactive">Arquivados</option>
+                                </select>
+                                <input type="date" id="filter-visitante-data" onchange="filterVisitantes()">
+                            </div>
+                        </div>
+
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th id="th-select-all" style="display:none;">
+                                            <input type="checkbox" id="select-all-visitors"
+                                                onchange="toggleSelectAll()">
+                                        </th>
+                                        <th>Foto</th>
+                                        <th>Nome</th>
+                                        <th>Matrícula</th>
+                                        <th>Documento</th>
+                                        <th>Empresa</th>
+                                        <th>Cartão</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="visitantes-table-body">
+                                    <tr>
+                                        <td colspan="6" class="text-center">Carregando dados...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="table-footer">
+                            <div class="table-info">
+                                <span id="visitantes-count">0</span> registros encontrados
+                            </div>
+                            <div class="pagination">
+                                <button class="btn btn-sm btn-secondary" id="visitantes-prev-btn"
+                                    onclick="VisitanteManager.prevPage()" disabled>
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span id="visitantes-page-info">Página 1 de 1</span>
+                                <button class="btn btn-sm btn-secondary" id="visitantes-next-btn"
+                                    onclick="VisitanteManager.nextPage()" disabled>
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VISITANTES FORM VIEW -->
+                    <div id="visitantes-form" class="hidden">
+                        <div class="section-header section-header-compact">
+                            <div class="section-actions">
+                                <button class="btn btn-secondary" onclick="showVisitantesList()">
+                                    <i class="fas fa-times"></i> Fechar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="content-box">
+                            <form id="form-visitante" onsubmit="saveVisitante(event)">
+                                <input type="hidden" id="visitante-id">
+
+                                <!-- Tabs Navigation -->
+                                <div class="tabs-container">
+                                    <div class="tabs-nav">
+                                        <button type="button" class="tab-btn active"
+                                            onclick="switchTab('visitante-dados-tab')">
+                                            <i class="fas fa-user"></i> Dados Pessoais
+                                        </button>
+                                        <button type="button" class="tab-btn"
+                                            onclick="switchTab('visitante-visita-tab')">
+                                            <i class="fas fa-building"></i> Dados da Visita
+                                        </button>
+                                    </div>
+
+                                    <!-- Tabs Content -->
+                                    <div class="tab-content active" id="visitante-dados-tab">
+                                        <!-- FOTO CENTRALIZADA NO TOPO -->
+                                        <div class="foto-centralizada">
+                                            <div class="photo-section">
+                                                <div id="visitante-photo-preview" class="photo-circle"
+                                                    onclick="VisitanteManager.openCamera()">
+                                                    <div class="photo-circle-placeholder">
+                                                        <i class="fas fa-camera"></i>
+                                                        <span>Adicionar foto</span>
+                                                    </div>
+                                                </div>
+                                                <input type="file" id="visitante-photo-input" accept="image/*"
+                                                    class="hidden" onchange="handleVisitantePhotoUpload(event)">
+                                                <div style="display: flex; gap: 8px;">
+                                                    <button type="button" class="btn btn-sm btn-secondary photo-btn"
+                                                        onclick="document.getElementById('visitante-photo-input').click()">
+                                                        <i class="fas fa-upload"></i> Upload
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-primary photo-btn"
+                                                        onclick="VisitanteManager.openCamera()">
+                                                        <i class="fas fa-camera"></i> Câmera
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- GRID DE 3 COLUNAS -->
+                                        <div class="campos-grid">
+                                            <!-- Coluna 1 -->
+                                            <div class="form-group">
+                                                <label for="visitante-nome" class="required">Nome Completo</label>
+                                                <input type="text" id="visitante-nome" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="visitante-documento" class="required">Documento</label>
+                                                <input type="text" id="visitante-documento" required
+                                                    placeholder="CPF, RG ou outro">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="visitante-email">E-mail</label>
+                                                <input type="email" id="visitante-email">
+                                            </div>
+
+                                            <!-- Coluna 2 -->
+                                            <div class="form-group">
+                                                <label for="visitante-celular">Celular</label>
+                                                <input type="tel" id="visitante-celular" data-mask="cellphone">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="visitante-empresa">Empresa do Visitante</label>
+                                                <input type="text" id="visitante-empresa">
+                                            </div>
+
+                                            <!-- Coluna 3 - Campos de CartÃ£o e Checkbox -->
+                                            <div class="form-group" style="grid-column: span 1;">
+                                                <label>
+                                                    <i class="fas fa-credit-card"></i> Número do Cartão
+                                                </label>
+
+                                                <div class="cartao-section">
+                                                    <div class="radio-group">
+                                                        <label class="radio-option">
+                                                            <input type="radio" name="tipo-cartao" value="manual"
+                                                                checked onchange="toggleCartaoFields()">
+                                                            <span>Número</span>
+                                                        </label>
+                                                        <label class="radio-option">
+                                                            <input type="radio" name="tipo-cartao" value="remoto"
+                                                                onchange="toggleCartaoFields()">
+                                                            <span>Remoto</span>
+                                                        </label>
+                                                    </div>
+
+                                                    <div id="cartao-manual-container">
+                                                        <div class="tag-input-group">
+                                                            <input type="text" id="visitante-numero-cartao"
+                                                                placeholder="Digite o número do cartão">
+                                                            <button type="button" class="btn btn-sm btn-secondary"
+                                                                onclick="gerarCartaoAleatorio()">
+                                                                <i class="fas fa-random"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div id="cartao-remoto-container" class="hidden">
+                                                        <div style="text-align: center; padding: 5px;">
+                                                            <button type="button" class="btn btn-sm btn-primary"
+                                                                onclick="iniciarCadastramentoRemoto()"
+                                                                style="width: 100%;">
+                                                                <i class="fas fa-wifi"></i> Iniciar Leitura
+                                                            </button>
+                                                            <div class="form-hint">
+                                                                Aproxime o cartÃ£o do leitor
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group" style="grid-column: span 1;">
+                                                <div class="checkbox-wrapper">
+                                                    <input type="checkbox" id="visitante-nao-dar-baixa">
+                                                    <label for="visitante-nao-dar-baixa">
+                                                        <strong>Não dar baixa na saída</strong>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-content" id="visitante-visita-tab">
+                                        <div class="campos-grid">
+                                            <div class="form-group">
+                                                <label for="visitante-pessoa-visitada" class="required">Pessoa
+                                                    Visitada</label>
+                                                <select id="visitante-pessoa-visitada">
+                                                    <option value="">Selecione uma pessoa</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="visitante-empresa-visitada">Empresa Visitada</label>
+                                                <select id="visitante-empresa-visitada">
+                                                    <option value="">Selecione uma empresa</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="visitante-motivo">Motivo da Visita</label>
+                                                <textarea id="visitante-motivo" rows="3"></textarea>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="visitante-data-entrada">Data/Hora Início</label>
+                                                <input type="datetime-local" id="visitante-data-entrada">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="visitante-data-saida">Data/Hora Fim</label>
+                                                <input type="datetime-local" id="visitante-data-saida">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Form Actions -->
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-secondary" onclick="showVisitantesList()">
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Salvar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Cadastramento Remoto -->
+    <div id="cartaoRemotoModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-wifi"></i> Cadastramento Remoto</h3>
+                <button class="modal-close" onclick="fecharModalRemoto()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <i class="fas fa-sync-alt fa-spin"></i>
+                <p>Aguardando leitura do cartÃ£o...</p>
+                <small>Aproxime o cartÃ£o do leitor</small>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModalRemoto()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+    <script src="../../auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        // FunÃ§Ãµes auxiliares para API
+        async function refreshVisitantes() {
+            await VisitanteManager.loadList();
+        }
+
+        // Carregar automaticamente ao iniciar
+        setTimeout(() => {
+            refreshVisitantes();
+            carregarPessoasEmpresas();
+        }, 100);
+
+        // Função para carregar pessoas e empresas nos selects
+        async function carregarPessoasEmpresas() {
+            try {
+                // Buscar pessoas e empresas via API
+                const [pessoasResponse, empresasResponse] = await Promise.all([
+                    api.request('/persons?limit=1000'),
+                    api.request('/companies?limit=10000')
+                ]);
+
+                const pessoas = pessoasResponse.success ? pessoasResponse.data : [];
+                const empresas = empresasResponse.success ? empresasResponse.data : [];
+
+                const pessoaSelect = document.getElementById('visitante-pessoa-visitada');
+                const empresaSelect = document.getElementById('visitante-empresa-visitada');
+
+                // Limpar selects antes de preencher
+                if (pessoaSelect) {
+                    pessoaSelect.innerHTML = '<option value="">Selecione...</option>';
+                    pessoas.forEach(p => {
+                        const option = document.createElement('option');
+                        option.value = p.id;
+                        option.textContent = p.name || p.nome || `Pessoa ${p.id}`;
+                        pessoaSelect.appendChild(option);
+                    });
+                }
+
+                if (empresaSelect) {
+                    empresaSelect.innerHTML = '<option value="">Selecione...</option>';
+                    empresas.forEach(e => {
+                        const option = document.createElement('option');
+                        option.value = e.id;
+                        option.textContent = (e.fantasy_name || e.nomeFantasia || e.corporate_name || e.razaoSocial || `Empresa ${e.id}`) + (e.active === false ? ' (Inativa)' : '');
+                        empresaSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao carregar pessoas/empresas:', error);
+            }
+        }
+
+        // Funções de cartão
+        function toggleCartaoFields() {
+            const tipo = document.querySelector('input[name="tipo-cartao"]:checked').value;
+            const manualContainer = document.getElementById('cartao-manual-container');
+            const remotoContainer = document.getElementById('cartao-remoto-container');
+
+            if (tipo === 'manual') {
+                manualContainer.classList.remove('hidden');
+                remotoContainer.classList.add('hidden');
+            } else {
+                manualContainer.classList.add('hidden');
+                remotoContainer.classList.remove('hidden');
+            }
+        }
+
+        function gerarCartaoAleatorio() {
+            const cartao = Math.floor(Math.random() * 10000000000).toString().padStart(10, '0');
+            document.getElementById('visitante-numero-cartao').value = cartao;
+        }
+
+        function iniciarCadastramentoRemoto() {
+            document.getElementById('cartaoRemotoModal').classList.add('active');
+
+            setTimeout(() => {
+                const cartao = Math.floor(Math.random() * 10000000000).toString().padStart(10, '0');
+                document.getElementById('visitante-numero-cartao').value = cartao;
+                document.querySelector('input[name="tipo-cartao"][value="manual"]').checked = true;
+                toggleCartaoFields();
+                fecharModalRemoto();
+                alert(`CartÃ£o lido com sucesso: ${cartao}`);
+            }, 3000);
+        }
+
+        function fecharModalRemoto() {
+            document.getElementById('cartaoRemotoModal').classList.remove('active');
+        }
+
+        // FunÃ§Ãµes auxiliares
+        function refreshVisitantes() {
+            VisitanteManager.loadList();
+        }
+
+        function filterVisitantes() {
+            VisitanteManager.filter();
+        }
+
+        function showVisitanteForm(id = null) {
+            document.getElementById('visitantes-list').classList.add('hidden');
+            document.getElementById('visitantes-form').classList.remove('hidden');
+
+            // Só reseta o formulário se não for para editar (sem ID)
+            if (!id) {
+                document.getElementById('form-visitante').reset();
+                document.getElementById('visitante-id').value = '';
+
+                // Resetar campos de cartão
+                document.querySelector('input[name="tipo-cartao"][value="manual"]').checked = true;
+                toggleCartaoFields();
+            }
+        }
+
+        // Expor função global para edição via JavaScript
+        window.editarVisitantePorId = async function (id) {
+            console.log('DEBUG editarVisitantePorId: Início - id:', id);
+            try {
+                const response = await api.request('/visitors/' + id);
+                console.log('DEBUG editarVisitantePorId: Response:', response);
+
+                if (response.success && response.data) {
+                    const visitante = response.data;
+                    console.log('DEBUG editarVisitantePorId: Dados:', visitante);
+                    console.log('DEBUG editarVisitantePorId: period_start:', visitante.period_start);
+                    console.log('DEBUG editarVisitantePorId: period_end:', visitante.period_end);
+                    console.log('DEBUG editarVisitantePorId: liberation_type:', visitante.liberation_type);
+
+                    // Preencher os campos
+                    document.getElementById('visitante-id').value = visitante.id;
+                    document.getElementById('visitante-nome').value = visitante.name || '';
+                    document.getElementById('visitante-documento').value = visitante.document || '';
+                    document.getElementById('visitante-celular').value = visitante.cellphone || '';
+                    document.getElementById('visitante-email').value = visitante.email || '';
+                    document.getElementById('visitante-empresa').value = visitante.visitor_company || '';
+                    document.getElementById('visitante-numero-cartao').value = visitante.card_number || '';
+                    document.getElementById('visitante-pessoa-visitada').value = visitante.visited_person_id || '';
+                    document.getElementById('visitante-empresa-visitada').value = visitante.visited_company_id || '';
+                    document.getElementById('visitante-motivo').value = visitante.reason || '';
+
+                    // Carregar tipo de liberação e período
+                    if (visitante.liberation_type) {
+                        const radioLiberacao = document.querySelector('input[name="tipoLiberacao"][value="' + visitante.liberation_type + '"]');
+                        if (radioLiberacao) {
+                            radioLiberacao.checked = true;
+                            togglePeriodo();
+                        }
+                        if (visitante.liberation_type === 'periodo' && visitante.period_start) {
+                            document.getElementById('visitante-data-entrada').value = visitante.period_start.slice(0, 16);
+                        }
+                        if (visitante.liberation_type === 'periodo' && visitante.period_end) {
+                            document.getElementById('visitante-data-saida').value = visitante.period_end.slice(0, 16);
+                        }
+                    } else {
+                        const radioUnica = document.querySelector('input[name="tipoLiberacao"][value="unica"]');
+                        if (radioUnica) {
+                            radioUnica.checked = true;
+                            togglePeriodo();
+                        }
+                    }
+
+                    // Carregar foto do visitante
+                    const preview = document.getElementById('visitante-photo-preview');
+                    if (visitante.photo_url) {
+                        preview.innerHTML = `<img src="${visitante.photo_url}" alt="${visitante.name}" onerror="onVisitorPhotoError(this)">`;
+                        preview.classList.add('has-image');
+                        STATE.visitorPhoto = visitante.photo_url;
+                    } else if (visitante.photo_base64) {
+                        preview.innerHTML = `<img src="${visitante.photo_base64}" alt="${visitante.name}">`;
+                        preview.classList.add('has-image');
+                        STATE.visitorPhoto = visitante.photo_base64;
+                    }
+
+                    // Mostrar formulário
+                    document.getElementById('visitantes-list').classList.add('hidden');
+                    document.getElementById('visitantes-form').classList.remove('hidden');
+                } else {
+                    alert('Erro ao carregar dados do visitante');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar visitante:', error);
+                alert('Erro ao carregar visitante');
+            }
+        };
+
+        function showVisitantesList() {
+            document.getElementById('visitantes-list').classList.remove('hidden');
+            document.getElementById('visitantes-form').classList.add('hidden');
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function saveVisitante(e) {
+            e.preventDefault();
+
+            const entryDateValue = document.getElementById('visitante-data-entrada').value;
+            const exitDateValue = document.getElementById('visitante-data-saida').value;
+            const visitanteId = document.getElementById('visitante-id').value;
+
+            // Verificar se tem foto capturada
+            const visitorPhoto = STATE.visitorPhoto || null;
+
+            const visitante = {
+                id: visitanteId && visitanteId.trim() !== '' ? parseInt(visitanteId) : null,
+                name: document.getElementById('visitante-nome').value,
+                document: document.getElementById('visitante-documento').value,
+                cellphone: document.getElementById('visitante-celular').value,
+                email: document.getElementById('visitante-email').value,
+                visitor_company: document.getElementById('visitante-empresa').value,
+                visited_person_id: document.getElementById('visitante-pessoa-visitada').value || null,
+                visited_company_id: document.getElementById('visitante-empresa-visitada').value || null,
+                reason: document.getElementById('visitante-motivo').value,
+                photo_base64: visitorPhoto,
+                // Período de acesso
+                period_start: entryDateValue || null,
+                period_end: exitDateValue || null
+            };
+
+            // Só adiciona entry_date se o usuário preencher
+            if (entryDateValue) {
+                visitante.entry_date = entryDateValue;
+            }
+
+            const isEditing = visitante.id !== null && !isNaN(visitante.id);
+            const method = isEditing ? 'PUT' : 'POST';
+            const url = isEditing ? `/visitors/${visitante.id}` : '/visitors';
+
+            console.log('DEBUG saveVisitante(): Enviando:', {
+                url,
+                method,
+                visitorPhoto: visitorPhoto ? 'tem foto (' + visitorPhoto.substring(0, 50) + '...)' : 'null'
+            });
+
+            api.request(url, {
+                method: method,
+                body: JSON.stringify(visitante)
+            }).then(response => {
+                if (response.success) {
+                    alert(`${visitante.name} ${isEditing ? 'atualizado' : 'cadastrado'} com sucesso!`);
+                    document.getElementById('form-visitante').reset();
+                    document.getElementById('visitante-id').value = '';
+                    STATE.visitorPhoto = null;
+                    showVisitantesList();
+                    refreshVisitantes();
+                } else {
+                    alert('Erro ao salvar visitante: ' + (response.message || 'Erro desconhecido'));
+                }
+            }).catch(error => {
+                if (error.status === 409 && error.data) {
+                    if (confirm(`O documento fornecido já está vinculado ao visitante: ${error.data.name}.\n\nDeseja recarregar o cadastro existente para atualizar ou reativá-lo?`)) {
+                        document.getElementById('form-visitante').reset();
+                        window.editarVisitante(error.data.id);
+                    }
+                } else {
+                    console.error('Erro ao salvar visitante:', error);
+                    alert(error.message || 'Erro ao salvar visitante');
+                }
+            });
+        }
+
+        function editarVisitante(id) {
+            console.log('DEBUG lista.html editarVisitante(): Início - id:', id);
+            // Buscar dados do visitante via API
+            api.request(`/visitors/${id}`).then(response => {
+                console.log('DEBUG editarVisitante(): Response:', response);
+                if (response.success && response.data) {
+                    const visitante = response.data;
+                    console.log('DEBUG editarVisitante(): Dados do visitante:', visitante);
+                    console.log('DEBUG editarVisitante(): period_start:', visitante.period_start);
+                    console.log('DEBUG editarVisitante(): period_end:', visitante.period_end);
+                    console.log('DEBUG editarVisitante(): liberation_type:', visitante.liberation_type);
+
+                    document.getElementById('visitante-id').value = visitante.id;
+                    document.getElementById('visitante-nome').value = visitante.name || '';
+                    document.getElementById('visitante-documento').value = visitante.document || '';
+                    document.getElementById('visitante-celular').value = visitante.cellphone || '';
+                    document.getElementById('visitante-email').value = visitante.email || '';
+                    document.getElementById('visitante-empresa').value = visitante.visitor_company || '';
+                    document.getElementById('visitante-numero-cartao').value = visitante.card_number || '';
+                    document.getElementById('visitante-pessoa-visitada').value = visitante.visited_person_id || '';
+                    document.getElementById('visitante-empresa-visitada').value = visitante.visited_company_id || '';
+                    document.getElementById('visitante-motivo').value = visitante.reason || '';
+
+                    // Carregar tipo de liberação e período
+                    if (visitante.liberation_type) {
+                        const radioLiberacao = document.querySelector('input[name="tipoLiberacao"][value="' + visitante.liberation_type + '"]');
+                        if (radioLiberacao) {
+                            radioLiberacao.checked = true;
+                            togglePeriodo();
+                        }
+                        if (visitante.liberation_type === 'periodo' && visitante.period_start) {
+                            document.getElementById('visitante-data-entrada').value = visitante.period_start.slice(0, 16);
+                        }
+                        if (visitante.liberation_type === 'periodo' && visitante.period_end) {
+                            document.getElementById('visitante-data-saida').value = visitante.period_end.slice(0, 16);
+                        }
+                    } else {
+                        // Se não tem liberation_type, define como única por padrão
+                        const radioUnica = document.querySelector('input[name="tipoLiberacao"][value="unica"]');
+                        if (radioUnica) {
+                            radioUnica.checked = true;
+                            togglePeriodo();
+                        }
+                    }
+
+                    document.getElementById('visitante-data-entrada').value = visitante.period_start ? visitante.period_start.slice(0, 16) : '';
+                    document.getElementById('visitante-data-saida').value = visitante.period_end ? visitante.period_end.slice(0, 16) : '';
+
+                    // Carregar foto do visitante
+                    const preview = document.getElementById('visitante-photo-preview');
+                    if (visitante.photo_url) {
+                        preview.innerHTML = `<img src="${visitante.photo_url}" alt="${visitante.name}" onerror="onVisitorPhotoError(this)">`;
+                        preview.classList.add('has-image');
+                        STATE.visitorPhoto = visitante.photo_url;
+                    } else if (visitante.photo_base64) {
+                        preview.innerHTML = `<img src="${visitante.photo_base64}" alt="${visitante.name}">`;
+                        preview.classList.add('has-image');
+                        STATE.visitorPhoto = visitante.photo_base64;
+                    }
+
+                    // Resetar campos de cartão
+                    if (visitante.card_number) {
+                        document.querySelector('input[name="tipo-cartao"][value="manual"]').checked = true;
+                    } else {
+                        document.querySelector('input[name="tipo-cartao"][value="manual"]').checked = true;
+                    }
+                    toggleCartaoFields();
+
+                    console.log('DEBUG editarVisitante(): Chamando showVisitanteForm(' + visitante.id + ')');
+                    showVisitanteForm(visitante.id);
+                } else {
+                    alert('Erro ao carregar dados do visitante');
+                }
+            }).catch(error => {
+                console.error('DEBUG editarVisitante(): Erro:', error);
+                alert('Erro ao carregar visitante');
+            });
+        }
+
+        // Toggle modo de inativação em massa
+        function toggleMassInactivation() {
+            const btn = document.getElementById('btn-mass-inactivate');
+            const btnConfirm = document.getElementById('btn-confirm-mass-inactivate');
+            const thSelectAll = document.getElementById('th-select-all');
+
+            if (!window.massInactivationMode) {
+                // Ativar modo de seleção em massa
+                window.massInactivationMode = true;
+                btn.innerHTML = '<i class="fas fa-times"></i> CANCELAR';
+                btn.classList.remove('btn-warning');
+                btn.classList.add('btn-secondary');
+                if (btnConfirm) btnConfirm.style.display = '';
+                if (thSelectAll) thSelectAll.style.display = '';
+            } else {
+                // Desativar modo de seleção em massa
+                window.massInactivationMode = false;
+                btn.innerHTML = '<i class="fas fa-ban"></i> INATIVAR EM MASSA';
+                btn.classList.remove('btn-secondary');
+                btn.classList.add('btn-warning');
+                if (btnConfirm) btnConfirm.style.display = 'none';
+                if (thSelectAll) thSelectAll.style.display = 'none';
+                // Desmarcar todos os checkboxes
+                document.querySelectorAll('.visitor-checkbox').forEach(cb => cb.checked = false);
+            }
+
+            // Recarregar lista para mostrar/ocultar checkboxes
+            VisitanteManager.loadList();
+        }
+
+        // Selecionar todos os checkboxes
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('select-all-visitors');
+            const checkboxes = document.querySelectorAll('.visitor-checkbox');
+
+            checkboxes.forEach(cb => {
+                cb.checked = selectAll.checked;
+            });
+        }
+
+        // Mostrar botão de inativação em massa quando filtro for "on_premises"
+        function updateMassInactivateButton() {
+            const statusFilter = document.getElementById('filter-visitante-status')?.value;
+            const btn = document.getElementById('btn-mass-inactivate');
+            const btnConfirm = document.getElementById('btn-confirm-mass-inactivate');
+
+            if (btn) {
+                if (statusFilter === 'on_premises') {
+                    btn.style.display = '';
+                } else {
+                    btn.style.display = 'none';
+                    if (btnConfirm) btnConfirm.style.display = 'none';
+                    // Saír do modo de seleção em massa se mudar o filtro
+                    if (window.massInactivationMode) {
+                        toggleMassInactivation();
+                    }
+                }
+            }
+        }
+
+        // Adicionar listener para o filtro de status
+        document.addEventListener('DOMContentLoaded', function () {
+            const filterStatus = document.getElementById('filter-visitante-status');
+            if (filterStatus) {
+                filterStatus.addEventListener('change', updateMassInactivateButton);
+                // Verificar estado inicial
+                updateMassInactivateButton();
+            }
+        });
+
+        // Inativar visitante (soft delete)
+        function inativarVisitante(id) {
+            if (confirm('Deseja realmente inativar este visitante? Ele desaparecerá da lista ativa.')) {
+                api.request(`/visitors/${id}/exit`, {
+                    method: 'PUT'
+                }).then(response => {
+                    if (response.success) {
+                        alert('Visitante inativado com sucesso!');
+                        refreshVisitantes();
+                    } else {
+                        alert('Erro ao inativar visitante: ' + (response.message || 'Erro desconhecido'));
+                    }
+                }).catch(error => {
+                    console.error('Erro ao inativar visitante:', error);
+                    alert('Erro ao inativar visitante');
+                });
+            }
+        }
+
+        // Reativar visitante
+        function reativarVisitante(id) {
+            if (confirm('Deseja realmente reativar este visitante?')) {
+                api.request(`/visitors/${id}/reactivate`, {
+                    method: 'POST'
+                }).then(response => {
+                    if (response.success) {
+                        alert('Visitante reativado com sucesso!');
+                        refreshVisitantes();
+                    } else {
+                        alert('Erro ao reativar visitante: ' + (response.message || 'Erro desconhecido'));
+                    }
+                }).catch(error => {
+                    console.error('Erro ao reativar visitante:', error);
+                    alert('Erro ao reativar visitante');
+                });
+            }
+        }
+
+        // Excluir permanentemente visitante (apenas inativos)
+        function excluirVisitante(id) {
+            if (confirm('Deseja realmente excluir PERMANENTEMENTE este visitante? Esta ação não pode ser desfeita.')) {
+                api.request(`/visitors/${id}/force`, {
+                    method: 'DELETE'
+                }).then(response => {
+                    if (response.success) {
+                        alert('Visitante excluído com sucesso!');
+                        refreshVisitantes();
+                    } else {
+                        alert('Erro ao excluir visitante: ' + (response.message || 'Erro desconhecido'));
+                    }
+                }).catch(error => {
+                    console.error('Erro ao excluir visitante:', error);
+                    alert('Erro ao excluir visitante');
+                });
+            }
+        }
+
+        // Inativação em massa
+        function inativarSelecionados() {
+            const checkboxes = document.querySelectorAll('.visitor-checkbox:checked');
+            if (checkboxes.length === 0) {
+                alert('Selecione pelo menos um visitante para inativar');
+                return;
+            }
+
+            const ids = Array.from(checkboxes).map(cb => cb.value);
+
+            if (confirm(`Deseja realmente inativar ${ids.length} visitante(s)?`)) {
+                api.request('/visitors/bulk-inactivate', {
+                    method: 'POST',
+                    body: JSON.stringify({ ids })
+                }).then(response => {
+                    if (response.success) {
+                        alert(response.message || `${ids.length} visitante(s) inativado(s) com sucesso!`);
+                        if (window.massInactivationMode) toggleMassInactivation(); // Sair do modo de seleção
+                        refreshVisitantes();
+                    } else {
+                        alert('Erro ao inativar visitantes: ' + (response.message || 'Erro desconhecido'));
+                    }
+                }).catch(error => {
+                    console.error('Erro ao inativar visitantes:', error);
+                    alert('Erro ao inativar visitantes');
+                });
+            }
+        }
+
+        function handleVisitantePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (!validTypes.includes(file.type)) {
+                alert('Apenas imagens JPG, PNG ou GIF são permitidas.');
+                return;
+            }
+
+            if (file.size > 2 * 1024 * 1024) {
+                alert('A imagem deve ter no máximo 2MB.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const photoData = e.target.result;
+                const preview = document.getElementById('visitante-photo-preview');
+                preview.innerHTML = `<img src="${photoData}" alt="Preview">`;
+                preview.classList.add('has-image');
+                // Salvar no STATE para envio ao backend
+                STATE.visitorPhoto = photoData;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Fechar modal com ESC
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                fecharModalRemoto();
+            }
+        });
+
+        // InicializaÃ§Ã£o
+        document.addEventListener('DOMContentLoaded', function () {
+            // Verificar parâmetros da URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const editId = urlParams.get('id');
+            const reloadParam = urlParams.get('reload');
+
+            // Se há ID para editar, abrir formulário de edição
+            if (editId) {
+                setTimeout(function () {
+                    window.editarVisitantePorId(editId);
+                    // Remover o parâmetro ID da URL após abrir
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }, 100);
+            } else {
+                // Carregar lista normalmente
+                setTimeout(function () {
+                    VisitanteManager.loadList();
+                }, 100);
+            }
+
+            // Inicializar campos de cartÃ£o
+            toggleCartaoFields();
+
+            // Verificar se há parâmetro na URL para recarregar a lista
+            if (reloadParam === 'true') {
+                // Remover o parâmetro da URL e recarregar
+                window.history.replaceState({}, document.title, window.location.pathname);
+                VisitanteManager.loadList();
+            }
+        });
+    </script>
+    <!-- Modal Promover Visitante -->
+    <div id="promote-modal-overlay">
+        <div id="promote-modal">
+            <div class="pm-header">
+                <h3><i class="fas fa-user-plus"></i> Promover Visitante a Pessoa</h3>
+                <button class="pm-close" onclick="fecharModalPromover()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="pm-body">
+                <div class="pm-visitor-info" id="pm-visitor-info">
+                    <div class="pm-avatar-placeholder"><i class="fas fa-user"></i></div>
+                    <div>
+                        <div class="pm-visitor-name" id="pm-visitor-name">—</div>
+                        <div class="pm-visitor-doc" id="pm-visitor-doc">—</div>
+                    </div>
+                </div>
+                <div class="pm-field">
+                    <label for="pm-empresa">Empresa</label>
+                    <div class="pm-combobox-container">
+                        <input type="text" id="pm-empresa-search" class="pm-combobox-input"
+                            placeholder="Buscar empresa..." autocomplete="off">
+                        <input type="hidden" id="pm-empresa" value="">
+                        <div id="pm-empresa-dropdown" class="pm-combobox-dropdown"></div>
+                    </div>
+                    <span class="pm-hint">A pessoa será vinculada como proprietária desta empresa.</span>
+                </div>
+                <div class="pm-field">
+                    <label for="pm-grupo-search">Grupo / Departamento</label>
+                    <div class="pm-combobox-container">
+                        <input type="text" id="pm-grupo-search" class="pm-combobox-input" placeholder="Buscar grupo..."
+                            autocomplete="off">
+                        <input type="hidden" id="pm-grupo" value="">
+                        <div id="pm-grupo-dropdown" class="pm-combobox-dropdown"></div>
+                    </div>
+                </div>
+                <div class="pm-field">
+                    <label for="pm-matricula">Matrícula <span
+                            style="font-weight:400;text-transform:none;color:#94a3b8">(herdada do
+                            visitante)</span></label>
+                    <input type="text" id="pm-matricula" placeholder="Ex: 260042">
+                </div>
+                <div class="pm-warning">
+                    <i class="fas fa-exclamation-triangle" style="margin-top:2px;flex-shrink:0"></i>
+                    <span>O visitante será <strong>removido</strong> e os dados serão transferidos para o cadastro de
+                        Pessoas. Esta ação não pode ser desfeita.</span>
+                </div>
+            </div>
+            <div class="pm-footer">
+                <button class="btn btn-secondary" onclick="fecharModalPromover()">Cancelar</button>
+                <button class="btn btn-primary" id="pm-btn-confirmar" onclick="confirmarPromocao()">
+                    <i class="fas fa-user-plus"></i> Promover
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // ── Handlers de erro de foto ─────────────────────────────────
+        function onVisitorPhotoError(img) {
+            img.parentElement.classList.remove('has-image');
+            img.parentElement.innerHTML = '<div class="photo-circle-placeholder"><i class="fas fa-camera"></i><span>Adicionar foto</span></div>';
+            if (window.STATE) STATE.visitorPhoto = null;
+        }
+
+        function onPromoteAvatarError(img) {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'pm-avatar-placeholder';
+            placeholder.innerHTML = '<i class="fas fa-user"></i>';
+            img.replaceWith(placeholder);
+        }
+
+        // ── Estado do modal de promoção ─────────────────────────────
+        let _promoverVisitanteId = null;
+        let _promoverVisitanteDados = null;
+
+        async function abrirModalPromover(visitanteId) {
+            _promoverVisitanteId = visitanteId;
+
+            try {
+                const resp = await api.request(`/visitors/${visitanteId}`);
+                if (!resp.success || !resp.data) {
+                    if (typeof NotificationSystem !== 'undefined') {
+                        NotificationSystem.showToast('error', 'Erro', 'Erro ao carregar dados do visitante.');
+                    } else {
+                        alert('Erro ao carregar dados do visitante.');
+                    }
+                    return;
+                }
+                _promoverVisitanteDados = resp.data;
+            } catch (e) {
+                if (typeof NotificationSystem !== 'undefined') {
+                    NotificationSystem.showToast('error', 'Erro', 'Erro ao carregar visitante: ' + e.message);
+                } else {
+                    alert('Erro ao carregar visitante: ' + e.message);
+                }
+                return;
+            }
+
+            const v = _promoverVisitanteDados;
+            const pmVisitorName = document.getElementById('pm-visitor-name');
+            const pmVisitorDoc = document.getElementById('pm-visitor-doc');
+            const pmVisitorInfo = document.getElementById('pm-visitor-info');
+
+            if (pmVisitorName) pmVisitorName.textContent = v.name || '—';
+            if (pmVisitorDoc) pmVisitorDoc.textContent =
+                (v.document ? 'Doc: ' + v.document : '') +
+                (v.cellphone ? ' · ' + v.cellphone : '');
+
+            const photoSrc = v.photo_url || v.photo_base64 || null;
+            if (pmVisitorInfo) {
+                if (photoSrc) {
+                    pmVisitorInfo.innerHTML = `
+          <img class="pm-avatar" src="${photoSrc}" alt="${v.name}" onerror="onPromoteAvatarError(this)">
+          <div>
+            <div class="pm-visitor-name">${v.name || '—'}</div>
+            <div class="pm-visitor-doc">${v.document ? 'Doc: ' + v.document : ''}${v.cellphone ? ' · ' + v.cellphone : ''}</div>
+          </div>`;
+                } else {
+                    pmVisitorInfo.innerHTML = `
+          <div class="pm-avatar-placeholder"><i class="fas fa-user"></i></div>
+          <div>
+            <div class="pm-visitor-name">${v.name || '—'}</div>
+            <div class="pm-visitor-doc">${v.document ? 'Doc: ' + v.document : ''}${v.cellphone ? ' · ' + v.cellphone : ''}</div>
+          </div>`;
+                }
+            }
+
+            document.getElementById('pm-matricula').value = '';
+
+            const [empResp, grpResp] = await Promise.all([
+                api.request('/companies?limit=10000').catch(() => ({ success: false })),
+                api.request('/groups').catch(() => ({ success: false })),
+            ]);
+
+            // Armazenar dados para busca
+            window._pmEmpresas = [];
+            window._pmGrupos = [];
+
+            if (empResp.success && Array.isArray(empResp.data)) {
+                window._pmEmpresas = empResp.data;
+            }
+
+            const grupos = grpResp.success
+                ? (Array.isArray(grpResp.data) ? grpResp.data : (Array.isArray(grpResp) ? grpResp : []))
+                : [];
+            window._pmGrupos = grupos;
+
+            // Configurar busca de empresas
+            const empInput = document.getElementById('pm-empresa-search');
+            const empDropdown = document.getElementById('pm-empresa-dropdown');
+            const empHidden = document.getElementById('pm-empresa');
+
+            // Mostrar todas as empresas ao clicar/focar
+            function showEmpresas() {
+                const filtered = window._pmEmpresas;
+                if (filtered.length === 0) {
+                    empDropdown.innerHTML = '<div class="pm-combobox-item" style="color:#94a3b8">Nenhuma empresa cadastrada</div>';
+                } else {
+                    empDropdown.innerHTML = filtered.map(e => {
+                        const nome = e.corporate_name || e.trading_name || e.name || 'Empresa ' + e.id;
+                        const inativa = e.active === false ? ' (Inativa)' : '';
+                        return `<div class="pm-combobox-item" data-id="${e.id}" data-name="${nome}">${nome}${inativa}</div>`;
+                    }).join('');
+                }
+                empDropdown.classList.add('active');
+            }
+
+            empInput.addEventListener('focus', showEmpresas);
+            empInput.addEventListener('input', function () {
+                const query = this.value.toLowerCase();
+                const filtered = window._pmEmpresas.filter(e => {
+                    const nome = (e.corporate_name || e.trading_name || e.name || '').toLowerCase();
+                    return nome.includes(query);
+                });
+
+                if (filtered.length === 0) {
+                    empDropdown.innerHTML = '<div class="pm-combobox-item" style="color:#94a3b8">Nenhuma empresa encontrada</div>';
+                } else {
+                    empDropdown.innerHTML = filtered.map(e => {
+                        const nome = e.corporate_name || e.trading_name || e.name || 'Empresa ' + e.id;
+                        const inativa = e.active === false ? ' (Inativa)' : '';
+                        return `<div class="pm-combobox-item" data-id="${e.id}" data-name="${nome}">${nome}${inativa}</div>`;
+                    }).join('');
+                }
+                empDropdown.classList.add('active');
+            });
+
+            empDropdown.addEventListener('click', function (e) {
+                if (e.target.classList.contains('pm-combobox-item')) {
+                    empHidden.value = e.target.dataset.id;
+                    empInput.value = e.target.dataset.name;
+                    empDropdown.classList.remove('active');
+                }
+            });
+
+            // Configurar busca de grupos
+            const grpInput = document.getElementById('pm-grupo-search');
+            const grpDropdown = document.getElementById('pm-grupo-dropdown');
+            const grpHidden = document.getElementById('pm-grupo');
+
+            // Mostrar todos os grupos ao clicar/focar
+            function showGrupos() {
+                const filtered = window._pmGrupos;
+                if (filtered.length === 0) {
+                    grpDropdown.innerHTML = '<div class="pm-combobox-item" style="color:#94a3b8">Nenhum grupo cadastrado</div>';
+                } else {
+                    grpDropdown.innerHTML = filtered.map(g => {
+                        const nome = g.name || g.nome || 'Grupo ' + g.id;
+                        return `<div class="pm-combobox-item" data-id="${g.id}" data-name="${nome}">${nome}</div>`;
+                    }).join('');
+                }
+                grpDropdown.classList.add('active');
+            }
+
+            grpInput.addEventListener('focus', showGrupos);
+            grpInput.addEventListener('input', function () {
+                const query = this.value.toLowerCase();
+                const filtered = window._pmGrupos.filter(g => {
+                    const nome = (g.name || g.nome || '').toLowerCase();
+                    return nome.includes(query);
+                });
+
+                if (filtered.length === 0) {
+                    grpDropdown.innerHTML = '<div class="pm-combobox-item" style="color:#94a3b8">Nenhum grupo encontrado</div>';
+                } else {
+                    grpDropdown.innerHTML = filtered.map(g => {
+                        const nome = g.name || g.nome || 'Grupo ' + g.id;
+                        return `<div class="pm-combobox-item" data-id="${g.id}" data-name="${nome}">${nome}</div>`;
+                    }).join('');
+                }
+                grpDropdown.classList.add('active');
+            });
+
+            grpDropdown.addEventListener('click', function (e) {
+                if (e.target.classList.contains('pm-combobox-item')) {
+                    grpHidden.value = e.target.dataset.id;
+                    grpInput.value = e.target.dataset.name;
+                    grpDropdown.classList.remove('active');
+                }
+            });
+
+            // Fechar dropdowns ao clicar fora
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('.pm-combobox-container')) {
+                    empDropdown.classList.remove('active');
+                    grpDropdown.classList.remove('active');
+                }
+            });
+
+            document.getElementById('promote-modal-overlay').classList.add('active');
+        }
+
+        function fecharModalPromover() {
+            document.getElementById('promote-modal-overlay').classList.remove('active');
+            _promoverVisitanteId = null;
+            _promoverVisitanteDados = null;
+            // Limpar campos
+            document.getElementById('pm-empresa-search').value = '';
+            document.getElementById('pm-empresa').value = '';
+            document.getElementById('pm-grupo-search').value = '';
+            document.getElementById('pm-grupo').value = '';
+            document.getElementById('pm-matricula').value = '';
+        }
+
+        async function confirmarPromocao() {
+            if (!_promoverVisitanteId) return;
+
+            const company_id = document.getElementById('pm-empresa').value || null;
+            const group_id = document.getElementById('pm-grupo').value || null;
+            const regNumber = document.getElementById('pm-matricula').value.trim() || null;
+            const btnConfirmar = document.getElementById('pm-btn-confirmar');
+
+            const payload = {
+                company_id: company_id ? Number(company_id) : null,
+                group_ids: group_id ? [Number(group_id)] : [],
+                registration_number: regNumber,
+            };
+
+            btnConfirmar.disabled = true;
+            btnConfirmar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Promovendo...';
+
+            try {
+                const resp = await api.request(`/visitors/${_promoverVisitanteId}/promote`, {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                });
+
+                if (resp.success) {
+                    fecharModalPromover();
+                    if (typeof NotificationSystem !== 'undefined') {
+                        NotificationSystem.showToast(
+                            'success',
+                            'Visitante Promovido!',
+                            `${resp.data?.name || 'Visitante'} agora está cadastrado como Pessoa.`
+                        );
+                    } else {
+                        alert('Visitante promovido com sucesso! Acesse o cadastro de Pessoas para ver.');
+                    }
+                    // Recarregar lista
+                    if (typeof VisitanteManager !== 'undefined' && typeof VisitanteManager.loadList === 'function') {
+                        VisitanteManager.loadList();
+                    } else if (typeof carregarListaVisitantes === 'function') {
+                        carregarListaVisitantes();
+                    } else if (typeof loadList === 'function') {
+                        loadList();
+                    } else {
+                        location.reload();
+                    }
+                } else {
+                    if (typeof NotificationSystem !== 'undefined') {
+                        NotificationSystem.showToast('error', 'Erro', resp.message || 'Tente novamente.');
+                    } else {
+                        alert('Erro: ' + (resp.message || 'Tente novamente.'));
+                    }
+                }
+            } catch (err) {
+                if (typeof NotificationSystem !== 'undefined') {
+                    NotificationSystem.showToast('error', 'Erro', 'Erro ao promover visitante: ' + err.message);
+                } else {
+                    alert('Erro ao promover visitante: ' + err.message);
+                }
+            } finally {
+                btnConfirmar.disabled = false;
+                btnConfirmar.innerHTML = '<i class="fas fa-user-plus"></i> Promover';
+            }
+        }
+
+        document.getElementById('promote-modal-overlay').addEventListener('click', function (e) {
+            if (e.target === this) fecharModalPromover();
+        });
+    </script>
+</body>
+
+</html>

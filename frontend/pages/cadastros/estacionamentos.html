@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>MAM Control - Estacionamentos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="icon" href="../../favicon.png">
+    
+    <style>
+        /* Reset e estilos base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+        /* Cards */
+        .content-box {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Grid de formulário - 3 colunas */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        /* Form groups */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #ffffff;
+            font-family: inherit;
+        }
+
+        .form-group input:hover,
+        .form-group select:hover,
+        .form-group textarea:hover {
+            border-color: #94a3b8;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .form-hint {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .required:after {
+            content: " *";
+            color: #e53e3e;
+        }
+
+        /* Botões */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4a90d9;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3a78c2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 144, 217, 0.2);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Section header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-header-compact {
+            margin-bottom: 20px;
+        }
+
+        .section-title h1 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title h2 {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Tabela */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: auto;
+            margin-bottom: 20px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            color: #1e293b;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* Lista de empresas com vagas */
+        .empresas-vagas-container {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            margin-top: 20px;
+        }
+
+        .empresas-vagas-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .empresas-vagas-header h4 {
+            font-size: 1rem;
+            color: #1e293b;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .empresas-vagas-header h4 i {
+            color: #4a90d9;
+        }
+
+        .empresas-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .empresa-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+
+        .empresa-item:hover {
+            border-color: #4a90d9;
+            box-shadow: 0 2px 8px rgba(74, 144, 217, 0.1);
+        }
+
+        .empresa-info {
+            flex: 2;
+        }
+
+        .empresa-nome {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .empresa-documento {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .vagas-input {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .vagas-input input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .vagas-input input:focus {
+            border-color: #4a90d9;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .total-vagas {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 20px;
+            font-weight: 600;
+        }
+
+        .total-vagas span {
+            color: #4a90d9;
+            font-size: 1.2rem;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Mensagem vazia */
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+
+        .empty-message i {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .empresa-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .vagas-input {
+                width: 100%;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-container">
+        <div class="main-content">
+            <div class="content-area" id="contentArea">
+                <section id="estacionamentos" class="content-section active">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <h1>Estacionamentos</h1>
+                            <p>Gerencie estacionamentos rotativos e fixos</p>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary" onclick="EstacionamentoManager.refresh()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button class="btn btn-primary" onclick="EstacionamentoManager.showForm()">
+                                <i class="fas fa-plus"></i> Novo Estacionamento
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ESTACIONAMENTOS LIST VIEW -->
+                    <div id="estacionamentos-list">
+                        <div class="search-filter">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="search-estacionamentos" placeholder="Buscar por nome..."
+                                    onkeyup="EstacionamentoManager.filter()">
+                            </div>
+                        </div>
+
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Tipo</th>
+                                        <th>Vagas</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="estacionamentos-table-body">
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="empty-message">
+                                                <i class="fas fa-parking"></i>
+                                                <p>Nenhum estacionamento cadastrado</p>
+                                                <button class="btn btn-primary btn-sm" onclick="EstacionamentoManager.showForm()" style="margin-top: 12px;">
+                                                    <i class="fas fa-plus"></i> Cadastrar primeiro estacionamento
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="table-footer">
+                            <div class="table-info">
+                                <span id="estacionamentos-count">0</span> registros encontrados
+                            </div>
+                            <div class="pagination">
+                                <button class="btn btn-sm btn-secondary" disabled>
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span>Página 1 de 1</span>
+                                <button class="btn btn-sm btn-secondary" disabled>
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ESTACIONAMENTOS FORM VIEW -->
+                    <div id="estacionamentos-form" class="hidden">
+                        <div class="section-header section-header-compact">
+                            <div class="section-title">
+                                <h2 id="estacionamento-form-title">Novo Estacionamento</h2>
+                                <p>Configure o estacionamento</p>
+                            </div>
+                            <div class="section-actions">
+                                <button class="btn btn-secondary" onclick="EstacionamentoManager.showList()">
+                                    <i class="fas fa-arrow-left"></i> Voltar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="content-box" style="padding: 24px;">
+                            <form id="form-estacionamento" onsubmit="EstacionamentoManager.save(event)">
+                                <input type="hidden" id="estacionamento-id">
+
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="estacionamento-nome" class="required">Nome</label>
+                                        <input type="text" id="estacionamento-nome" required
+                                            placeholder="Ex: Estacionamento Principal">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="estacionamento-tipo">Tipo</label>
+                                        <select id="estacionamento-tipo"
+                                            onchange="EstacionamentoManager.toggleTipoFields()">
+                                            <option value="rotativo" selected>Rotativo</option>
+                                            <option value="fixo">Fixo</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Campos para Rotativo (quantidade total de vagas) -->
+                                    <div class="form-group" id="estacionamento-vagas-rotativo-container">
+                                        <label for="estacionamento-vagas-rotativo">Quantidade Total de Vagas</label>
+                                        <input type="number" id="estacionamento-vagas-rotativo" min="0" value="100"
+                                            placeholder="Ex: 100" onkeyup="EstacionamentoManager.calcularTotalVagas()" onchange="EstacionamentoManager.calcularTotalVagas()">
+                                        <div class="form-hint">Deixe vazio para estacionamento ilimitado (9999 vagas)</div>
+                                    </div>
+                                </div>
+
+                                <!-- Lista de Empresas com Vagas (aparece apenas para Rotativo) -->
+                                <div id="empresas-vagas-container" class="empresas-vagas-container">
+                                    <div class="empresas-vagas-header">
+                                        <h4>
+                                            <i class="fas fa-building"></i>
+                                            Distribuição de Vagas por Empresa
+                                        </h4>
+                                        <span class="badge badge-info" id="empresas-selecionadas-count">0 empresas</span>
+                                    </div>
+
+                                    <div class="empresas-list" id="empresas-list">
+                                        <!-- Empresas serão carregadas via JavaScript -->
+                                    </div>
+
+                                    <div class="total-vagas">
+                                        <span>Total distribuído:</span>
+                                        <span id="total-vagas-distribuidas">0</span>
+                                        <span>de</span>
+                                        <span id="total-vagas-disponiveis">100</span>
+                                    </div>
+                                </div>
+
+                                <!-- Aba para Vagas (Fixo) -->
+                                <div id="estacionamento-vagas-section" class="hidden">
+                                    <div class="section-header">
+                                        <h3 class="section-title" style="margin:0; font-size:1.1rem;">Gerenciar Vagas</h3>
+                                        <div class="section-actions">
+                                            <button type="button" class="btn btn-secondary btn-sm"
+                                                onclick="EstacionamentoManager.showBulkVagaForm()">
+                                                <i class="fas fa-plus-circle"></i> Cadastrar em Massa
+                                            </button>
+                                            <button type="button" class="btn btn-primary btn-sm"
+                                                onclick="EstacionamentoManager.showVagaForm()">
+                                                <i class="fas fa-plus"></i> Nova Vaga
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Formulário de Nova Vaga -->
+                                    <div id="vaga-form-container" style="display: none; margin-bottom: 16px; padding: 16px; background: #f8fafc; border-radius: 8px;">
+                                        <div style="display: flex; gap: 12px; align-items: flex-end;">
+                                            <div class="form-group" style="flex: 1; margin: 0;">
+                                                <label for="vaga-numero">Número da Vaga</label>
+                                                <input type="text" id="vaga-numero" placeholder="Ex: A1">
+                                            </div>
+                                            <button type="button" class="btn btn-primary btn-sm" onclick="EstacionamentoManager.addVaga(event)">
+                                                <i class="fas fa-plus"></i> Adicionar
+                                            </button>
+                                            <button type="button" class="btn btn-secondary btn-sm" onclick="EstacionamentoManager.showVagaForm()">
+                                                Cancelar
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Formulário de Cadastro em Massa -->
+                                    <div id="vaga-bulk-form-container" style="display: none; margin-bottom: 16px; padding: 16px; background: #f8fafc; border-radius: 8px;">
+                                        <div style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+                                            <div class="form-group" style="flex: 1; min-width: 120px; margin: 0;">
+                                                <label for="vaga-prefixo">Prefixo (opcional)</label>
+                                                <input type="text" id="vaga-prefixo" placeholder="Ex: Sala, A, Andar">
+                                            </div>
+                                            <div class="form-group" style="flex: 1; min-width: 100px; margin: 0;">
+                                                <label for="vaga-inicio">Vaga Início</label>
+                                                <input type="number" id="vaga-inicio" placeholder="Ex: 1" min="1">
+                                            </div>
+                                            <div class="form-group" style="flex: 1; min-width: 100px; margin: 0;">
+                                                <label for="vaga-fim">Vaga Fim</label>
+                                                <input type="number" id="vaga-fim" placeholder="Ex: 50" min="1">
+                                            </div>
+                                            <button type="button" class="btn btn-primary btn-sm" onclick="EstacionamentoManager.addVagasBulk(event)">
+                                                <i class="fas fa-plus"></i> Adicionar
+                                            </button>
+                                            <button type="button" class="btn btn-secondary btn-sm" onclick="EstacionamentoManager.showBulkVagaForm()">
+                                                Cancelar
+                                            </button>
+                                        </div>
+                                        <div style="margin-top: 8px; font-size: 0.85rem; color: #64748b;">
+                                            <i class="fas fa-info-circle"></i> Exemplo: Prefixo "Sala" + Início 1 + Fim 3 = Sala 1, Sala 2, Sala 3
+                                        </div>
+                                    </div>
+
+                                    <div class="table-container">
+                                        <table class="data-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Número</th>
+                                                    <th>Status</th>
+                                                    <th>Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="vagas-table-body">
+                                                <tr>
+                                                    <td colspan="3">
+                                                        <div class="empty-message" style="padding: 20px;">
+                                                            <i class="fas fa-parking"></i>
+                                                            <p>Nenhuma vaga cadastrada</p>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-secondary"
+                                        onclick="EstacionamentoManager.confirmarCancelamento()">
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Salvar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts externos -->
+    <script src="../../components.js"></script>
+    <script src="../../app.js"></script>
+    <script src="../../auth.js"></script>
+    
+    <!-- Script com extensões do EstacionamentoManager (deve vir DEPOIS do app.js) -->
+    <script>
+        // Variável global para empresas
+        window.EMPRESAS_ESTACIONAMENTO = [];
+        
+        // Função para carregar empresas do banco de dados
+        async function carregarEmpresasDoBanco() {
+            console.log('Carregando empresas do banco de dados...');
+            try {
+                // Usar a API para buscar empresas com limite maior
+                const result = await api.request('/companies?limit=10000');
+                console.log('Resultado da API de empresas:', result);
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    window.EMPRESAS_ESTACIONAMENTO = result.data.map(e => ({
+                        id: e.id,
+                        nome: e.trading_name || e.corporate_name || e.name || e.nome || 'Empresa ' + e.id,
+                        documento: e.cnpj || e.documento || '',
+                        vagas: 0
+                    }));
+                    console.log('Empresas carregadas do banco:', window.EMPRESAS_ESTACIONAMENTO);
+                } else {
+                    window.EMPRESAS_ESTACIONAMENTO = [];
+                    console.log('Nenhuma empresa encontrada na API');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar empresas:', error);
+                window.EMPRESAS_ESTACIONAMENTO = [];
+            }
+        }
+        
+        // Sobrescrever showForm para carregar empresas
+        const _originalShowForm = EstacionamentoManager.showForm;
+        EstacionamentoManager.showForm = async function() {
+            await carregarEmpresasDoBanco();
+            // Atualizar a lista de empresas no formulário
+            if (typeof atualizarListaEmpresasForm === 'function') {
+                atualizarListaEmpresasForm();
+            }
+            return _originalShowForm.apply(this, arguments);
+        };
+        
+        // Sobrescrever edit para carregar empresas
+        const _originalEdit = EstacionamentoManager.edit;
+        EstacionamentoManager.edit = async function(id) {
+            await carregarEmpresasDoBanco();
+            // Atualizar a lista de empresas no formulário
+            if (typeof atualizarListaEmpresasForm === 'function') {
+                atualizarListaEmpresasForm();
+            }
+            return _originalEdit.apply(this, arguments);
+        };
+        
+        // Função para atualizar a lista de empresas no formulário
+        function atualizarListaEmpresasForm() {
+            const container = document.getElementById('empresas-list');
+            if (!container) return;
+            
+            const empresas = window.EMPRESAS_ESTACIONAMENTO;
+            
+            if (!empresas || empresas.length === 0) {
+                container.innerHTML = '<div class="empty-message"><i class="fas fa-building"></i><p>Nenhuma empresa cadastrada</p></div>';
+                return;
+            }
+            
+            container.innerHTML = empresas.map(empresa => `
+                <div class="empresa-item" data-empresa-id="${empresa.id}">
+                    <div class="empresa-info">
+                        <div class="empresa-nome">${empresa.nome || 'Empresa ' + empresa.id}</div>
+                        <div class="empresa-documento">${empresa.documento || ''}</div>
+                    </div>
+                    <div class="empresa-vagas">
+                        <input type="number" class="vagas-empresa-input" 
+                            data-empresa-id="${empresa.id}" 
+                            data-empresa-nome="${empresa.nome || ''}"
+                            min="0" step="1" value="${empresa.vagas || 0}" placeholder="Vagas"
+                            onchange="EstacionamentoManager.atualizarVagasEmpresa(${empresa.id}, this.value); atualizarTotalDisplay();"
+                            onkeyup="EstacionamentoManager.atualizarVagasEmpresa(${empresa.id}, this.value); atualizarTotalDisplay();">
+                    </div>
+                </div>
+            `).join('');
+            
+            // Atualizar o contador e total
+            atualizarTotalDisplay();
+        }
+        
+        // Função para atualizar o display do total
+        function atualizarTotalDisplay() {
+            const empresas = window.EMPRESAS_ESTACIONAMENTO || [];
+            const totalVagasInput = document.getElementById('estacionamento-vagas-rotativo');
+            const totalVagas = parseInt(totalVagasInput?.value) || 0;
+            
+            const totalDistribuido = empresas.reduce((acc, e) => acc + (parseInt(e.vagas) || 0), 0);
+            
+            const distribuidoEl = document.getElementById('total-vagas-distribuidas');
+            const disponivelEl = document.getElementById('total-vagas-disponiveis');
+            
+            if (distribuidoEl) distribuidoEl.textContent = totalDistribuido;
+            if (disponivelEl) disponivelEl.textContent = totalVagas;
+            
+            // Validação visual
+            if (distribuidoEl) {
+                if (totalDistribuido > totalVagas && totalVagas > 0) {
+                    distribuidoEl.style.color = '#ef4444';
+                } else {
+                    distribuidoEl.style.color = '#4a90d9';
+                }
+            }
+            
+            // Atualizar contador de empresas
+            const ativas = empresas.filter(e => (parseInt(e.vagas) || 0) > 0).length;
+            const countEl = document.getElementById('empresas-selecionadas-count');
+            if (countEl) countEl.textContent = `${ativas} empresas ativas`;
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        // Inicialização quando a página é carregada diretamente
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (typeof EstacionamentoManager !== 'undefined') {
+                    EstacionamentoManager.loadList();
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>
