@@ -47,7 +47,7 @@ async function downloadAndLink(vpsDb, localDb, table, baseUrl, vpsToken) {
             const pathParts = urlObj.pathname.split('/');
             let filename = pathParts[pathParts.length - 1];
             if (!filename) {
-                filename = `mamcontrol_${photoType}_${row.id}_${Date.now()}.jpg`;
+                filename = `acesscontrol_${photoType}_${row.id}_${Date.now()}.jpg`;
             }
 
             const localFilePath = path.join(photosDir, filename);
@@ -87,7 +87,7 @@ async function downloadAndLink(vpsDb, localDb, table, baseUrl, vpsToken) {
     return { total: rows.length, downloaded, updated, errors, results };
 }
 
-export async function importMamcontrol(req, res) {
+export async function importLegacyDatabase(req, res) {
     const tenantId = req.tenantId;
     const dbFile = req.file;
     const { vps_url, vps_token } = req.body;

@@ -3,7 +3,7 @@
  * Executa todas as migrações do banco de dados
  * 
  * Uso: node migrations.js [tenant_id]
- * Exemplo: node migrations.js mamsolucoes
+ * Exemplo: node migrations.js demo
  */
 
 import fs from 'fs';
@@ -418,7 +418,7 @@ Uso: node migrations.js <tenant_id|all>
 
 Exemplos:
   node migrations.js default        # Executa em um tenant específico
-  node migrations.js mamsolucoes    # Executa em um tenant específico
+  node migrations.js demo    # Executa em um tenant específico
   node migrations.js all            # Executa em TODOS os tenants
 
 Tenants disponíveis:

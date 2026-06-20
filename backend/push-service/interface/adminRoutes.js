@@ -239,7 +239,7 @@ router.post('/devices/:validador/reprovision', async (req, res) => {
   const { validador } = req.params;
   const { ip, login = 'admin', password = 'admin',
           server_host, server_port = '3001',
-          server_id = '5', server_name = 'mam-push' } = req.body || {};
+          server_id = '5', server_name = 'acess-push' } = req.body || {};
 
   if (!ip)          return res.status(400).json({ error: 'ip required' });
   if (!server_host) return res.status(400).json({ error: 'server_host required' });

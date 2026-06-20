@@ -272,9 +272,9 @@ class DatabaseManager {
 
   // Conexão "system" / master — usada pelo M-Panel administrativo para acessar
   // tabelas globais como `revendas`, `tenant_limits`, etc. que residem no tenant
-  // master `mamcontrolmam`. Reusa o pool de conexões normal.
+  // master `acesscontrolmaster`. Reusa o pool de conexões normal.
   async getSystemConnection() {
-    return this.getConnection('mamcontrolmam');
+    return this.getConnection('acesscontrolmaster');
   }
 
   // No-op: conexões são poolizadas, fechá-las quebraria outros consumidores.

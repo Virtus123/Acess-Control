@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>MAM Control - Preferências</title>
+    <title>Acess Control - Preferências</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../style.css">
     <link rel="icon" href="../../favicon.png">
@@ -1257,9 +1257,9 @@
                                             <i class="fas fa-cloud-download-alt" style="font-size: 1.5rem; display: block; margin-bottom: 6px;"></i>
                                             <span>IDSecure</span>
                                         </button>
-                                        <button class="import-type-btn" id="import-type-btn-mamcontrol" onclick="selectImportType('mamcontrol')">
+                                        <button class="import-type-btn" id="import-type-btn-acesscontrol" onclick="selectImportType('acesscontrol')">
                                             <i class="fas fa-database" style="font-size: 1.5rem; display: block; margin-bottom: 6px;"></i>
-                                            <span>MAMControl</span>
+                                            <span>AcessControl</span>
                                         </button>
                                     </div>
                                 </div>
@@ -1550,7 +1550,7 @@
                                             <div class="form-group">
                                                 <label class="checkbox-label">
                                                     <input type="checkbox" id="idsecure-force-inactive">
-                                                    <span>Importar todos como INATIVOS no MAM</span>
+                                                    <span>Importar todos como INATIVOS no sistema</span>
                                                 </label>
                                             </div>
 
@@ -1577,13 +1577,13 @@
                                 </div>
                             </div>
 
-                            <!-- Seção: MAMControl (download de fotos via .db) -->
-                            <div id="import-section-mamcontrol" style="display: none;">
+                            <!-- Seção: AcessControl (download de fotos via .db) -->
+                            <div id="import-section-acesscontrol" style="display: none;">
                                 <div class="settings-grid">
                                     <div class="settings-card">
                                         <div class="settings-card-header">
                                             <i class="fas fa-database"></i>
-                                            <h3>Importar Fotos do MAMControl (VPS)</h3>
+                                            <h3>Importar Fotos do AcessControl (VPS)</h3>
                                         </div>
                                         <div class="settings-card-body">
                                             <p style="margin-bottom: 20px; color: #64748b;">
@@ -1593,39 +1593,39 @@
                                             <div style="background: #f0f9ff; padding: 12px; border-radius: 8px; font-size: 0.85rem; color: #0369a1; margin-bottom: 20px;">
                                                 <i class="fas fa-info-circle"></i>
                                                 <strong>Como exportar o .db:</strong> No servidor VPS, copie o arquivo
-                                                <code>/mamcontrol/backend/databases/tenants/tenant_SEUID.db</code> para sua máquina local.
+                                                <code>/acesscontrol/backend/databases/tenants/tenant_SEUID.db</code> para sua máquina local.
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="mamcontrol-vps-url">URL da VPS *</label>
-                                                <input type="url" id="mamcontrol-vps-url" placeholder="https://mamcontrol.com.br">
-                                                <div class="form-hint">URL base do servidor MAMControl na VPS (sem barra no final)</div>
+                                                <label for="acesscontrol-vps-url">URL da VPS *</label>
+                                                <input type="url" id="acesscontrol-vps-url" placeholder="https://example.com">
+                                                <div class="form-hint">URL base do servidor AcessControl na VPS (sem barra no final)</div>
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="mamcontrol-vps-token">Token JWT (opcional)</label>
-                                                <input type="text" id="mamcontrol-vps-token" placeholder="eyJhbGciOiJIUzI1NiI...">
+                                                <label for="acesscontrol-vps-token">Token JWT (opcional)</label>
+                                                <input type="text" id="acesscontrol-vps-token" placeholder="eyJhbGciOiJIUzI1NiI...">
                                                 <div class="form-hint">Token de autenticação para acessar fotos protegidas na VPS</div>
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="mamcontrol-db-file">Arquivo .db da VPS *</label>
-                                                <input type="file" id="mamcontrol-db-file" accept=".db" required>
+                                                <label for="acesscontrol-db-file">Arquivo .db da VPS *</label>
+                                                <input type="file" id="acesscontrol-db-file" accept=".db" required>
                                                 <div class="form-hint">Banco de dados SQLite exportado da VPS (tenant_SEUID.db)</div>
                                             </div>
 
-                                            <button class="btn btn-primary w-100" onclick="importMamcontrolPhotos()">
+                                            <button class="btn btn-primary w-100" onclick="importLegacyPhotos()">
                                                 <i class="fas fa-cloud-download-alt"></i> Baixar Fotos da VPS
                                             </button>
 
-                                            <div id="mamcontrol-import-progress" style="display: none; margin-top: 20px;">
+                                            <div id="acesscontrol-import-progress" style="display: none; margin-top: 20px;">
                                                 <div class="progress-bar">
-                                                    <div class="progress-fill" id="mamcontrol-progress-fill"></div>
+                                                    <div class="progress-fill" id="acesscontrol-progress-fill"></div>
                                                 </div>
-                                                <p class="progress-text" id="mamcontrol-progress-text">Processando...</p>
+                                                <p class="progress-text" id="acesscontrol-progress-text">Processando...</p>
                                             </div>
 
-                                            <div id="mamcontrol-import-results" style="display: none; margin-top: 20px;"></div>
+                                            <div id="acesscontrol-import-results" style="display: none; margin-top: 20px;"></div>
                                         </div>
                                     </div>
 
@@ -1802,7 +1802,7 @@
 
         function selectImportType(type) {
             // Toggle section visibility
-            ['pessoas', 'visitantes', 'idsecure', 'mamcontrol'].forEach(t => {
+            ['pessoas', 'visitantes', 'idsecure', 'acesscontrol'].forEach(t => {
                 document.getElementById(`import-section-${t}`).style.display = t === type ? '' : 'none';
                 const btn = document.getElementById(`import-type-btn-${t}`);
                 if (btn) btn.classList.toggle('active', t === type);
@@ -1829,7 +1829,7 @@
                     if (result.success) {
                         alert('Labels salvos com sucesso!');
                         // Atualiza o localStorage para uso imediato
-                        localStorage.setItem('mamcontrol_labels', JSON.stringify(labels));
+                        localStorage.setItem('acesscontrol_labels', JSON.stringify(labels));
                         // Aplicar labels (se houver a função)
                         if (window.translateLabels) window.translateLabels();
                     } else {
@@ -1894,7 +1894,7 @@
                     document.getElementById('config-label-pessoas').value = labels.pessoas || '';
                     document.getElementById('config-label-grupos').value = labels.grupos || '';
                     // Atualiza o localStorage
-                    localStorage.setItem('mamcontrol_labels', JSON.stringify(labels));
+                    localStorage.setItem('acesscontrol_labels', JSON.stringify(labels));
                 }
             } catch (e) {
                 console.error('Erro ao carregar labels:', e);
@@ -1991,9 +1991,9 @@
                     if (result.success) {
                         alert('Preferência de fonte salva com sucesso!');
                         // Atualiza o localStorage para refletir imediatamente
-                        const stored = JSON.parse(localStorage.getItem('mamcontrol_modules') || '{}');
+                        const stored = JSON.parse(localStorage.getItem('acesscontrol_modules') || '{}');
                         stored.font_size = config.font_size;
-                        localStorage.setItem('mamcontrol_modules', JSON.stringify(stored));
+                        localStorage.setItem('acesscontrol_modules', JSON.stringify(stored));
                         
                         // Aplica a fonte globalmente (se houver a função applyFontSize no app.js)
                         if (window.applyFontSize) {
@@ -2031,10 +2031,10 @@
                     if (result.success) {
                         alert('Configurações de limpeza e reset salvas com sucesso!');
                         // Atualiza o localStorage
-                        const stored = JSON.parse(localStorage.getItem('mamcontrol_modules') || '{}');
+                        const stored = JSON.parse(localStorage.getItem('acesscontrol_modules') || '{}');
                         stored.module_inativar_visitantes_dia = config.module_inativar_visitantes_dia;
                         stored.reset_estatisticas_diario = config.reset_estatisticas_diario;
-                        localStorage.setItem('mamcontrol_modules', JSON.stringify(stored));
+                        localStorage.setItem('acesscontrol_modules', JSON.stringify(stored));
                     } else {
                         alert('Erro ao salvar: ' + result.message);
                     }
@@ -2061,10 +2061,10 @@
                     if (result.success) {
                         alert('Configurações de notificação salvas!');
                         // Atualiza o localStorage
-                        const stored = JSON.parse(localStorage.getItem('mamcontrol_modules') || '{}');
+                        const stored = JSON.parse(localStorage.getItem('acesscontrol_modules') || '{}');
                         stored.notif_visitante_entrada_email = config.notif_visitante_entrada_email;
                         stored.notif_encomenda_email = config.notif_encomenda_email;
-                        localStorage.setItem('mamcontrol_modules', JSON.stringify(stored));
+                        localStorage.setItem('acesscontrol_modules', JSON.stringify(stored));
                     } else {
                         alert('Erro ao salvar: ' + result.message);
                     }
@@ -2088,9 +2088,9 @@
 
                     if (result.success) {
                         alert('Configuração do autorizador salva com sucesso!');
-                        const stored = JSON.parse(localStorage.getItem('mamcontrol_modules') || '{}');
+                        const stored = JSON.parse(localStorage.getItem('acesscontrol_modules') || '{}');
                         stored.autorizador_busca_id_primeiro = config.autorizador_busca_id_primeiro;
-                        localStorage.setItem('mamcontrol_modules', JSON.stringify(stored));
+                        localStorage.setItem('acesscontrol_modules', JSON.stringify(stored));
                     } else {
                         alert('Erro ao salvar: ' + result.message);
                     }
@@ -2160,7 +2160,7 @@
                     if (result.success) {
                         alert('Configurações dos módulos salvas com sucesso!');
                         // Armazenar no localStorage para uso imediato no frontend
-                        localStorage.setItem('mamcontrol_modules', JSON.stringify(modulos));
+                        localStorage.setItem('acesscontrol_modules', JSON.stringify(modulos));
                         // Recarregar a página para aplicar as mudanças
                         window.location.reload();
                     } else {
@@ -2325,8 +2325,8 @@
             document.getElementById('person-progress-text').textContent = 'Enviando arquivo...';
             
             try {
-                const tenantId = localStorage.getItem('mamcontrol_tenant') || localStorage.getItem('tenant_id') || 'mamsolucoes';
-                const token = localStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('token');
+                const tenantId = localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id') || 'demo';
+                const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('token');
                 
                 const response = await fetch(`/api/imports?tenant_id=${tenantId}`, {
                     method: 'POST',
@@ -2435,8 +2435,8 @@
             document.getElementById('visitor-progress-text').textContent = 'Enviando arquivo...';
             
             try {
-                const tenantId = localStorage.getItem('mamcontrol_tenant') || localStorage.getItem('tenant_id') || 'mamsolucoes';
-                const token = localStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('token');
+                const tenantId = localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id') || 'demo';
+                const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('token');
                 
                 const response = await fetch(`/api/imports?tenant_id=${tenantId}`, {
                     method: 'POST',
@@ -2476,8 +2476,8 @@
             if (!container) return;
             
             try {
-                const tenantId = localStorage.getItem('mamcontrol_tenant') || localStorage.getItem('tenant_id') || 'mamsolucoes';
-                const token = localStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('token');
+                const tenantId = localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id') || 'demo';
+                const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('token');
                 
                 const response = await fetch(`/api/imports/${tenantId}?type=${type}`, {
                     headers: {
@@ -2553,8 +2553,8 @@
             progressText.textContent = 'Autenticando e conectando à base de dados (pode levar alguns minutos)...';
             
             try {
-                const tenantId = localStorage.getItem('mamcontrol_tenant') || localStorage.getItem('tenant_id') || 'mamsolucoes';
-                const token = localStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('token');
+                const tenantId = localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id') || 'demo';
+                const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('token');
                 
                 const response = await fetch(`/api/imports/idsecure?tenant_id=${tenantId}`, {
                     method: 'POST',
@@ -2593,11 +2593,11 @@
             }
         }
 
-        // Importar fotos do MAMControl via arquivo .db da VPS
-        async function importMamcontrolPhotos() {
-            const dbFile = document.getElementById('mamcontrol-db-file').files[0];
-            const vpsUrl = document.getElementById('mamcontrol-vps-url').value.trim();
-            const vpsToken = document.getElementById('mamcontrol-vps-token').value.trim();
+        // Importar fotos do AcessControl via arquivo .db da VPS
+        async function importLegacyPhotos() {
+            const dbFile = document.getElementById('acesscontrol-db-file').files[0];
+            const vpsUrl = document.getElementById('acesscontrol-vps-url').value.trim();
+            const vpsToken = document.getElementById('acesscontrol-vps-token').value.trim();
 
             if (!dbFile) {
                 alert('Por favor, selecione o arquivo .db exportado da VPS.');
@@ -2608,10 +2608,10 @@
                 return;
             }
 
-            const progressDiv = document.getElementById('mamcontrol-import-progress');
-            const progressFill = document.getElementById('mamcontrol-progress-fill');
-            const progressText = document.getElementById('mamcontrol-progress-text');
-            const resultsDiv = document.getElementById('mamcontrol-import-results');
+            const progressDiv = document.getElementById('acesscontrol-import-progress');
+            const progressFill = document.getElementById('acesscontrol-progress-fill');
+            const progressText = document.getElementById('acesscontrol-progress-text');
+            const resultsDiv = document.getElementById('acesscontrol-import-results');
 
             progressDiv.style.display = 'block';
             progressFill.style.width = '30%';
@@ -2619,8 +2619,8 @@
             resultsDiv.style.display = 'none';
 
             try {
-                const tenantId = localStorage.getItem('mamcontrol_tenant') || localStorage.getItem('tenant_id') || 'mamsolucoes';
-                const token = localStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('token');
+                const tenantId = localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id') || 'demo';
+                const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('token');
 
                 const formData = new FormData();
                 formData.append('db', dbFile);
@@ -2630,7 +2630,7 @@
                 progressFill.style.width = '60%';
                 progressText.textContent = 'Baixando fotos da VPS (pode demorar alguns minutos)...';
 
-                const response = await fetch(`/api/imports/mamcontrol?tenant_id=${tenantId}`, {
+                const response = await fetch(`/api/imports/acesscontrol?tenant_id=${tenantId}`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -2712,8 +2712,8 @@
                 return;
             }
 
-            const tenantId = localStorage.getItem('mamcontrol_tenant') || localStorage.getItem('tenant_id') || 'mamsolucoes';
-            const token    = localStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('token');
+            const tenantId = localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id') || 'demo';
+            const token    = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('token');
 
             resultDiv.style.display = 'block';
             resultDiv.style.background = '#f0f9ff';

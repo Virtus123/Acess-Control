@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAM Control - Login</title>
+    <title>Acess Control - Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -565,7 +565,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="MAMCONTROL">
+    <meta name="apple-mobile-web-app-title" content="Acess Control">
 </head>
 <body>
     <div class="login-container">
@@ -578,14 +578,14 @@
                         <i class="fas fa-shield-alt"></i>
                     </div>
                     <div class="logo-text">
-                        <h1>MAM Control</h1>
+                        <h1>Acess Control</h1>
                         <p>Sistema de Controle de Acesso</p>
                     </div>
                 </div>
 
                 <div class="main-logo">
                     <div class="logo-image-container">
-                        <img src="./logo.jpg" alt="MAM Control" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'200\' viewBox=\'0 0 300 200\'%3E%3Crect width=\'300\' height=\'200\' fill=\'%2324A751\' rx=\'24\'/%3E%3Ctext x=\'50\' y=\'120\' font-family=\'Arial\' font-size=\'36\' fill=\'white\'%3EMAM Control%3C/text%3E%3C/svg%3E'">
+                        <img src="./logo.jpg" alt="Acess Control" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'200\' viewBox=\'0 0 300 200\'%3E%3Crect width=\'300\' height=\'200\' fill=\'%2324A751\' rx=\'24\'/%3E%3Ctext x=\'50\' y=\'120\' font-family=\'Arial\' font-size=\'36\' fill=\'white\'%3EAcess Control%3C/text%3E%3C/svg%3E'">
                     </div>
                 </div>
 
@@ -679,7 +679,7 @@
                     </button>
 
                     <div class="support-links">
-                        <a href="#" class="support-link" onclick="alert('Suporte MAM Control\n\n📞 (41) 8489-1742\n📧 suporte@mamcontrol.com.br\n⏰ 8h às 18h (dias úteis)')">
+                        <a href="#" class="support-link" onclick="alert('Suporte Acess Control\n\n📞 (41) 8489-1742\n📧 suporte@example.com\n⏰ 8h às 18h (dias úteis)')">
                             <i class="fas fa-headset"></i>
                             Suporte
                         </a>
@@ -746,22 +746,22 @@
                     const tenant = data.data?.tenantId || '';
 
                     if (rememberMe) {
-                        localStorage.setItem('mamcontrol_remember', 'true');
-                        localStorage.setItem('mamcontrol_saved_email', email);
+                        localStorage.setItem('acesscontrol_remember', 'true');
+                        localStorage.setItem('acesscontrol_saved_email', email);
                     } else {
-                        localStorage.removeItem('mamcontrol_remember');
-                        localStorage.removeItem('mamcontrol_saved_email');
+                        localStorage.removeItem('acesscontrol_remember');
+                        localStorage.removeItem('acesscontrol_saved_email');
                     }
 
-                    localStorage.setItem('mamcontrol_accessToken', data.data?.accessToken || data.token);
-                    localStorage.setItem('mamcontrol_refreshToken', data.data?.refreshToken || '');
+                    localStorage.setItem('acesscontrol_accessToken', data.data?.accessToken || data.token);
+                    localStorage.setItem('acesscontrol_refreshToken', data.data?.refreshToken || '');
                     const userObj = data.data?.user || {};
                     if (data.data?.profilePermissions) {
                         userObj.profilePermissions = data.data.profilePermissions;
                     }
-                    localStorage.setItem('mamcontrol_user', JSON.stringify(userObj));
-                    localStorage.setItem('mamcontrol_tenant', tenant);
-                    localStorage.setItem('mamcontrol_loginTime', Date.now().toString());
+                    localStorage.setItem('acesscontrol_user', JSON.stringify(userObj));
+                    localStorage.setItem('acesscontrol_tenant', tenant);
+                    localStorage.setItem('acesscontrol_loginTime', Date.now().toString());
 
                     localStorage.setItem('tenant_id', tenant);
                     localStorage.setItem('user_name', data.user_name || data.data?.user?.name || email);
@@ -791,8 +791,8 @@
             errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        const accessToken = localStorage.getItem('mamcontrol_accessToken');
-        const loginTime = localStorage.getItem('mamcontrol_loginTime');
+        const accessToken = localStorage.getItem('acesscontrol_accessToken');
+        const loginTime = localStorage.getItem('acesscontrol_loginTime');
         
         if (accessToken && loginTime) {
             const elapsed = Date.now() - parseInt(loginTime);
@@ -818,8 +818,8 @@
         });
 
         function loadSavedCredentials() {
-            if (localStorage.getItem('mamcontrol_remember') === 'true') {
-                const savedEmail = localStorage.getItem('mamcontrol_saved_email');
+            if (localStorage.getItem('acesscontrol_remember') === 'true') {
+                const savedEmail = localStorage.getItem('acesscontrol_saved_email');
                 if (savedEmail) document.getElementById('login-email').value = savedEmail;
                 document.getElementById('remember-me').checked = true;
             }

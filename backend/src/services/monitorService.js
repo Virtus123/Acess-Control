@@ -174,7 +174,7 @@ class MonitorService {
   }
 
   async getTenantStats() {
-    const masterDb = await dbManager.getConnection('mamcontrolmam');
+    const masterDb = await dbManager.getConnection('acesscontrolmaster');
     let tenants = [];
     try {
       tenants = await masterDb.all('SELECT tenant_id, company_name, status FROM tenants ORDER BY tenant_id');

@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>MAM Control - Dashboard</title>
+    <title>Acess Control - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="favicon.png">
@@ -739,18 +739,18 @@
         async function fetchDashboardData() {
             try {
                 // Priorizar sessionStorage (Impersonation) sobre localStorage
-                const token = sessionStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('mamcontrol_accessToken');
-                let tenantId = sessionStorage.getItem('mamcontrol_tenant') || localStorage.getItem('mamcontrol_tenant') || localStorage.getItem('tenant_id');
+                const token = sessionStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('acesscontrol_accessToken');
+                let tenantId = sessionStorage.getItem('acesscontrol_tenant') || localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id');
                 if (!tenantId) {
                     // Fallback 2: verificar user_data
                     try {
-                        const userData = JSON.parse(localStorage.getItem('mamcontrol_user') || '{}');
+                        const userData = JSON.parse(localStorage.getItem('acesscontrol_user') || '{}');
                         tenantId = userData.tenant_id || userData.tenant;
                     } catch (e) { }
                 }
                 if (!tenantId) {
-                    // Fallback 3: usar mamsolucoes como padrão
-                    tenantId = 'mamsolucoes';
+                    // Fallback 3: usar demo como padrão
+                    tenantId = 'demo';
                 }
 
                 // Buscar estatísticas (números) - atualiza frequentemente
@@ -1030,14 +1030,14 @@
 
         // ── Timeline ──────────────────────────────────────────
         function getAuthHeaders() {
-            const token = sessionStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('mamcontrol_accessToken');
-            let tenantId = sessionStorage.getItem('mamcontrol_tenant') || localStorage.getItem('mamcontrol_tenant') || localStorage.getItem('tenant_id');
+            const token = sessionStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('acesscontrol_accessToken');
+            let tenantId = sessionStorage.getItem('acesscontrol_tenant') || localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id');
             if (!tenantId) {
-                try { tenantId = JSON.parse(localStorage.getItem('mamcontrol_user') || '{}').tenant_id; } catch (e) {}
+                try { tenantId = JSON.parse(localStorage.getItem('acesscontrol_user') || '{}').tenant_id; } catch (e) {}
             }
             return {
                 'Authorization': `Bearer ${token}`,
-                'X-Tenant-ID': tenantId || 'mamsolucoes'
+                'X-Tenant-ID': tenantId || 'demo'
             };
         }
 

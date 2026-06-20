@@ -1,12 +1,12 @@
-# MAM Push Service
+# Push Service
 
 Serviço independente que conversa com equipamentos Control iD em **Modo Push** nativo.
-Roda em paralelo ao backend `nexis-backend`, lendo o **mesmo SQLite** (via WAL).
+Roda em paralelo ao backend `acess-control-backend`, lendo o **mesmo SQLite** (via WAL).
 
 ```
-Frontend → nexis-backend (3000) ─┐
+Frontend → acess-control-backend (3000) ─┐
                                  ├──► SQLite tenant_xxx.db
-                       mam-push  ─┘
+                       acess-push  ─┘
                        (3001)    ↕ HTTPS
                        ↕ HTTP    Equipamento Control iD
                        Dashboard (na LAN do cliente)

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <title>MAM Control - Admin Master</title>
+    <title>Acess Control - Admin Master</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="favicon.png">
@@ -787,11 +787,11 @@
         
         async function loadRevendas() {
             const tbody = document.getElementById('revendas-tbody');
-            const token = localStorage.getItem('mamcontrol_accessToken');
+            const token = localStorage.getItem('acesscontrol_accessToken');
             try {
                 const response = await fetch(`${API_URL}/api/revendas`, {
                     headers: { 
-                        'X-Tenant-ID': 'mamcontrolmam',
+                        'X-Tenant-ID': 'acesscontrolmaster',
                         'Authorization': `Bearer ${token}`
                     }
                 });
@@ -828,7 +828,7 @@
 
         async function loadTenants() {
             const tbody = document.getElementById('tenants-tbody');
-            const token = localStorage.getItem('mamcontrol_accessToken');
+            const token = localStorage.getItem('acesscontrol_accessToken');
             try {
                 const response = await fetch(`${API_URL}/api/admin/tenants`, {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -903,7 +903,7 @@
         }
 
         async function enterTenant(tenantId) {
-            const token = localStorage.getItem('mamcontrol_accessToken');
+            const token = localStorage.getItem('acesscontrol_accessToken');
             try {
                 const response = await fetch(`${API_URL}/api/admin/tenants/${tenantId}/impersonate`, {
                     method: 'POST',
@@ -912,8 +912,8 @@
                 const data = await response.json();
                 if (data.success) {
                     // Prepara o handshake para a nova aba
-                    localStorage.setItem('mamcontrol_impersonate_token', data.data.accessToken);
-                    localStorage.setItem('mamcontrol_impersonate_tenant', tenantId);
+                    localStorage.setItem('acesscontrol_impersonate_token', data.data.accessToken);
+                    localStorage.setItem('acesscontrol_impersonate_tenant', tenantId);
                     
                     // Abre o dashboard em uma nova aba
                     window.open('./dashboard.html', '_blank');
@@ -945,11 +945,11 @@
         }
         
         async function loadRevendasForSelect() {
-            const token = localStorage.getItem('mamcontrol_accessToken');
+            const token = localStorage.getItem('acesscontrol_accessToken');
             try {
                 const response = await fetch(`${API_URL}/api/revendas`, {
                     headers: { 
-                        'X-Tenant-ID': 'mamcontrolmam',
+                        'X-Tenant-ID': 'acesscontrolmaster',
                         'Authorization': `Bearer ${token}`
                     }
                 });
@@ -983,12 +983,12 @@
             };
             
             try {
-                const token = localStorage.getItem('mamcontrol_accessToken');
+                const token = localStorage.getItem('acesscontrol_accessToken');
                 const response = await fetch(`${API_URL}/api/revendas`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-Tenant-ID': 'mamcontrolmam',
+                        'X-Tenant-ID': 'acesscontrolmaster',
                         'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify(revendaData)
@@ -1026,7 +1026,7 @@
             };
             
             try {
-                const token = localStorage.getItem('mamcontrol_accessToken');
+                const token = localStorage.getItem('acesscontrol_accessToken');
                 const response = await fetch(`${API_URL}/api/admin/tenants`, {
                     method: 'POST',
                     headers: { 
@@ -1055,7 +1055,7 @@
         // Funções para gerenciar tabela de preços
         async function loadPrecos() {
             const tbody = document.getElementById('precos-tbody');
-            const token = localStorage.getItem('mamcontrol_accessToken');
+            const token = localStorage.getItem('acesscontrol_accessToken');
             try {
                 const response = await fetch(`${API_URL}/api/prices`, {
                     headers: {
@@ -1170,7 +1170,7 @@
             });
             
             try {
-                const token = localStorage.getItem('mamcontrol_accessToken');
+                const token = localStorage.getItem('acesscontrol_accessToken');
                 const url = id ? `${API_URL}/api/prices/${id}` : `${API_URL}/api/prices`;
                 const method = id ? 'PATCH' : 'POST';
 
@@ -1197,7 +1197,7 @@
         });
         
         async function editPreco(id) {
-            const token = localStorage.getItem('mamcontrol_accessToken');
+            const token = localStorage.getItem('acesscontrol_accessToken');
             try {
                 const response = await fetch(`${API_URL}/api/prices/${id}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -1254,7 +1254,7 @@
             if (!confirm('Tem certeza que deseja excluir esta tabela de preços?')) return;
             
             try {
-                const token = localStorage.getItem('mamcontrol_accessToken');
+                const token = localStorage.getItem('acesscontrol_accessToken');
                 const response = await fetch(`${API_URL}/api/prices/${id}`, {
                     method: 'DELETE',
                     headers: {
@@ -1280,7 +1280,7 @@
             if (!newPassword) return;
             
             try {
-                const token = localStorage.getItem('mamcontrol_accessToken');
+                const token = localStorage.getItem('acesscontrol_accessToken');
                 const response = await fetch(`${API_URL}/api/admin/tenants/${tenantId}/reset-password`, {
                     method: 'POST',
                     headers: {
@@ -1320,7 +1320,7 @@
             if (!confirm(`Tem certeza que deseja ${action} este tenant?`)) return;
             
             try {
-                const token = localStorage.getItem('mamcontrol_accessToken');
+                const token = localStorage.getItem('acesscontrol_accessToken');
                 const response = await fetch(`${API_URL}/api/admin/tenants/${tenantId}/toggle-status`, {
                     method: 'PATCH',
                     headers: { 
@@ -1347,7 +1347,7 @@
             if (!confirm('Isso irá excluir TODOS os dados deste tenant. Continuar?')) return;
             
             try {
-                const token = localStorage.getItem('mamcontrol_accessToken');
+                const token = localStorage.getItem('acesscontrol_accessToken');
                 const response = await fetch(`${API_URL}/api/admin/tenants/${tenantId}`, {
                     method: 'DELETE',
                     headers: { 
@@ -1393,7 +1393,7 @@
             document.getElementById('edit-tenant-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 if (!_editingTenantId) return;
-                const token = localStorage.getItem('mamcontrol_accessToken');
+                const token = localStorage.getItem('acesscontrol_accessToken');
                 const body = {
                     company_name: document.getElementById('edit-tenant-company-name').value,
                     cnpj: document.getElementById('edit-tenant-cnpj').value,
@@ -1424,7 +1424,7 @@
             if (!confirm('Tem certeza que deseja EXCLUIR esta revenda? Esta ação não pode ser desfeita!')) return;
             
             try {
-                const token = localStorage.getItem('mamcontrol_accessToken');
+                const token = localStorage.getItem('acesscontrol_accessToken');
                 const response = await fetch(`${API_URL}/api/revendas/${id}`, {
                     method: 'DELETE',
                     headers: {
@@ -1446,7 +1446,7 @@
         
         async function loadFaturamentoPlans() {
             const select = document.getElementById('billing-plan-select');
-            const token = localStorage.getItem('mamcontrol_accessToken');
+            const token = localStorage.getItem('acesscontrol_accessToken');
             try {
                 const response = await fetch(`${API_URL}/api/prices`, {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -1470,7 +1470,7 @@
             const resultDiv = document.getElementById('billing-report-result');
             const title = document.getElementById('report-title');
             const totalGeralEl = document.getElementById('report-total-geral');
-            const token = localStorage.getItem('mamcontrol_accessToken');
+            const token = localStorage.getItem('acesscontrol_accessToken');
 
             tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Processando revendas...</td></tr>';
             resultDiv.style.display = 'block';
@@ -1662,7 +1662,7 @@
 
         async function loadFaturamentoPlans() {
             const select = document.getElementById('billing-plan-select');
-            const token = localStorage.getItem('mamcontrol_accessToken');
+            const token = localStorage.getItem('acesscontrol_accessToken');
             try {
                 const response = await fetch(`${API_URL}/api/prices`, {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -1687,7 +1687,7 @@
             const resultDiv = document.getElementById('billing-report-result');
             const title = document.getElementById('report-title');
             const totalGeralEl = document.getElementById('report-total-geral');
-            const token = localStorage.getItem('mamcontrol_accessToken');
+            const token = localStorage.getItem('acesscontrol_accessToken');
 
             tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Processando revendas...</td></tr>';
             resultDiv.style.display = 'block';

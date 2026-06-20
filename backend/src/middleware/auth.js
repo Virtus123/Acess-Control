@@ -70,7 +70,7 @@ export function generateTokens(user) {
     userType: user.userType || (user.isMobile ? 'person' : 'operator'),
     company_id: user.company_id || null,
     tenant_id: user.tenant_id,
-    is_master: user.tenant_id === 'mamcontrolmam' || user.is_master || false
+    is_master: user.tenant_id === 'acesscontrolmaster' || user.is_master || false
   };
 
   const accessToken = jwt.sign(payload, JWT_SECRET, {
@@ -141,7 +141,7 @@ export async function authenticate(req, res, next) {
         email: decoded.email,
         role: decoded.role === 'super_admin' ? 'admin' : decoded.role,
         is_master: decoded.role === 'super_admin',
-        tenant_id: 'mamcontrolmam',
+        tenant_id: 'acesscontrolmaster',
         userType: 'operator'
       };
       return next();
@@ -158,7 +158,7 @@ export async function authenticate(req, res, next) {
     let db = req.db;
     
     if (!db && isAdminRoute) {
-      db = await dbManager.getConnection('mamcontrolmam');
+      db = await dbManager.getConnection('acesscontrolmaster');
     }
     
     if (!db) {

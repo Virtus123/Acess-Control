@@ -141,7 +141,7 @@ export const login = asyncHandler(async (req, res) => {
   }
 
   const db = await dbManager.getConnection(tenantId);
-  const dbMaster = await dbManager.getConnection('mamcontrolmam');
+  const dbMaster = await dbManager.getConnection('acesscontrolmaster');
 
   
   // Garantir que a coluna profile_id existe na tabela users
@@ -240,7 +240,7 @@ export const login = asyncHandler(async (req, res) => {
   // Determinar URL de redirecionamento (para web)
   let redirectUrl = '/dashboard';
   if (userType === 'operator') {
-    if (tenantId === 'mamcontrolmam' && user.role === 'admin') {
+    if (tenantId === 'acesscontrolmaster' && user.role === 'admin') {
       redirectUrl = '/admin-master.html';
     } else {
       // Verificar se este tenant_id é uma revenda registrada no master

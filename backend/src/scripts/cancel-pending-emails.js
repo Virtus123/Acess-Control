@@ -5,7 +5,7 @@ import logger from '../config/logger.js';
 import 'dotenv/config';
 
 async function main() {
-  console.log('\n--- MAM Control - Cancelador de E-mails Pendentes ---\n');
+  console.log('\n--- Acess Control - Cancelador de E-mails Pendentes ---\n');
 
   const tenantDir = process.env.DATABASE_STORAGE || './database/tenants';
   

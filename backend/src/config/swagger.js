@@ -4,16 +4,16 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'MAM Control API',
+      title: 'Acess Control API',
       version: '1.0.0',
-      description: 'Documentação completa da API do sistema de controle de acesso MAM Control. Esta API permite a integração com outros sistemas e o desenvolvimento de aplicativos móveis.',
+      description: 'Documentação completa da API do sistema de controle de acesso Acess Control. Esta API permite a integração com outros sistemas e o desenvolvimento de aplicativos móveis.',
       license: {
         name: 'MIT',
         url: 'https://opensource.org/licenses/MIT',
       },
       contact: {
-        name: 'Suporte MAM Control',
-        email: 'suporte@mamcontrol.com.br',
+        name: 'Suporte Acess Control',
+        email: 'suporte@example.com',
       },
     },
     servers: [

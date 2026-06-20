@@ -1,7 +1,7 @@
-// Tradutor: ações de alto nível (semânticas do MAMCONTROL) → comandos FCGI Control iD.
+// Tradutor: ações de alto nível (semânticas do Acess Control) → comandos FCGI Control iD.
 // Sem I/O. Pura função. Cada função devolve array de descritores que vira Command.
 //
-// REFERÊNCIA: PUSH.txt (raiz do MAMCONTROL) + Postman collection.
+// REFERÊNCIA: PUSH.txt (raiz do Acess Control) + Postman collection.
 
 import { Command } from './command.js';
 import crypto from 'crypto';

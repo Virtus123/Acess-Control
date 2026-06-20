@@ -13,7 +13,7 @@ const router = express.Router();
 const bodyParser = express.json({ limit: '4mb' });
 
 // ============================================
-// Rotas autenticadas — cliente MAMCONTROL gerencia o link
+// Rotas autenticadas — cliente Acess Control gerencia o link
 // ============================================
 // (montadas em /api/admin-photo-link via index.js depois do tenantMiddleware)
 export const adminRouter = express.Router();

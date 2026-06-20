@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>MAM Control - Relatórios</title>
+    <title>Acess Control - Relatórios</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../style.css">
     <link rel="icon" href="../../favicon.png">
@@ -398,7 +398,7 @@
     <script>
         // ── Estado global ─────────────────────────────────────────────────────
         let reportData = [];          // dados carregados da API
-        let empresaInfo = { razao: 'MAM Control', cnpj: '', endereco: '', telefone: '', email: '' };
+        let empresaInfo = { razao: 'Acess Control', cnpj: '', endereco: '', telefone: '', email: '' };
         let logoBase64 = null;        // logo convertida para base64
 
         // ── Tradução de status ────────────────────────────────────────────────
@@ -875,7 +875,7 @@
             } else {
                 doc.setFontSize(10);
                 doc.setTextColor(74, 144, 217);
-                doc.text('MAM Control', pageW - 15, 15, { align: 'right' });
+                doc.text('Acess Control', pageW - 15, 15, { align: 'right' });
             }
 
             // Título
@@ -940,7 +940,7 @@
             const rows       = dados.map(item => colunasSelecionadas.map(col => formatCellValue(col, item[col])));
 
             const wsData = [
-                [empresaInfo.razao || 'MAM Control'],
+                [empresaInfo.razao || 'Acess Control'],
                 empresaInfo.cnpj     ? [`CNPJ: ${empresaInfo.cnpj}`]     : [],
                 empresaInfo.endereco ? [empresaInfo.endereco]             : [],
                 [titulo],
@@ -969,7 +969,7 @@
             }));
 
             const csv = [
-                [empresaInfo.razao || 'MAM Control'],
+                [empresaInfo.razao || 'Acess Control'],
                 empresaInfo.cnpj ? [`CNPJ: ${empresaInfo.cnpj}`] : null,
                 [titulo],
                 [`Período: ${dataInicio || '—'} a ${dataFim || '—'}`],
@@ -1003,7 +1003,7 @@
                 const data = await api.getReportCompany();
                 if (data && (data.razao || data.cnpj)) {
                     empresaInfo = {
-                        razao:    data.razao    || 'MAM Control',
+                        razao:    data.razao    || 'Acess Control',
                         cnpj:     data.cnpj     || '',
                         endereco: data.endereco || '',
                         telefone: data.telefone || '',

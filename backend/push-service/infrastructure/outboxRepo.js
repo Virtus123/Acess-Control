@@ -302,7 +302,7 @@ export async function pruneCompleted(tenantId, olderThanDays = 7) {
 /**
  * Atualiza push_last_seen do equipamento e marca online=1.
  * `online` e `last_connection` são lidos pela UI legada (equipmentController).
- * Sem isso, equipamento aparece OFFLINE na tela do MAMCONTROL mesmo bombando heartbeat.
+ * Sem isso, equipamento aparece OFFLINE na tela do Acess Control mesmo bombando heartbeat.
  */
 export async function touchDeviceLastSeen(tenantId, deviceId) {
   const db = await getTenantDb(tenantId);

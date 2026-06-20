@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>MAM Control - Fila de Tarefas</title>
+    <title>Acess Control - Fila de Tarefas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../style.css">
     <link rel="icon" href="../../favicon.png">
@@ -203,8 +203,8 @@
         });
 
         function getAuthHeader() {
-            const token = localStorage.getItem('mamcontrol_accessToken');
-            const tenantId = localStorage.getItem('mamcontrol_tenant') || 'default';
+            const token = localStorage.getItem('acesscontrol_accessToken');
+            const tenantId = localStorage.getItem('acesscontrol_tenant') || 'default';
             return {
                 'X-Tenant-ID': tenantId,
                 'Authorization': `Bearer ${token}`
@@ -218,7 +218,7 @@
             }
 
             try {
-                const tenantId = localStorage.getItem('mamcontrol_tenant') || 'default';
+                const tenantId = localStorage.getItem('acesscontrol_tenant') || 'default';
                 const response = await fetch(`/api/access-tasks?tenant_id=${tenantId}&status=${currentTab}&page=${currentPage}&limit=${limit}`, {
                     headers: getAuthHeader()
                 });
@@ -237,7 +237,7 @@
 
         async function updateStats() {
             try {
-                const tenantId = localStorage.getItem('mamcontrol_tenant') || 'default';
+                const tenantId = localStorage.getItem('acesscontrol_tenant') || 'default';
                 // Pegar contagem de pendentes
                 const resPending = await fetch(`/api/access-tasks?tenant_id=${tenantId}&status=pending&limit=1`, { headers: getAuthHeader() });
                 const dataPending = await resPending.json();
@@ -319,7 +319,7 @@
             if (!confirm('Tem certeza que deseja limpar a fila de tarefas pendentes? Todas as tarefas não executadas serão marcadas como resolvidas.')) return;
 
             try {
-                const tenantId = localStorage.getItem('mamcontrol_tenant') || 'default';
+                const tenantId = localStorage.getItem('acesscontrol_tenant') || 'default';
                 const response = await fetch('/api/access-tasks/clear', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', ...getAuthHeader() },

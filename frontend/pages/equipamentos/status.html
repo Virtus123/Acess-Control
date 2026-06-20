@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>MAM Control - Status da Comunicação</title>
+    <title>Acess Control - Status da Comunicação</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../style.css">
     <link rel="icon" href="../../favicon.png">
@@ -651,8 +651,8 @@
         const API_URL = '/api';
 
         function getAuthHeader() {
-            const token = localStorage.getItem('mamcontrol_accessToken');
-            const tenantId = localStorage.getItem('mamcontrol_tenant') || localStorage.getItem('tenant_id') || 'default';
+            const token = localStorage.getItem('acesscontrol_accessToken');
+            const tenantId = localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id') || 'default';
             const headers = {
                 'X-Tenant-ID': tenantId
             };
@@ -872,7 +872,7 @@
             if (!validador) return alert('Equipamento sem validador configurado');
             
             try {
-                const tenantId = localStorage.getItem('mamcontrol_tenant') || localStorage.getItem('tenant_id') || 'default';
+                const tenantId = localStorage.getItem('acesscontrol_tenant') || localStorage.getItem('tenant_id') || 'default';
                 const response = await fetch(`${API_URL}/access-tasks`, {
                     method: 'POST',
                     headers: {

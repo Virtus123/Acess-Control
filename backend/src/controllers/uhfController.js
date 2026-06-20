@@ -1,7 +1,7 @@
 /**
  * UHF Controller — Integração com equipamentos IDUHF
  *
- * Recebe eventos de leitura de tag UHF vindos do MAM SERVICE,
+ * Recebe eventos de leitura de tag UHF vindos do Equipment Bridge,
  * identifica o veículo pela tag, e aciona o autorizador de acesso.
  *
  * Endpoint: POST /api/comunicador/uhf
@@ -70,7 +70,7 @@ function getAllTagVariants(normalizedTag) {
 /**
  * POST /api/comunicador/uhf
  *
- * Body esperado (enviado pelo MAM SERVICE):
+ * Body esperado (enviado pelo Equipment Bridge):
  *   tenant_id       — ID do tenant
  *   equip_validator — validador do equipamento cadastrado no NEXIS
  *   uhf_tag         — tag UHF lida (qualquer formato)

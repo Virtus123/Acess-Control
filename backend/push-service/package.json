@@ -1,7 +1,7 @@
 {
-  "name": "mam-push-service",
+  "name": "acess-push-service",
   "version": "1.0.0",
-  "description": "Push Service para comunicação direta equipamento Control iD ↔ MAMCONTROL",
+  "description": "Push Service para comunicação direta equipamento Control iD ↔ Acess Control",
   "type": "module",
   "main": "server.js",
   "scripts": {

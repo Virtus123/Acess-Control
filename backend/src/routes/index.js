@@ -157,8 +157,8 @@ router.get('/photos/:type/:filename', serveProtectedPhoto);
 const adminCors = cors({
   origin: [
     process.env.ADMIN_FRONTEND_URL || 'http://localhost:5174',
-    'https://mamcontrol.com.br',
-    'https://www.mamcontrol.com.br',
+    'https://example.com',
+    'https://www.example.com',
     'http://localhost:5174',
     'http://localhost:3000'
   ],

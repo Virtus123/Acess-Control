@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Veículos - MAM Control</title>
+    <title>Veículos - Acess Control</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../style.css">
     <link rel="icon" href="../../favicon.png">
@@ -924,10 +924,10 @@
 
         function getColunasStorageKey() {
             const tenantId = localStorage.getItem('tenant_id')
-                || localStorage.getItem('mamcontrol_tenant') || 'default';
+                || localStorage.getItem('acesscontrol_tenant') || 'default';
             let userId = 'anon';
             try {
-                const u = JSON.parse(localStorage.getItem('mamcontrol_user') || '{}');
+                const u = JSON.parse(localStorage.getItem('acesscontrol_user') || '{}');
                 userId = u.id || u.user_id || u.email || 'anon';
             } catch (_) {}
             return `veiculos_colunas_${tenantId}_${userId}`;
@@ -1165,9 +1165,9 @@
         // HELPERS
         // =============================================
         function getHeaders() {
-            const token = localStorage.getItem('mamcontrol_accessToken') || '';
+            const token = localStorage.getItem('acesscontrol_accessToken') || '';
             const tenantId = localStorage.getItem('tenant_id')
-                || localStorage.getItem('mamcontrol_tenant') || '';
+                || localStorage.getItem('acesscontrol_tenant') || '';
             return {
                 'Authorization': 'Bearer ' + token,
                 'Content-Type': 'application/json',

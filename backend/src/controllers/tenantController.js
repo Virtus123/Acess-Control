@@ -141,7 +141,7 @@ export const createTenant = asyncHandler(async (req, res) => {
     // 7. Se a requisição veio de uma revenda, associar o novo tenant à revenda
     if (currentTenantId) {
       try {
-        const dbMaster = await dbManager.getConnection('mamcontrolmam');
+        const dbMaster = await dbManager.getConnection('acesscontrolmaster');
         
         // Buscar a revenda pelo tenant_id (a própria revenda)
         const revenda = await dbMaster.get('SELECT id FROM revendas WHERE tenant_id = ?', [currentTenantId]);
@@ -155,7 +155,7 @@ export const createTenant = asyncHandler(async (req, res) => {
           logger.info(`✅ Tenant ${tenant_id} associado à revenda ${currentTenantId}`);
         }
         
-        await dbManager.closeConnection('mamcontrolmam');
+        await dbManager.closeConnection('acesscontrolmaster');
       } catch (e) {
         logger.error('Erro ao associar tenant à revenda:', e);
         // Não bloqueia a criação se falhar nesta etapa
@@ -221,13 +221,13 @@ export const listTenants = asyncHandler(async (req, res) => {
     // Buscar mapeamento de tenants->revendas no banco master
     let revendaMap = {}; // { tenant_id: { revenda_id, corporate_name } }
     try {
-      const dbMaster = await dbManager.getConnection('mamcontrolmam');
+      const dbMaster = await dbManager.getConnection('acesscontrolmaster');
       const revendaLinks = await dbMaster.all(
         `SELECT rt.tenant_id, rt.revenda_id, r.corporate_name as revenda_name
          FROM revenda_tenants rt
          JOIN revendas r ON r.id = rt.revenda_id`
       );
-      await dbManager.closeConnection('mamcontrolmam');
+      await dbManager.closeConnection('acesscontrolmaster');
       revendaLinks.forEach(l => { revendaMap[l.tenant_id] = { revenda_id: l.revenda_id, revenda_name: l.revenda_name }; });
     } catch (e) {
       logger.warn('Não foi possível carregar mapeamento de revendas:', e.message);
@@ -581,10 +581,10 @@ export const impersonateTenant = asyncHandler(async (req, res) => {
   }
 
   try {
-    const dbMaster = await dbManager.getConnection('mamcontrolmam');
+    const dbMaster = await dbManager.getConnection('acesscontrolmaster');
     
     // Verificação de Segurança (Admin Master tem permissão total)
-    const isMaster = req.user.is_master === true || (callerRole === 'admin' && callerTenant === 'mamcontrolmam');
+    const isMaster = req.user.is_master === true || (callerRole === 'admin' && callerTenant === 'acesscontrolmaster');
     
     if (isMaster) {
       // Admin Master: Tudo liberado
@@ -592,7 +592,7 @@ export const impersonateTenant = asyncHandler(async (req, res) => {
       // É uma revenda ou admin de outra base? Verificar se o tenant pertence a ela
       const revenda = await dbMaster.get('SELECT id FROM revendas WHERE tenant_id = ?', [callerTenant]);
       if (!revenda) {
-        await dbManager.closeConnection('mamcontrolmam');
+        await dbManager.closeConnection('acesscontrolmaster');
         return res.status(403).json({ success: false, message: 'Acesso negado. Sua conta não tem permissão de revendedor para acessar outras bases.' });
       }
       
@@ -602,15 +602,15 @@ export const impersonateTenant = asyncHandler(async (req, res) => {
       );
       
       if (!associacao) {
-        await dbManager.closeConnection('mamcontrolmam');
+        await dbManager.closeConnection('acesscontrolmaster');
         return res.status(403).json({ success: false, message: 'Acesso negado. Esta base não pertence à sua revenda.' });
       }
     } else {
-      await dbManager.closeConnection('mamcontrolmam');
+      await dbManager.closeConnection('acesscontrolmaster');
       return res.status(403).json({ success: false, message: `Permissão insuficiente para impersonation. Role: ${callerRole}, Tenant: ${callerTenant}` });
     }
     
-    await dbManager.closeConnection('mamcontrolmam');
+    await dbManager.closeConnection('acesscontrolmaster');
 
     const db = await dbManager.getConnection(tenant_id);
     const admin = await db.get(

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Módulo de Cadastro - MAM Control</title>
+    <title>Módulo de Cadastro - Acess Control</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../style.css">
     <link rel="icon" href="../../favicon.png">
@@ -1625,7 +1625,7 @@
         }
 
         function carregarVisitantes() {
-            const stored = localStorage.getItem('mamcontrol_visitantes');
+            const stored = localStorage.getItem('acesscontrol_visitantes');
             if (stored) {
                 visitantes = JSON.parse(stored);
             }
@@ -1960,8 +1960,8 @@
         const FACE_REMOTE_POLL_INTERVAL = 2000;
 
         function getAuthHeaders() {
-            const token = localStorage.getItem('mamcontrol_accessToken') || '';
-            const tenantId = localStorage.getItem('mamcontrol_tenant') || '';
+            const token = localStorage.getItem('acesscontrol_accessToken') || '';
+            const tenantId = localStorage.getItem('acesscontrol_tenant') || '';
             return {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
@@ -1970,7 +1970,7 @@
         }
 
         function getTenantId() {
-            return localStorage.getItem('mamcontrol_tenant') || '';
+            return localStorage.getItem('acesscontrol_tenant') || '';
         }
 
         async function iniciarCapturaFaceRemotaVisitante() {
@@ -2035,7 +2035,7 @@
             loading.style.display = 'block';
 
             try {
-                const token = localStorage.getItem('mamcontrol_accessToken');
+                const token = localStorage.getItem('acesscontrol_accessToken');
                 const tenantId = getTenantId();
 
                 const response = await fetch('/api/equipments', {

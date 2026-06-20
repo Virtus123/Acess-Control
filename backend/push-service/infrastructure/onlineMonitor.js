@@ -14,7 +14,7 @@ const STALE_SECONDS = parseInt(process.env.PUSH_STALE_SECONDS || '30', 10);
 
 // Tenants "do sistema" que não têm equipamentos push e por isso devem ser
 // pulados nas varreduras (também são frequentemente read-only em produção).
-const SYSTEM_TENANTS = new Set(['mamcontrolmam']);
+const SYSTEM_TENANTS = new Set(['acesscontrolmaster']);
 
 let timer = null;
 

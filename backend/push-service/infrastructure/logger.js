@@ -11,7 +11,7 @@ const logger = winston.createLogger({
     winston.format.timestamp(),
     winston.format.json()
   ),
-  defaultMeta: { service: 'mam-push' },
+  defaultMeta: { service: 'acess-push' },
   transports: [
     new winston.transports.File({
       filename: join(logDir, 'push.log'),

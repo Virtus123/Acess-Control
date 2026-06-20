@@ -34,7 +34,7 @@ const router = express.Router();
  *               email:
  *                 type: string
  *                 format: email
- *                 example: admin@mamcontrol.com.br
+ *                 example: admin@example.com
  *               password:
  *                 type: string
  *                 format: password

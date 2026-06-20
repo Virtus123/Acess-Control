@@ -1,5 +1,5 @@
 /* ============================================
-   MAM Control - Sistema de Controle de Acesso
+   Acess Control - Sistema de Controle de Acesso
    Versão 1.0.0
    ============================================ */
 
@@ -9,9 +9,9 @@
 
 // Configuração padrão do sistema
 const CONFIG = {
-    APP_NAME: 'MAM Control',
+    APP_NAME: 'Acess Control',
     VERSION: '1.0.0',
-    STORAGE_PREFIX: 'mamcontrol_',
+    STORAGE_PREFIX: 'acesscontrol_',
     DEFAULT_LABELS: {
         pessoas: 'Pessoas',
         grupos: 'Grupos/Departamentos'
@@ -26,18 +26,18 @@ const CONFIG = {
 // HANDSHAKE DE IMPERSONATION (Consumir contexto da nova aba)
 // ============================================
 (function() {
-    const impToken = localStorage.getItem('mamcontrol_impersonate_token');
-    const impTenant = localStorage.getItem('mamcontrol_impersonate_tenant');
+    const impToken = localStorage.getItem('acesscontrol_impersonate_token');
+    const impTenant = localStorage.getItem('acesscontrol_impersonate_tenant');
     if (impToken && impTenant) {
         // Armazenar APENAS no sessionStorage para isolar esta aba das demais.
         // O localStorage é compartilhado entre abas e se alterado aqui, 
         // "sequestraria" a sessão da aba Master/Revenda original.
-        sessionStorage.setItem('mamcontrol_accessToken', impToken);
-        sessionStorage.setItem('mamcontrol_tenant', impTenant);
+        sessionStorage.setItem('acesscontrol_accessToken', impToken);
+        sessionStorage.setItem('acesscontrol_tenant', impTenant);
         
         // Limpar os sinais de handshake do localStorage para que não sejam reprocessados
-        localStorage.removeItem('mamcontrol_impersonate_token');
-        localStorage.removeItem('mamcontrol_impersonate_tenant');
+        localStorage.removeItem('acesscontrol_impersonate_token');
+        localStorage.removeItem('acesscontrol_impersonate_tenant');
         console.log(`[Impersonation] Sincronização isolada no sessionStorage para o tenant: ${impTenant}`);
     }
 })();
@@ -59,7 +59,7 @@ function getPhotoUrl(photoUrl) {
     }
     
     // Obter token de acesso para autenticação
-    const accessToken = localStorage.getItem('mamcontrol_accessToken') || '';
+    const accessToken = localStorage.getItem('acesscontrol_accessToken') || '';
     
     // Tentar extrair tipo (person ou visitor) e nome do arquivo
     // Normaliza path sem barra inicial: "uploads/..." → "/uploads/..."
@@ -107,9 +107,9 @@ let STATE = {
     currentEditId: null,
     cameraActive: false,
     cameraStream: null,
-    accessToken: localStorage.getItem('mamcontrol_accessToken') || null,
-    refreshToken: localStorage.getItem('mamcontrol_refreshToken') || null,
-    user: JSON.parse(localStorage.getItem('mamcontrol_user') || 'null'),
+    accessToken: localStorage.getItem('acesscontrol_accessToken') || null,
+    refreshToken: localStorage.getItem('acesscontrol_refreshToken') || null,
+    user: JSON.parse(localStorage.getItem('acesscontrol_user') || 'null'),
     personPhotoChanged: false
 };
 
@@ -131,18 +131,18 @@ window.fetch = async (...args) => {
         config.headers = config.headers || {};
 
         // 1. Resolver Tenant ID (sessionStorage primeiro para suportar impersonation em novas abas)
-        const tenantId = sessionStorage.getItem('mamcontrol_tenant') || 
-                         localStorage.getItem('mamcontrol_tenant') || 
+        const tenantId = sessionStorage.getItem('acesscontrol_tenant') || 
+                         localStorage.getItem('acesscontrol_tenant') || 
                          localStorage.getItem('tenant_id') || 
                          CONFIG.TENANT_ID;
         
         // 2. Resolver Token
-        const token = sessionStorage.getItem('mamcontrol_accessToken') ||
-                      localStorage.getItem('mamcontrol_accessToken');
+        const token = sessionStorage.getItem('acesscontrol_accessToken') ||
+                      localStorage.getItem('acesscontrol_accessToken');
 
         // Injetar headers (SOBERANO: sessionStorage tem precedência total se existir)
-        const forcedTenant = sessionStorage.getItem('mamcontrol_tenant');
-        const forcedToken = sessionStorage.getItem('mamcontrol_accessToken');
+        const forcedTenant = sessionStorage.getItem('acesscontrol_tenant');
+        const forcedToken = sessionStorage.getItem('acesscontrol_accessToken');
 
         if (forcedTenant) {
             config.headers['X-Tenant-ID'] = forcedTenant;
@@ -179,10 +179,10 @@ window.applyFontSize = function(value) {
     console.log(`[Appearance] Font size applied: ${value} (${size})`);
     
     // Armazenar no localStorage para persistência imediata entre abas
-    const modules = JSON.parse(localStorage.getItem('mamcontrol_modules') || '{}');
+    const modules = JSON.parse(localStorage.getItem('acesscontrol_modules') || '{}');
     if (modules.font_size !== value) {
         modules.font_size = value;
-        localStorage.setItem('mamcontrol_modules', JSON.stringify(modules));
+        localStorage.setItem('acesscontrol_modules', JSON.stringify(modules));
     }
 };
 
@@ -191,7 +191,7 @@ window.applyFontSize = function(value) {
  */
 window.translateLabels = function() {
     try {
-        const labels = JSON.parse(localStorage.getItem('mamcontrol_labels') || '{}');
+        const labels = JSON.parse(localStorage.getItem('acesscontrol_labels') || '{}');
         if (!labels.pessoas && !labels.grupos) return;
 
         const replacements = [];
@@ -257,7 +257,7 @@ window.translateLabels = function() {
 // Inicialização da fonte
 (function() {
     try {
-        const modules = JSON.parse(localStorage.getItem('mamcontrol_modules') || '{}');
+        const modules = JSON.parse(localStorage.getItem('acesscontrol_modules') || '{}');
         const savedFontSize = modules.font_size || 'normal';
         window.applyFontSize(savedFontSize);
         
@@ -284,8 +284,8 @@ class ApiService {
 
     // Headers padrão (Dínâmicos via LocalStorage/SessionStorage)
     getHeaders(includeAuth = true, omitContentType = false) {
-        const tenantId = sessionStorage.getItem('mamcontrol_tenant') || 
-                         localStorage.getItem('mamcontrol_tenant') || 
+        const tenantId = sessionStorage.getItem('acesscontrol_tenant') || 
+                         localStorage.getItem('acesscontrol_tenant') || 
                          localStorage.getItem('tenant_id') || 
                          CONFIG.TENANT_ID;
                          
@@ -297,8 +297,8 @@ class ApiService {
             headers['Content-Type'] = 'application/json';
         }
 
-        const token = sessionStorage.getItem('mamcontrol_accessToken') || 
-                      localStorage.getItem('mamcontrol_accessToken');
+        const token = sessionStorage.getItem('acesscontrol_accessToken') || 
+                      localStorage.getItem('acesscontrol_accessToken');
 
         if (includeAuth && token) {
             headers['Authorization'] = `Bearer ${token}`;
@@ -380,8 +380,8 @@ class ApiService {
             STATE.refreshToken = data.data.refreshToken;
             STATE.user = data.data.user;
 
-            localStorage.setItem('mamcontrol_accessToken', STATE.accessToken);
-            localStorage.setItem('mamcontrol_refreshToken', STATE.refreshToken);
+            localStorage.setItem('acesscontrol_accessToken', STATE.accessToken);
+            localStorage.setItem('acesscontrol_refreshToken', STATE.refreshToken);
             
             // Salvar dados do usuário incluindo permissões do perfil
             const userData = {
@@ -390,8 +390,8 @@ class ApiService {
                 profileName: data.data.profileName || null
             };
             console.log('Salvando userData:', userData);
-            localStorage.setItem('mamcontrol_user', JSON.stringify(userData));
-            localStorage.setItem('mamcontrol_loginTime', Date.now().toString());
+            localStorage.setItem('acesscontrol_user', JSON.stringify(userData));
+            localStorage.setItem('acesscontrol_loginTime', Date.now().toString());
 
             return data; // Retornar objeto completo com success
         }
@@ -415,11 +415,11 @@ class ApiService {
             STATE.refreshToken = null;
             STATE.user = null;
 
-            localStorage.removeItem('mamcontrol_accessToken');
-            localStorage.removeItem('mamcontrol_refreshToken');
-            localStorage.removeItem('mamcontrol_user');
-            localStorage.removeItem('mamcontrol_tenant');
-            localStorage.removeItem('mamcontrol_loginTime');
+            localStorage.removeItem('acesscontrol_accessToken');
+            localStorage.removeItem('acesscontrol_refreshToken');
+            localStorage.removeItem('acesscontrol_user');
+            localStorage.removeItem('acesscontrol_tenant');
+            localStorage.removeItem('acesscontrol_loginTime');
         }
     }
 
@@ -435,7 +435,7 @@ class ApiService {
 
             if (data.success && data.data) {
                 STATE.accessToken = data.data.accessToken;
-                localStorage.setItem('mamcontrol_accessToken', STATE.accessToken);
+                localStorage.setItem('acesscontrol_accessToken', STATE.accessToken);
                 return true;
             }
         } catch (error) {
@@ -870,8 +870,8 @@ class ApiService {
     async uploadShiftNoteAttachment(noteId, file) {
         const formData = new FormData();
         formData.append('file', file);
-        const token = localStorage.getItem('mamcontrol_accessToken');
-        const tenantId = this.tenantId || localStorage.getItem('mamcontrol_tenant');
+        const token = localStorage.getItem('acesscontrol_accessToken');
+        const tenantId = this.tenantId || localStorage.getItem('acesscontrol_tenant');
         const response = await fetch(`${this.baseURL}/shift-notes/${noteId}/attachments`, {
             method: 'POST',
             headers: {
@@ -888,14 +888,14 @@ class ApiService {
     }
 
     getShiftNoteAttachmentViewUrl(attachmentId) {
-        const token = localStorage.getItem('mamcontrol_accessToken');
-        const tenantId = this.tenantId || localStorage.getItem('mamcontrol_tenant');
+        const token = localStorage.getItem('acesscontrol_accessToken');
+        const tenantId = this.tenantId || localStorage.getItem('acesscontrol_tenant');
         return `${this.baseURL}/shift-notes/attachments/${attachmentId}/view`;
     }
 
     getShiftNoteAttachmentDownloadUrl(attachmentId) {
-        const token = localStorage.getItem('mamcontrol_accessToken');
-        const tenantId = this.tenantId || localStorage.getItem('mamcontrol_tenant');
+        const token = localStorage.getItem('acesscontrol_accessToken');
+        const tenantId = this.tenantId || localStorage.getItem('acesscontrol_tenant');
         return `${this.baseURL}/shift-notes/attachments/${attachmentId}/download`;
     }
 
@@ -1861,7 +1861,7 @@ class StorageManager {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `mamcontrol-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `acesscontrol-backup-${new Date().toISOString().split('T')[0]}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -5773,10 +5773,10 @@ class GrupoManager {
         
         // Aguarda o token estar disponível - verificar todas as chaves possíveis
         const checkToken = () => {
-            const token = localStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('token') || 
+            const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('token') || 
                           localStorage.getItem('authToken') || 
                           localStorage.getItem('access_token') ||
-                          localStorage.getItem('mamcontrol_accessToken');
+                          localStorage.getItem('acesscontrol_accessToken');
             return !!token;
         };
         
@@ -6928,7 +6928,7 @@ class ConfigManager {
 
     static showPrivacyPolicy() {
         const policy = `
-            <h3>Política de Privacidade - MAM Control</h3>
+            <h3>Política de Privacidade - Acess Control</h3>
             <p><strong>Última atualização:</strong> ${new Date().toLocaleDateString('pt-BR')}</p>
             
             <h4>1. Coleta de Dados</h4>
@@ -7605,7 +7605,7 @@ async function loadEmpresasForVagaRotativa() {
     } catch (error) {
         console.error('Erro ao carregar empresas:', error);
         // Tentar do localStorage como fallback
-        const stored = localStorage.getItem('mamcontrol_companies');
+        const stored = localStorage.getItem('acesscontrol_companies');
         if (stored) {
             const empresas = JSON.parse(stored);
             window.empresasCache = empresas;
@@ -7921,7 +7921,7 @@ function getEmpresaNome(companyId) {
 function salvarVeiculoNoStorage(veiculoData) {
     try {
         let veiculos = [];
-        const stored = localStorage.getItem('mamcontrol_veiculos');
+        const stored = localStorage.getItem('acesscontrol_veiculos');
         if (stored) {
             veiculos = JSON.parse(stored);
         }
@@ -7933,7 +7933,7 @@ function salvarVeiculoNoStorage(veiculoData) {
                 id: Date.now(),
                 ...veiculoData
             });
-            localStorage.setItem('mamcontrol_veiculos', JSON.stringify(veiculos));
+            localStorage.setItem('acesscontrol_veiculos', JSON.stringify(veiculos));
             console.log('Veículo sincronizado com sucesso:', veiculoData.placa);
         } else {
             console.log('Veículo já existe no cadastro de veículos:', veiculoData.placa);
@@ -8028,11 +8028,11 @@ async function logout() {
         STATE.refreshToken = null;
         STATE.user = null;
         
-        localStorage.removeItem('mamcontrol_accessToken');
-        localStorage.removeItem('mamcontrol_refreshToken');
-        localStorage.removeItem('mamcontrol_user');
-        localStorage.removeItem('mamcontrol_loginTime');
-        localStorage.removeItem('mamcontrol_tenant');
+        localStorage.removeItem('acesscontrol_accessToken');
+        localStorage.removeItem('acesscontrol_refreshToken');
+        localStorage.removeItem('acesscontrol_user');
+        localStorage.removeItem('acesscontrol_loginTime');
+        localStorage.removeItem('acesscontrol_tenant');
         
         // Redirecionar para página de login
         redirectToLogin();
@@ -8079,7 +8079,7 @@ class LoginManager {
         if (appContainer) appContainer.classList.remove('hidden');
         
         // Atualizar footer com nome do tenant (se o elemento existir)
-        const tenantName = localStorage.getItem('mamcontrol_tenant') || 'unknown';
+        const tenantName = localStorage.getItem('acesscontrol_tenant') || 'unknown';
         const footerTenantName = document.getElementById('footer-tenant-name');
         if (footerTenantName) {
             footerTenantName.textContent = tenantName;
@@ -8116,8 +8116,8 @@ class LoginManager {
                 STATE.refreshToken = result.data.refreshToken;
                 STATE.user = result.data.user;
                 
-                localStorage.setItem('mamcontrol_accessToken', STATE.accessToken);
-                localStorage.setItem('mamcontrol_refreshToken', STATE.refreshToken);
+                localStorage.setItem('acesscontrol_accessToken', STATE.accessToken);
+                localStorage.setItem('acesscontrol_refreshToken', STATE.refreshToken);
                 
                 // Salvar dados do usuário incluindo permissões do perfil
                 const userData = {
@@ -8125,12 +8125,12 @@ class LoginManager {
                     profilePermissions: result.data.profilePermissions || [],
                     profileName: result.data.profileName || null
                 };
-                localStorage.setItem('mamcontrol_user', JSON.stringify(userData));
-                localStorage.setItem('mamcontrol_tenant', tenant);
+                localStorage.setItem('acesscontrol_user', JSON.stringify(userData));
+                localStorage.setItem('acesscontrol_tenant', tenant);
                 
-                // Verificar se é admin master (mamcontrolmam) - redirecionar para admin master
+                // Verificar se é admin master (acesscontrolmaster) - redirecionar para admin master
                 console.log('Login successful, checking redirect:', { tenant, role: STATE.user?.role });
-                if (tenant === 'mamcontrolmam' && STATE.user && STATE.user.role === 'admin') {
+                if (tenant === 'acesscontrolmaster' && STATE.user && STATE.user.role === 'admin') {
                     console.log('Redirecting to admin-master.html');
                     window.location.href = './admin-master.html';
                     return;
@@ -8140,7 +8140,7 @@ class LoginManager {
                     window.location.href = './admin-revenda.html';
                 }
                 // Verificar se é usuário master/admin do tenant master antigo
-                else if (tenant === 'mamcontrol' && STATE.user && STATE.user.role === 'admin') {
+                else if (tenant === 'acesscontrol' && STATE.user && STATE.user.role === 'admin') {
                     window.location.href = './create-tenant.html';
                 } else {
                     // Esconder tela de login e mostrar app
@@ -8180,20 +8180,20 @@ function initializeApp() {
     setTimeout(() => {
         NotificationSystem.showToast(
             'success',
-            'Bem-vindo ao MAM Control',
+            'Bem-vindo ao Acess Control',
             'Sistema inicializado com sucesso!',
             3000
         );
     }, 1000);
     
-    console.log('MAM Control - Pronto para uso!');
+    console.log('Acess Control - Pronto para uso!');
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('MAM Control - Inicializando...');
+    console.log('Acess Control - Inicializando...');
     
     // Restaurar tenant do localStorage
-    const savedTenant = localStorage.getItem('mamcontrol_tenant');
+    const savedTenant = localStorage.getItem('acesscontrol_tenant');
     if (savedTenant) {
         api.tenantId = savedTenant;
         const loginTenantInput = document.getElementById('login-tenant');
@@ -8221,11 +8221,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (result.success && result.data) {
                 // Token válido, atualizar dados do usuário e inicializar app
                 STATE.user = result.data;
-                localStorage.setItem('mamcontrol_user', JSON.stringify(STATE.user));
+                localStorage.setItem('acesscontrol_user', JSON.stringify(STATE.user));
                 
                 // Verificar se é usuário master/admin do tenant master
-                const savedTenant = localStorage.getItem('mamcontrol_tenant');
-                if (savedTenant === 'mamcontrol' && STATE.user && STATE.user.role === 'admin') {
+                const savedTenant = localStorage.getItem('acesscontrol_tenant');
+                if (savedTenant === 'acesscontrol' && STATE.user && STATE.user.role === 'admin') {
                     // Redirecionar para página de criar tenant
                     window.location.href = './create-tenant.html';
                     return;
@@ -8245,11 +8245,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const result = await api.request('/auth/me');
                     if (result.success && result.data) {
                         STATE.user = result.data;
-                        localStorage.setItem('mamcontrol_user', JSON.stringify(STATE.user));
+                        localStorage.setItem('acesscontrol_user', JSON.stringify(STATE.user));
                         
                         // Verificar se é usuário master/admin do tenant master
-                        const savedTenant = localStorage.getItem('mamcontrol_tenant');
-                        if (savedTenant === 'mamcontrol' && STATE.user && STATE.user.role === 'admin') {
+                        const savedTenant = localStorage.getItem('acesscontrol_tenant');
+                        if (savedTenant === 'acesscontrol' && STATE.user && STATE.user.role === 'admin') {
                             // Redirecionar para página de criar tenant
                             window.location.href = './create-tenant.html';
                             return;
@@ -8268,10 +8268,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             STATE.accessToken = null;
             STATE.refreshToken = null;
             STATE.user = null;
-            localStorage.removeItem('mamcontrol_accessToken');
-            localStorage.removeItem('mamcontrol_refreshToken');
-            localStorage.removeItem('mamcontrol_user');
-            localStorage.removeItem('mamcontrol_loginTime');
+            localStorage.removeItem('acesscontrol_accessToken');
+            localStorage.removeItem('acesscontrol_refreshToken');
+            localStorage.removeItem('acesscontrol_user');
+            localStorage.removeItem('acesscontrol_loginTime');
             // Não remover tenant, para facilitar novo login
         }
     }

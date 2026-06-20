@@ -48,7 +48,7 @@ if (DEBUG_INGRESS) {
 }
 
 // === Heartbeat do equipamento — bate na RAIZ sem auth, exige 200 vazio ===
-// Sem isso, a tela do MAMCONTROL/painel marca equipamento como OFFLINE.
+// Sem isso, a tela do Acess Control/painel marca equipamento como OFFLINE.
 const aliveHandler = (req, res) => {
   logger.info('device_is_alive', {
     query: req.query,
@@ -75,7 +75,7 @@ app.post('/session_is_valid', sessionValidHandler);
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
-    service: 'mam-push',
+    service: 'acess-push',
     version: '1.0.0',
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <title>MAM Control - Admin Revenda</title>
+    <title>Acess Control - Admin Revenda</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="favicon.png">
@@ -485,7 +485,7 @@
     <script src="components.js"></script>
     <script>
         const API_URL = '';
-        const currentTenant = localStorage.getItem('mamcontrol_tenant');
+        const currentTenant = localStorage.getItem('acesscontrol_tenant');
         
         function switchTab(tabId) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -506,7 +506,7 @@
 
         async function loadBases() {
             const tbody = document.getElementById('bases-tbody');
-            const token = localStorage.getItem('mamcontrol_accessToken');
+            const token = localStorage.getItem('acesscontrol_accessToken');
             try {
                 const response = await fetch(`${API_URL}/api/admin/revenda/tenants`, {
                     headers: {
@@ -580,7 +580,7 @@
             const isActive = currentStatus === 'active';
             const action = isActive ? 'bloquear' : 'desbloquear';
             if (!confirm(`Tem certeza que deseja ${action} esta base?`)) return;
-            const token = localStorage.getItem('mamcontrol_accessToken');
+            const token = localStorage.getItem('acesscontrol_accessToken');
             try {
                 const res = await fetch(`${API_URL}/api/admin/tenants/${tenantId}/toggle-status`, {
                     method: 'PATCH',
@@ -595,7 +595,7 @@
 
         async function resetBasePassword(tenantId) {
             if (!confirm('Deseja resetar a senha do admin desta base?')) return;
-            const token = localStorage.getItem('mamcontrol_accessToken');
+            const token = localStorage.getItem('acesscontrol_accessToken');
             try {
                 const res = await fetch(`${API_URL}/api/admin/tenants/${tenantId}/reset-password`, {
                     method: 'POST',
@@ -626,7 +626,7 @@
 
         document.getElementById('base-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const token = localStorage.getItem('mamcontrol_accessToken');
+            const token = localStorage.getItem('acesscontrol_accessToken');
             const tenantData = {
                 tenant_id: document.getElementById('tenant-id').value,
                 company_name: document.getElementById('tenant-company-name').value,
@@ -661,7 +661,7 @@
             if (editForm) editForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 if (!_editingBaseId) return;
-                const token = localStorage.getItem('mamcontrol_accessToken');
+                const token = localStorage.getItem('acesscontrol_accessToken');
                 const body = {
                     company_name: document.getElementById('edit-base-company-name').value,
                     cnpj: document.getElementById('edit-base-cnpj').value,
@@ -684,7 +684,7 @@
         function openBaseModal() { document.getElementById('base-modal').classList.add('active'); }
         function closeBaseModal() { document.getElementById('base-modal').classList.remove('active'); }
         async function accessTenant(tenantId) {
-            const token = localStorage.getItem('mamcontrol_accessToken');
+            const token = localStorage.getItem('acesscontrol_accessToken');
             try {
                 const response = await fetch(`${API_URL}/api/admin/tenants/${tenantId}/impersonate`, {
                     method: 'POST',
@@ -693,8 +693,8 @@
                 const data = await response.json();
                 if (data.success) {
                     // Prepara o handshake para a nova aba
-                    localStorage.setItem('mamcontrol_impersonate_token', data.data.accessToken);
-                    localStorage.setItem('mamcontrol_impersonate_tenant', tenantId);
+                    localStorage.setItem('acesscontrol_impersonate_token', data.data.accessToken);
+                    localStorage.setItem('acesscontrol_impersonate_tenant', tenantId);
                     
                     // Abre o dashboard em uma nova aba
                     window.open('./dashboard.html', '_blank');

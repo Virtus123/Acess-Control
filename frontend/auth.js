@@ -3,8 +3,8 @@ const SESSION_TIMEOUT = 24 * 60 * 60 * 1000; // 24 horas
 const SESSION_WARNING_TIME = 30 * 60 * 1000; // 30 minutos antes de expirar
 
 function checkAuth() {
-    const token = localStorage.getItem('mamcontrol_accessToken');
-    const loginTime = localStorage.getItem('mamcontrol_loginTime');
+    const token = localStorage.getItem('acesscontrol_accessToken');
+    const loginTime = localStorage.getItem('acesscontrol_loginTime');
     
     if (!token) {
         redirectToLogin();
@@ -35,11 +35,11 @@ function checkAuth() {
 }
 
 function clearSession() {
-    localStorage.removeItem('mamcontrol_accessToken');
-    localStorage.removeItem('mamcontrol_refreshToken');
-    localStorage.removeItem('mamcontrol_user');
-    localStorage.removeItem('mamcontrol_tenant');
-    localStorage.removeItem('mamcontrol_loginTime');
+    localStorage.removeItem('acesscontrol_accessToken');
+    localStorage.removeItem('acesscontrol_refreshToken');
+    localStorage.removeItem('acesscontrol_user');
+    localStorage.removeItem('acesscontrol_tenant');
+    localStorage.removeItem('acesscontrol_loginTime');
     localStorage.removeItem('auth_token'); // Limpar token antigo se existir
 }
 

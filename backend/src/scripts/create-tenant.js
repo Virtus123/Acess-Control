@@ -17,7 +17,7 @@ const question = (query) => new Promise((resolve) => rl.question(query, resolve)
 
 async function main() {
   console.log('\n================================================');
-  console.log('   MAM Control - Criador de Unidades (Tenants)   ');
+  console.log('   Acess Control - Criador de Unidades (Tenants)   ');
   console.log('================================================\n');
 
   try {

@@ -13,7 +13,7 @@ router.use(authenticate);
 
 // Listar revendas - apenas admin master
 router.get('/', requireRole('admin'), asyncHandler(async (req, res) => {
-    const dbMaster = await dbManager.getConnection('mamcontrolmam');
+    const dbMaster = await dbManager.getConnection('acesscontrolmaster');
     
     try {
         const revendas = await dbMaster.all('SELECT * FROM revendas ORDER BY created_at DESC');
@@ -29,7 +29,7 @@ router.get('/', requireRole('admin'), asyncHandler(async (req, res) => {
             message: 'Erro ao listar revendas'
         });
     } finally {
-        await dbManager.closeConnection('mamcontrolmam');
+        await dbManager.closeConnection('acesscontrolmaster');
     }
 }));
 
@@ -54,7 +54,7 @@ router.post('/', asyncHandler(async (req, res) => {
         });
     }
     
-    const dbMaster = await dbManager.getConnection('mamcontrolmam');
+    const dbMaster = await dbManager.getConnection('acesscontrolmaster');
     
     try {
         // Verificar se tenant_id já existe
@@ -110,7 +110,7 @@ router.post('/', asyncHandler(async (req, res) => {
             message: 'Erro ao criar revenda: ' + error.message
         });
     } finally {
-        await dbManager.closeConnection('mamcontrolmam');
+        await dbManager.closeConnection('acesscontrolmaster');
     }
 }));
 
@@ -129,7 +129,7 @@ router.patch('/:id', asyncHandler(async (req, res) => {
         active
     } = req.body;
     
-    const dbMaster = await dbManager.getConnection('mamcontrolmam');
+    const dbMaster = await dbManager.getConnection('acesscontrolmaster');
     
     try {
         const updates = [];
@@ -165,7 +165,7 @@ router.patch('/:id', asyncHandler(async (req, res) => {
             message: 'Erro ao atualizar revenda'
         });
     } finally {
-        await dbManager.closeConnection('mamcontrolmam');
+        await dbManager.closeConnection('acesscontrolmaster');
     }
 }));
 
@@ -173,7 +173,7 @@ router.patch('/:id', asyncHandler(async (req, res) => {
 router.delete('/:id', asyncHandler(async (req, res) => {
     const { id } = req.params;
     
-    const dbMaster = await dbManager.getConnection('mamcontrolmam');
+    const dbMaster = await dbManager.getConnection('acesscontrolmaster');
     
     try {
         // Pegar o tenant_id antes de deletar
@@ -195,7 +195,7 @@ router.delete('/:id', asyncHandler(async (req, res) => {
             message: 'Erro ao deletar revenda'
         });
     } finally {
-        await dbManager.closeConnection('mamcontrolmam');
+        await dbManager.closeConnection('acesscontrolmaster');
     }
 }));
 
@@ -211,7 +211,7 @@ router.get('/tenants', asyncHandler(async (req, res) => {
     }
     
     // Buscar a revenda pelo tenant_id
-    const dbMaster = await dbManager.getConnection('mamcontrolmam');
+    const dbMaster = await dbManager.getConnection('acesscontrolmaster');
     
     try {
         const revenda = await dbMaster.get('SELECT id FROM revendas WHERE tenant_id = ?', [tenantId]);
@@ -288,7 +288,7 @@ router.get('/tenants', asyncHandler(async (req, res) => {
             message: 'Erro ao listar tenants'
         });
     } finally {
-        await dbManager.closeConnection('mamcontrolmam');
+        await dbManager.closeConnection('acesscontrolmaster');
     }
 }));
 
@@ -296,7 +296,7 @@ router.get('/tenants', asyncHandler(async (req, res) => {
 router.post('/:id/block', asyncHandler(async (req, res) => {
     const { id } = req.params;
     
-    const dbMaster = await dbManager.getConnection('mamcontrolmam');
+    const dbMaster = await dbManager.getConnection('acesscontrolmaster');
     
     try {
         const revenda = await dbMaster.get('SELECT * FROM revendas WHERE id = ?', [id]);
@@ -323,7 +323,7 @@ router.post('/:id/block', asyncHandler(async (req, res) => {
             message: 'Erro ao bloquear revenda'
         });
     } finally {
-        await dbManager.closeConnection('mamcontrolmam');
+        await dbManager.closeConnection('acesscontrolmaster');
     }
 }));
 

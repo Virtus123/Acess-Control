@@ -1,6 +1,6 @@
 import express from 'express';
 import importController from '../controllers/importController.js';
-import { importMamcontrol } from '../controllers/mamcontrolImportController.js';
+import { importLegacyDatabase } from '../controllers/acessControlImportController.js';
 import multer from 'multer';
 import { authenticate } from '../middleware/auth.js';
 
@@ -34,7 +34,7 @@ const upload = multer({
     }
 });
 
-// Configure multer for .db file uploads (MAMControl import)
+// Configure multer for .db file uploads (AcessControl import)
 const uploadDb = multer({
     storage: multer.diskStorage({
         destination: async (req, file, cb) => {
@@ -153,7 +153,7 @@ router.get('/:tenant_id/:import_id/status', (req, res) => importController.getIm
 import idsecureController from '../controllers/idsecureController.js';
 router.post('/idsecure', (req, res) => idsecureController.startImport(req, res));
 
-// MAMControl: download photos from VPS database
-router.post('/mamcontrol', uploadDb.single('db'), importMamcontrol);
+// AcessControl: download photos from VPS database
+router.post('/acesscontrol', uploadDb.single('db'), importLegacyDatabase);
 
 export default router;

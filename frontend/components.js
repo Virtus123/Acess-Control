@@ -50,9 +50,9 @@ function getSidebar() {
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
-                    <img src="${prefix}favicon.png" alt="MAM Control" draggable="false">
+                    <img src="${prefix}favicon.png" alt="Acess Control" draggable="false">
                     <div class="logo-text">
-                        <h2>MAM Control</h2>
+                        <h2>Acess Control</h2>
                         <small>Sistema de Controle</small>
                     </div>
                 </div>
@@ -296,12 +296,12 @@ function handleLogout() {
     // Limpar todos os tokens possíveis
     localStorage.removeItem('auth_token');
     localStorage.removeItem('tenant_id');
-    localStorage.removeItem('mamcontrol_accessToken');
-    localStorage.removeItem('mamcontrol_refreshToken');
-    localStorage.removeItem('mamcontrol_user');
-    localStorage.removeItem('mamcontrol_loginTime');
-    localStorage.removeItem('mamcontrol_tenant');
-    localStorage.removeItem('mamcontrol_modules');
+    localStorage.removeItem('acesscontrol_accessToken');
+    localStorage.removeItem('acesscontrol_refreshToken');
+    localStorage.removeItem('acesscontrol_user');
+    localStorage.removeItem('acesscontrol_loginTime');
+    localStorage.removeItem('acesscontrol_tenant');
+    localStorage.removeItem('acesscontrol_modules');
 
     const prefix = getPathPrefix();
     window.location.href = prefix + 'index';
@@ -378,8 +378,8 @@ const menuSectionToResource = {
 // Carregar módulos do servidor
 async function loadModules() {
     try {
-        const tenantId = localStorage.getItem('mamcontrol_tenant') || 'default';
-        const token = localStorage.getItem('mamcontrol_accessToken');
+        const tenantId = localStorage.getItem('acesscontrol_tenant') || 'default';
+        const token = localStorage.getItem('acesscontrol_accessToken');
 
         const headers = {
             'Content-Type': 'application/json',
@@ -400,14 +400,14 @@ async function loadModules() {
 
             if (result.success && result.data) {
                 const modules = result.data;
-                localStorage.setItem('mamcontrol_modules', JSON.stringify(modules));
+                localStorage.setItem('acesscontrol_modules', JSON.stringify(modules));
                 return modules;
             }
         } catch (e) {
             console.warn('Erro ao buscar módulos do servidor, usando cache local:', e);
         }
 
-        let modules = localStorage.getItem('mamcontrol_modules');
+        let modules = localStorage.getItem('acesscontrol_modules');
         if (modules) {
             return JSON.parse(modules);
         }
@@ -422,8 +422,8 @@ async function loadModules() {
 // Aplicar permissões do perfil de autorização ao menu
 async function applyAuthorizationPermissions() {
     try {
-        const token = localStorage.getItem('mamcontrol_accessToken');
-        const userData = localStorage.getItem('mamcontrol_user');
+        const token = localStorage.getItem('acesscontrol_accessToken');
+        const userData = localStorage.getItem('acesscontrol_user');
 
         if (!token || !userData) return;
 
@@ -436,13 +436,13 @@ async function applyAuthorizationPermissions() {
             console.log('Buscando permissões da API para o perfil:', profileId);
             try {
                 const response = await fetch(`/api/authorization-profiles/profiles/${profileId}`, {
-                    headers: { 'Authorization': `Bearer ${token}`, 'X-Tenant-ID': localStorage.getItem('mamcontrol_tenant') }
+                    headers: { 'Authorization': `Bearer ${token}`, 'X-Tenant-ID': localStorage.getItem('acesscontrol_tenant') }
                 });
                 const result = await response.json();
                 if (result.success && result.data?.permissions) {
                     permissions = result.data.permissions;
                     parsed.profilePermissions = permissions;
-                    localStorage.setItem('mamcontrol_user', JSON.stringify(parsed));
+                    localStorage.setItem('acesscontrol_user', JSON.stringify(parsed));
                 }
             } catch (e) {
                 console.error('Erro ao buscar permissões:', e);
@@ -464,7 +464,7 @@ async function applyAuthorizationPermissions() {
         }
 
         // Carregar módulos para verificar visibilidade global
-        const modules = JSON.parse(localStorage.getItem('mamcontrol_modules') || '{}');
+        const modules = JSON.parse(localStorage.getItem('acesscontrol_modules') || '{}');
         const userRole = (parsed.role || '').toLowerCase();
 
         console.log('--- DEBUG MENU VISIBILITY ---');
@@ -623,7 +623,7 @@ let notificationsPopup = null;
 
 async function showNotificationsPopup() {
     try {
-        const tenantId = localStorage.getItem('mamcontrol_tenant') || 'default';
+        const tenantId = localStorage.getItem('acesscontrol_tenant') || 'default';
         const response = await fetch(`/api/notifications?tenant_id=${encodeURIComponent(tenantId)}`);
         const notifications = await response.json();
 
@@ -753,7 +753,7 @@ function showNotificationDetail(id, title, message, date, isPrioritary = false) 
 // Marcar notificação como lida
 async function markNotificationAsRead(id) {
     try {
-        const tenantId = localStorage.getItem('mamcontrol_tenant') || 'default';
+        const tenantId = localStorage.getItem('acesscontrol_tenant') || 'default';
         console.log('Marcando notificação como lida:', id, 'tenant:', tenantId);
         const response = await fetch(`/api/notifications/${id}/read`, {
             method: 'POST',
@@ -771,7 +771,7 @@ async function markNotificationAsRead(id) {
 // Verificar e abrir notificações prioritárias ao carregar a página
 async function checkPrioritaryNotifications() {
     try {
-        const tenantId = localStorage.getItem('mamcontrol_tenant') || 'default';
+        const tenantId = localStorage.getItem('acesscontrol_tenant') || 'default';
         console.log('Verificando notificações prioritárias para tenant:', tenantId);
         const response = await fetch(`/api/notifications/unread-prioritary?tenant_id=${encodeURIComponent(tenantId)}`);
         const notifications = await response.json();
@@ -1263,7 +1263,7 @@ function addNotificationModalStyles() {
 // Atualizar badge de notificações
 async function updateNotificationCount() {
     try {
-        const tenantId = localStorage.getItem('mamcontrol_tenant') || 'default';
+        const tenantId = localStorage.getItem('acesscontrol_tenant') || 'default';
         const response = await fetch(`/api/notifications/count?tenant_id=${encodeURIComponent(tenantId)}`);
         const data = await response.json();
         const badge = document.getElementById('notification-count');

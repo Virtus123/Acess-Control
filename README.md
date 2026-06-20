@@ -1,4 +1,4 @@
-# MAM Control
+# Acess Control
 
 Sistema SaaS multi-tenant de **controle de acesso físico** para condomínios, empresas e revendas. Gerencia pessoas, visitantes, veículos, equipamentos biométricos, regras de acesso, estacionamento, refeitórios e relatórios operacionais.
 
@@ -15,7 +15,7 @@ Sistema SaaS multi-tenant de **controle de acesso físico** para condomínios, e
 ## Estrutura
 
 ```
-MAMControl/
+Acess-Control/
 ├── backend/          # API REST + push-service + migrations SQL
 │   ├── server.js
 │   ├── src/

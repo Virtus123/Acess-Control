@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="./favicon.png">
-    <title>Admin - Gerenciar Tenants | MAM Control</title>
+    <title>Admin - Gerenciar Tenants | Acess Control</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
     <div class="header-bar">
-        <div class="logo">MAM Control</div>
+        <div class="logo">Acess Control</div>
         <div class="user-info">
             <span>Ola, <strong id="userName">Admin</strong></span>
-            <span id="userEmail">admin@mamcontrol.com</span>
+            <span id="userEmail">admin@acesscontrol.com</span>
             <button class="logout-btn" onclick="handleLogout()">
                 <i class="fas fa-sign-out-alt"></i> Sair
             </button>
@@ -393,13 +393,13 @@
         let currentModalAction = null;
         
         // Verificar sessão master (novo sistema)
-        const masterToken = localStorage.getItem('mamcontrol_master_token');
-        const masterUser = JSON.parse(localStorage.getItem('mamcontrol_master_user') || 'null');
+        const masterToken = localStorage.getItem('acesscontrol_master_token');
+        const masterUser = JSON.parse(localStorage.getItem('acesscontrol_master_user') || 'null');
         
         // Fallback para sistema antigo
-        const savedTenant = localStorage.getItem('mamcontrol_tenant');
-        const savedUser = JSON.parse(localStorage.getItem('mamcontrol_user') || 'null');
-        const savedToken = localStorage.getItem('mamcontrol_accessToken');
+        const savedTenant = localStorage.getItem('acesscontrol_tenant');
+        const savedUser = JSON.parse(localStorage.getItem('acesscontrol_user') || 'null');
+        const savedToken = localStorage.getItem('acesscontrol_accessToken');
 
         // ===== URL BASE DA API =====
         // Usa caminho relativo - Nginx faz reverse proxy automaticamente
@@ -408,7 +408,7 @@
         // ===== AUTH CHECK =====
         // Verificar se é sessão master válida OU fallback para sistema antigo
         const isMasterSession = masterToken && masterUser && masterUser.role === 'admin';
-        const isOldSession = savedTenant === 'mamcontrol' && savedUser && savedUser.role === 'admin' && savedToken;
+        const isOldSession = savedTenant === 'acesscontrol' && savedUser && savedUser.role === 'admin' && savedToken;
         
         if (!isMasterSession && !isOldSession) {
             window.location.href = './index.html';
@@ -435,7 +435,7 @@
         // ===== INICIALIZACAO =====
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('userName').textContent = savedUser.name || 'Admin';
-            document.getElementById('userEmail').textContent = savedUser.email || 'admin@mamcontrol.com';
+            document.getElementById('userEmail').textContent = savedUser.email || 'admin@acesscontrol.com';
             
             setupFormListeners();
             loadTenants();
@@ -464,9 +464,9 @@
 
         // ===== LOGOUT =====
         function handleLogout() {
-            localStorage.removeItem('mamcontrol_tenant');
-            localStorage.removeItem('mamcontrol_user');
-            localStorage.removeItem('mamcontrol_accessToken');
+            localStorage.removeItem('acesscontrol_tenant');
+            localStorage.removeItem('acesscontrol_user');
+            localStorage.removeItem('acesscontrol_accessToken');
             window.location.href = './index.html';
         }
 

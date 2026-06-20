@@ -100,7 +100,7 @@ router.post('/', async (req, res) => {
                 <hr>
                 
                 <p style="color: #666; font-size: 14px;">
-                    <strong>MAM Control</strong><br>
+                    <strong>Acess Control</strong><br>
                     Sistema de Controle de Acesso
                 </p>
                 

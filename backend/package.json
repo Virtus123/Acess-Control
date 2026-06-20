@@ -1,7 +1,7 @@
 {
-  "name": "nexis-control-backend",
+  "name": "acess-control-backend",
   "version": "1.0.0",
-  "description": "Backend API para sistema de controle de acesso MAM Control",
+  "description": "Backend API para sistema de controle de acesso Acess Control",
   "main": "server.js",
   "type": "module",
   "scripts": {
@@ -10,10 +10,10 @@
     "migrate": "node src/database/migrate.js",
     "migrate:tenant": "node migrations.js",
     "seed": "node src/database/seed.js",
-    "prod": "pm2 start server.js --name nexis-backend",
-    "prod:stop": "pm2 stop nexis-backend",
-    "prod:restart": "pm2 restart nexis-backend",
-    "prod:logs": "pm2 logs nexis-backend",
+    "prod": "pm2 start server.js --name acess-control-backend",
+    "prod:stop": "pm2 stop acess-control-backend",
+    "prod:restart": "pm2 restart acess-control-backend",
+    "prod:logs": "pm2 logs acess-control-backend",
     "backup:force": "node src/scripts/force-backup.js",
     "monitor:force": "node src/scripts/force-monitor.js"
   },
@@ -22,7 +22,7 @@
     "api",
     "multi-tenant"
   ],
-  "author": "MAM Control",
+  "author": "Vitor Yuri Fernandes",
   "license": "MIT",
   "dependencies": {
     "adm-zip": "^0.5.16",

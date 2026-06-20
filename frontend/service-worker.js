@@ -1,6 +1,6 @@
-// Service Worker para PWA - MAM Control
+// Service Worker para PWA - Acess Control
 
-const CACHE_NAME = 'mamcontrol-v1';
+const CACHE_NAME = 'acesscontrol-v1';
 const urlsToCache = [
   '/',
   '/index.html',

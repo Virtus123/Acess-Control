@@ -65,7 +65,7 @@ export const generateBillingReport = asyncHandler(async (req, res) => {
     const { priceTableId } = req.query;
     if (!priceTableId) return res.status(400).json({ success: false, message: 'ID da tabela de preços é obrigatório' });
 
-    const dbMaster = await dbManager.getConnection('mamcontrolmam');
+    const dbMaster = await dbManager.getConnection('acesscontrolmaster');
     try {
         // 1. Buscar as regras da tabela selecionada
         const rules = await dbMaster.all(
@@ -123,6 +123,6 @@ export const generateBillingReport = asyncHandler(async (req, res) => {
             }
         });
     } finally {
-        await dbManager.closeConnection('mamcontrolmam');
+        await dbManager.closeConnection('acesscontrolmaster');
     }
 });

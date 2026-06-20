@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>MAM Control - Recuperar Senha</title>
+    <title>Acess Control - Recuperar Senha</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="./favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -592,7 +592,7 @@
                 <form onsubmit="enviarEmail(event)">
                     <div class="input-group">
                         <label>Organização (Tenant ID)</label>
-                        <input type="text" id="tenant-id" placeholder="Ex: default, mamcontrol" required>
+                        <input type="text" id="tenant-id" placeholder="Ex: default, acesscontrol" required>
                     </div>
 
                     <div class="input-group">
@@ -763,7 +763,7 @@
                     mostrarAlerta('success', data.message || 'Código enviado para seu e-mail');
                     
                     // Salvar tenant no localStorage para uso futuro
-                    localStorage.setItem('mamcontrol_tenant', tenantId);
+                    localStorage.setItem('acesscontrol_tenant', tenantId);
                     
                     // Avançar para step 2
                     mostrarStep(2);
@@ -1058,7 +1058,7 @@
         // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
             // Verificar se há tenant salvo no localStorage
-            const savedTenant = localStorage.getItem('mamcontrol_tenant');
+            const savedTenant = localStorage.getItem('acesscontrol_tenant');
             if (savedTenant) {
                 document.getElementById('tenant-id').value = savedTenant;
             }

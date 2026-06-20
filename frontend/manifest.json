@@ -1,6 +1,6 @@
 {
-  "name": "MAM Control",
-  "short_name": "MAMCONTROL",
+  "name": "Acess Control",
+  "short_name": "Acess Control",
   "id": "/",
   "start_url": "/",
   "display": "standalone",

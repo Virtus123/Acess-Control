@@ -1,6 +1,6 @@
 // Link público de auto-cadastro de foto.
 //
-// Cliente MAMCONTROL gera um link único por tenant e envia pras pessoas dele.
+// Cliente Acess Control gera um link único por tenant e envia pras pessoas dele.
 // Pessoa abre → digita matrícula → tira foto → upload. Foto entra no cadastro
 // e dispara push pra equipamentos autorizados pela regra de acesso.
 //
@@ -59,7 +59,7 @@ function getClientIp(req) {
 // Helper: garante coluna public_photo_token na master
 // ============================================
 async function ensurePhotoTokenSchema() {
-  const master = await dbManager.getConnection('mamcontrolmam');
+  const master = await dbManager.getConnection('acesscontrolmaster');
   try {
     await master.exec(`ALTER TABLE tenants ADD COLUMN public_photo_token TEXT`);
   } catch (e) {

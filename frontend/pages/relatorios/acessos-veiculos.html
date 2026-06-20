@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>MAM Control - Relatório de Acessos - Veículos</title>
+    <title>Acess Control - Relatório de Acessos - Veículos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../style.css">
     <link rel="icon" href="../../favicon.png">
@@ -736,7 +736,7 @@
 
     <script>
         // Dados da empresa — carregados dinamicamente do banco
-        let empresaInfo = { razao: 'MAM Control', cnpj: '', endereco: '', telefone: '' };
+        let empresaInfo = { razao: 'Acess Control', cnpj: '', endereco: '', telefone: '' };
 
         async function carregarEmpresaInfo() {
             try {
@@ -744,7 +744,7 @@
                 const data = await api.getReportCompany();
                 if (data && (data.razao || data.cnpj)) {
                     empresaInfo = {
-                        razao:    data.razao    || 'MAM Control',
+                        razao:    data.razao    || 'Acess Control',
                         cnpj:     data.cnpj     || '',
                         endereco: data.endereco || '',
                         telefone: data.telefone || ''
@@ -1500,7 +1500,7 @@
             } else {
                 doc.setFontSize(10);
                 doc.setTextColor(74, 144, 217);
-                doc.text('MAM Control', pageW - 15, 15, { align: 'right' });
+                doc.text('Acess Control', pageW - 15, 15, { align: 'right' });
             }
 
             doc.setFontSize(16);
@@ -1509,7 +1509,7 @@
 
             doc.setFontSize(8);
             doc.setTextColor(100);
-            const linhasEmpresa = [empresaInfo.razao || 'MAM Control'];
+            const linhasEmpresa = [empresaInfo.razao || 'Acess Control'];
             if (empresaInfo.cnpj)     linhasEmpresa.push(`CNPJ: ${empresaInfo.cnpj}`);
             if (empresaInfo.endereco) linhasEmpresa.push(empresaInfo.endereco);
             doc.text(linhasEmpresa, 15, 30);
@@ -1609,7 +1609,7 @@
             const dataFim = document.getElementById('dataHoraFim').value;
 
             const wsData = [
-                ['MAM Control - Sistema de Controle de Acesso'],
+                ['Acess Control - Sistema de Controle de Acesso'],
                 [empresaInfo.razao],
                 [`CNPJ: ${empresaInfo.cnpj}`],
                 [empresaInfo.endereco],
@@ -1665,7 +1665,7 @@
             const dataFim = document.getElementById('dataHoraFim').value;
 
             const csvContent = [
-                ['MAM Control - Sistema de Controle de Acesso'],
+                ['Acess Control - Sistema de Controle de Acesso'],
                 [empresaInfo.razao],
                 [`CNPJ: ${empresaInfo.cnpj}`],
                 [empresaInfo.endereco],

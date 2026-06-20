@@ -3,7 +3,7 @@ import dbManager from '../config/database.js';
 
 // Helper: retorna conexão com o banco master onde ficam as tabelas de preços
 async function getMasterDb() {
-  return dbManager.getConnection('mamcontrolmam');
+  return dbManager.getConnection('acesscontrolmaster');
 }
 
 // Get all price tables
@@ -19,7 +19,7 @@ export const getPriceTables = asyncHandler(async (req, res) => {
     }
     res.json({ success: true, data: tables });
   } finally {
-    await dbManager.closeConnection('mamcontrolmam');
+    await dbManager.closeConnection('acesscontrolmaster');
   }
 });
 
@@ -36,7 +36,7 @@ export const getPriceTable = asyncHandler(async (req, res) => {
     );
     res.json({ success: true, data: table });
   } finally {
-    await dbManager.closeConnection('mamcontrolmam');
+    await dbManager.closeConnection('acesscontrolmaster');
   }
 });
 
@@ -61,7 +61,7 @@ export const createPriceTable = asyncHandler(async (req, res) => {
     }
     res.json({ success: true, message: 'Tabela de preços criada com sucesso', data: { id: tableId } });
   } finally {
-    await dbManager.closeConnection('mamcontrolmam');
+    await dbManager.closeConnection('acesscontrolmaster');
   }
 });
 
@@ -88,7 +88,7 @@ export const updatePriceTable = asyncHandler(async (req, res) => {
     }
     res.json({ success: true, message: 'Tabela de preços atualizada com sucesso' });
   } finally {
-    await dbManager.closeConnection('mamcontrolmam');
+    await dbManager.closeConnection('acesscontrolmaster');
   }
 });
 
@@ -103,7 +103,7 @@ export const deletePriceTable = asyncHandler(async (req, res) => {
     await db.run('DELETE FROM price_tables WHERE id = ?', [id]);
     res.json({ success: true, message: 'Tabela de preços excluída com sucesso' });
   } finally {
-    await dbManager.closeConnection('mamcontrolmam');
+    await dbManager.closeConnection('acesscontrolmaster');
   }
 });
 
@@ -172,6 +172,6 @@ export const calculatePrice = asyncHandler(async (req, res) => {
         } 
     });
   } finally {
-    await dbManager.closeConnection('mamcontrolmam');
+    await dbManager.closeConnection('acesscontrolmaster');
   }
 });

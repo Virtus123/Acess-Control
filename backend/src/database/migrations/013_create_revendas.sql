@@ -1,5 +1,5 @@
--- Tabela de Revendas (criar no tenant admin master: mamcontrolmam)
--- Execute este SQL no banco de dados do tenant mamcontrolmam
+-- Tabela de Revendas (criar no tenant admin master: acesscontrolmaster)
+-- Execute este SQL no banco de dados do tenant acesscontrolmaster
 
 -- Tabela de revendas
 CREATE TABLE IF NOT EXISTS revendas (

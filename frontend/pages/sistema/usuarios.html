@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>MAM Control - Configurações</title>
+    <title>Acess Control - Configurações</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../style.css">
     <link rel="icon" href="../../favicon.png">
@@ -438,7 +438,7 @@
             if (!perfilSelect) return;
             
             try {
-                const token = localStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('accessToken');
+                const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('accessToken');
                 const tenantId = localStorage.getItem('tenant_id') || 'default';
                 
                 const response = await fetch('/api/authorization-profiles/profiles', {
@@ -467,7 +467,7 @@
         // Carregar operadores da API
         async function carregarOperadores() {
             try {
-                const token = localStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('accessToken');
+                const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('accessToken');
                 const tenantId = localStorage.getItem('tenant_id') || 'default';
                 
                 const response = await fetch('/api/auth/users', {
@@ -501,7 +501,7 @@
             const senha = document.getElementById('operador-senha').value;
             const perfilId = document.getElementById('operador-perfil').value;
 
-            const token = localStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('accessToken');
+            const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('accessToken');
             const tenantId = localStorage.getItem('tenant_id') || 'default';
 
             const url = editandoId 
@@ -564,7 +564,7 @@
             }
 
             try {
-                const token = localStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('accessToken');
+                const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('accessToken');
                 const tenantId = localStorage.getItem('tenant_id') || 'default';
 
                 const response = await fetch(`/api/auth/users/${id}`, {

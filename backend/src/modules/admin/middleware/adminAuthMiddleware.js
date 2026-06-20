@@ -43,7 +43,7 @@ export const adminAuthMiddleware = (req, res, next) => {
         req.user = {
             ...req.admin,
             is_master: decoded.role === 'super_admin',
-            tenant_id: process.env.SYSTEM_TENANT_ID || 'mamcontrolmam' // Contexto master
+            tenant_id: process.env.SYSTEM_TENANT_ID || 'acesscontrolmaster' // Contexto master
         };
 
         // DEBUG: Imprimir payload de quem passou no middleware

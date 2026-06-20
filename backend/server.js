@@ -43,8 +43,8 @@ let server;
 let protocol = 'HTTP';
 
 // Verificar se temos certificados SSL disponíveis
-const certPath = process.env.SSL_CERT_PATH || '/etc/letsencrypt/live/mamcontrol.com.br/fullchain.pem';
-const keyPath = process.env.SSL_KEY_PATH || '/etc/letsencrypt/live/mamcontrol.com.br/privkey.pem';
+const certPath = process.env.SSL_CERT_PATH || '/etc/letsencrypt/live/example.com/fullchain.pem';
+const keyPath = process.env.SSL_KEY_PATH || '/etc/letsencrypt/live/example.com/privkey.pem';
 
 if (process.env.USE_HTTPS === 'true' && existsSync(certPath) && existsSync(keyPath)) {
   try {
@@ -102,9 +102,9 @@ if (isVpsProduction) {
 app.use(compression());
 
 const whitelist = [
-  'https://mamcontrol.com.br',
-  'https://www.mamcontrol.com.br',
-  process.env.FRONTEND_URL || 'https://mamcontrol.com.br'
+  'https://example.com',
+  'https://www.example.com',
+  process.env.FRONTEND_URL || 'https://example.com'
 ];
 
 app.use(cors({
@@ -175,11 +175,11 @@ app.use((req, res, next) => {
  *     tags: [Geral]
  *     responses:
  *       200:
- *         description: Bem-vindo à API MAM Control
+ *         description: Bem-vindo à API Acess Control
  */
 app.get('/api', (req, res) => {
   res.json({
-    message: 'MAM Control API',
+    message: 'Acess Control API',
     version: '1.0.0',
     status: 'running',
     endpoints: {
@@ -223,7 +223,7 @@ app.get('/api-docs/v1/swagger.json', (req, res) => {
 
 // Swagger UI versionado
 app.use('/api-docs/v1', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-  customSiteTitle: "MAM Control API v1 Documentation",
+  customSiteTitle: "Acess Control API v1 Documentation",
   swaggerOptions: {
     persistAuthorization: true,
     url: '/api-docs/v1/swagger.json',
@@ -301,7 +301,7 @@ async function startServer() {
     console.log(`🚀 Iniciando servidor na porta ${PORT}...`);
     server.listen(PORT, '0.0.0.0', () => { // Bind em Localhost para evitar bypass
       console.log(`\n✅ ====================================`);
-      console.log(`✅ MAM Control API`);
+      console.log(`✅ Acess Control API`);
       console.log(`✅ Porta: ${PORT}`);
       console.log(`✅ Ambiente: ${process.env.NODE_ENV || 'development'}`);
       console.log(`✅ URL: http://<seu-ip>:${PORT}/api`);

@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>MAM Control - Suporte Técnico</title>
+    <title>Acess Control - Suporte Técnico</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="./favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -630,8 +630,8 @@
                 
                 // Email 1 - Notificação para o suporte
                 await resend.emails.send({
-                    from: 'contato@mamcontrol.com.br',
-                    to: 'suporte' + '@' + 'mamcontrol.com.br', // Email de destino ofuscado
+                    from: 'contato@example.com',
+                    to: 'suporte' + '@' + 'example.com', // Email de destino ofuscado
                     subject: `Novo contato de suporte - ${protocolo}`,
                     html: `
                         <h2>Novo contato recebido</h2>
@@ -657,9 +657,9 @@
                 
                 // Email 2 - Confirmação para o cliente
                 await resend.emails.send({
-                    from: 'contato@mamcontrol.com.br',
+                    from: 'contato@example.com',
                     to: email,
-                    subject: 'Recebemos seu contato - MAM Control',
+                    subject: 'Recebemos seu contato - Acess Control',
                     html: `
                         <h2>Olá, ${nome}!</h2>
                         
@@ -678,7 +678,7 @@
                         <hr>
                         
                         <p style="color: #666; font-size: 14px;">
-                            <strong>MAM Control</strong><br>
+                            <strong>Acess Control</strong><br>
                             Sistema de Controle de Acesso
                         </p>
                         

@@ -6,7 +6,7 @@ import fs from 'fs';
 const tenantId = process.argv[2] || 'haofices';
 const candidates = [
   join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'database', 'tenants', `tenant_${tenantId}.db`),
-  `C:/ProgramData/MAMControl/backend/database/tenants/tenant_${tenantId}.db`,
+  `C:/ProgramData/AcessControl/backend/database/tenants/tenant_${tenantId}.db`,
 ];
 
 const dbPath = candidates.find(p => fs.existsSync(p));

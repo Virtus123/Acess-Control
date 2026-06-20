@@ -1,5 +1,5 @@
 -- Migration 048: Fix face_queue photo_url NOT NULL constraint
--- Execute diretamente com: sqlite3 database/tenants/tenant_mamsolucoes.db < src/database/migrations/048_fix_face_queue_photo_url.sql
+-- Execute diretamente com: sqlite3 database/tenants/tenant_demo.db < src/database/migrations/048_fix_face_queue_photo_url.sql
 
 -- Primeiro, remover tabela temporária se existir
 DROP TABLE IF EXISTS face_queue_old;

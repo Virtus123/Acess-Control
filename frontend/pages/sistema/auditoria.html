@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>MAM Control - Auditoria</title>
+    <title>Acess Control - Auditoria</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../style.css">
     <link rel="icon" href="../../favicon.png">
@@ -382,7 +382,7 @@
             const entity = document.getElementById('filter-entity').value;
 
             try {
-                const token = localStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('accessToken');
+                const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('accessToken');
                 const tenantId = localStorage.getItem('tenant_id') || 'default';
                 
                 let url = `/api/audit?page=${page}&limit=${limit}`;
@@ -478,7 +478,7 @@
 
         async function viewDetails(id) {
             try {
-                const token = localStorage.getItem('mamcontrol_accessToken') || localStorage.getItem('accessToken');
+                const token = localStorage.getItem('acesscontrol_accessToken') || localStorage.getItem('accessToken');
                 const tenantId = localStorage.getItem('tenant_id') || 'default';
                 
                 const response = await fetch(`/api/audit/${id}`, {

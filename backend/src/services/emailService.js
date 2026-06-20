@@ -55,7 +55,7 @@ class EmailService {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
       },
-      from: process.env.EMAIL_FROM || '"MAM Control" <noreply@mamsolucoes.com.br>'
+      from: process.env.EMAIL_FROM || '"Acess Control" <noreply@example.com>'
     };
 
     try {
@@ -381,10 +381,10 @@ class EmailService {
    * Email de boas-vindas para novos tenants
    */
   sendTenantCreatedEmail(email, tenantId, password, companyName) {
-    const assunto = `Bem-vindo ao MAM Control - ${companyName}`;
+    const assunto = `Bem-vindo ao Acess Control - ${companyName}`;
     const corpo = `
       <h3>Olá, administrador da empresa ${companyName}!</h3>
-      <p>Sua base de dados foi criada com sucesso no sistema MAM Control.</p>
+      <p>Sua base de dados foi criada com sucesso no sistema Acess Control.</p>
       <p>Abaixo estão suas credenciais de acesso:</p>
       <table class="info-table">
         <tr><td class="label">ID da Unidade:</td><td><strong>${tenantId}</strong></td></tr>
@@ -402,7 +402,7 @@ class EmailService {
    * Email de reset de senha para admins de tenant
    */
   sendPasswordResetEmail(email, tenantId, newPassword) {
-    const assunto = 'Nova Senha Gerada - MAM Control';
+    const assunto = 'Nova Senha Gerada - Acess Control';
     const corpo = `
       <h3>Redefinição de Senha</h3>
       <p>Conforme solicitado, uma nova senha foi gerada para o seu acesso à unidade <strong>${tenantId}</strong>.</p>
@@ -705,14 +705,14 @@ class EmailService {
       <body>
         <div class="container">
           <div class="header">
-            <h2 style="margin:0;">MAM Control Alert</h2>
+            <h2 style="margin:0;">Acess Control Alert</h2>
           </div>
           <div class="content">
             ${corpo.replace(/\n/g, '<br>')}
           </div>
           <div class="footer">
-            Este é um e-mail automático do sistema MAM Control.<br>
-            &copy; ${new Date().getFullYear()} MAM Soluções em Tecnologia.
+            Este é um e-mail automático do sistema Acess Control.<br>
+            &copy; ${new Date().getFullYear()} Acess Control.
           </div>
         </div>
       </body>

@@ -132,7 +132,7 @@ export const solicitarResetCode = async (req, res) => {
           </p>
         </div>
         <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
-          <p>© ${new Date().getFullYear()} MAM Control - Sistema de Controle de Acesso</p>
+          <p>© ${new Date().getFullYear()} Acess Control - Sistema de Controle de Acesso</p>
         </div>
       </div>
     `;

@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>MAM Control - Monitoramento de Acessos</title>
+    <title>Acess Control - Monitoramento de Acessos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../style.css">
     <link rel="icon" href="../../favicon.png">
@@ -1976,8 +1976,8 @@
         // Função helper para fazer fetch com headers corretos
         async function apiFetch(url, options = {}) {
             // Obter tenant do localStorage ou usar padrão
-            const tenantId = localStorage.getItem('mamcontrol_tenant') || 'mamsolucoes';
-            const accessToken = localStorage.getItem('mamcontrol_accessToken') || '';
+            const tenantId = localStorage.getItem('acesscontrol_tenant') || 'demo';
+            const accessToken = localStorage.getItem('acesscontrol_accessToken') || '';
             const headers = {
                 'Content-Type': 'application/json',
                 'X-Tenant-ID': tenantId
@@ -2414,7 +2414,7 @@
         }
 
         function liberarAcesso() {
-            const tenantId = localStorage.getItem('mamcontrol_tenant') || 'mamsolucoes';
+            const tenantId = localStorage.getItem('acesscontrol_tenant') || 'demo';
 
             // Se há um acesso selecionado, usar o equipamento dele
             // Se não, usar o primeiro equipamento disponível
@@ -2464,7 +2464,7 @@
 
         // Função para ativar/desativar modo emergência (envia para TODOS os equipamentos)
         async function toggleModoEmergencia() {
-            const tenantId = localStorage.getItem('mamcontrol_tenant') || 'mamsolucoes';
+            const tenantId = localStorage.getItem('acesscontrol_tenant') || 'demo';
             const btn = document.getElementById('btn-emergency');
             const indicator = document.getElementById('emergency-indicator');
             const isCurrentlyActive = btn.classList.contains('active');
@@ -2555,7 +2555,7 @@
 
         // Função para verificar status de emergência ao carregar a página
         async function checkEmergencyStatus() {
-            const tenantId = localStorage.getItem('mamcontrol_tenant') || 'mamsolucoes';
+            const tenantId = localStorage.getItem('acesscontrol_tenant') || 'demo';
 
             try {
                 const response = await fetch(`${API_BASE}/api/access-tasks/status?tenant_id=${tenantId}`, {
@@ -3753,7 +3753,7 @@
                 NotificationSystem.showToast('warning', 'Equipamento', 'Equipamento sem código validador.');
                 return;
             }
-            const tenantId = localStorage.getItem('mamcontrol_tenant') || 'mamsolucoes';
+            const tenantId = localStorage.getItem('acesscontrol_tenant') || 'demo';
 
             try {
                 const response = await fetch(`${API_BASE}/api/access-tasks`, {

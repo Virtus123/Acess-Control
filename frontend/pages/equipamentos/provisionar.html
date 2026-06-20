@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <title>MAM Control - Provisionar Equipamento Push</title>
+    <title>Acess Control - Provisionar Equipamento Push</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../style.css">
     <link rel="icon" href="../../favicon.png">
@@ -51,14 +51,14 @@
 <body>
 <div class="container">
     <h1><i class="fas fa-cogs"></i> Provisionar Equipamento Push</h1>
-    <p class="subtitle">Aponte um equipamento Control iD para o MAM Push Service. Roda 100% no navegador — sem instalar nada.</p>
+    <p class="subtitle">Aponte um equipamento Control iD para o Push Service. Roda 100% no navegador — sem instalar nada.</p>
 
     <div class="alert alert-info">
         <i class="fas fa-info-circle"></i>
         <div>
             <strong>Como funciona:</strong> seu navegador (esta página) faz as chamadas direto no IP local do equipamento.
             Por isso só funciona se você estiver na <strong>mesma rede</strong> do equipamento.
-            Se o site MAMCONTROL estiver em HTTPS, o navegador pode bloquear acesso ao equip em HTTP — abra esta página por HTTP nesse caso.
+            Se o site Acess Control estiver em HTTPS, o navegador pode bloquear acesso ao equip em HTTP — abra esta página por HTTP nesse caso.
         </div>
     </div>
 
@@ -88,11 +88,11 @@
     </div>
 
     <div class="card">
-        <h2><span class="step">2</span> MAM Push Service</h2>
+        <h2><span class="step">2</span> Push Service</h2>
         <div class="grid">
             <div class="full">
                 <label>Host/IP do servidor (o equipamento precisa alcançar isso)</label>
-                <input id="srv-host" type="text" placeholder="mamcontrol.com.br ou IP da máquina rodando o Push">
+                <input id="srv-host" type="text" placeholder="example.com ou IP da máquina rodando o Push">
             </div>
             <div>
                 <label>Porta</label>
@@ -104,7 +104,7 @@
             </div>
             <div class="full">
                 <label>Nome do server (cosmético)</label>
-                <input id="srv-name" type="text" value="mam-push">
+                <input id="srv-name" type="text" value="acess-push">
             </div>
         </div>
         <div class="btn-row">
@@ -168,7 +168,7 @@ function readForm() {
         srvHost: document.getElementById('srv-host').value.trim(),
         srvPort: document.getElementById('srv-port').value.trim() || '3001',
         srvId: parseInt(document.getElementById('srv-id').value || '5', 10),
-        srvName: document.getElementById('srv-name').value.trim() || 'mam-push',
+        srvName: document.getElementById('srv-name').value.trim() || 'acess-push',
     };
 }
 
@@ -311,7 +311,7 @@ class Provisionador {
         const serial = await this.getSerial();
         if (serial) {
             log(`      → serial detectado: ${serial}`, 'ok');
-            log('      → IMPORTANTE: cadastre o equipamento no MAMCONTROL', 'warn');
+            log('      → IMPORTANTE: cadastre o equipamento no Acess Control', 'warn');
             log(`        com VALIDADOR=${serial} antes de habilitar Push.`, 'warn');
         } else {
             log('      ⚠ serial não detectado (info.fcgi sem campo) — siga em frente.', 'warn');
@@ -389,7 +389,7 @@ async function provision() {
     try {
         const serial = await p.runAll();
         const msg = serial
-            ? `Equipamento configurado.\n\nSerial/validador: ${serial}\n\nCadastre esse validador no MAMCONTROL se ainda não estiver, e habilite Push.`
+            ? `Equipamento configurado.\n\nSerial/validador: ${serial}\n\nCadastre esse validador no Acess Control se ainda não estiver, e habilite Push.`
             : 'Equipamento configurado.';
         alert(msg);
     } catch (e) {
@@ -401,7 +401,7 @@ async function provision() {
 async function deprovision() {
     const f = readForm();
     if (!validateEquip(f)) return;
-    if (!confirm('Tirar o equipamento do modo Push?\n\nEle vai parar de chegar no servidor MAM Push.')) return;
+    if (!confirm('Tirar o equipamento do modo Push?\n\nEle vai parar de chegar no servidor Push Service.')) return;
 
     const p = new Provisionador(f);
     try {

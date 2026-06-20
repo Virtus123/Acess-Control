@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'nexis-backend',
+      name: 'acess-control-backend',
       script: './server.js',
       instances: 'max',
       exec_mode: 'cluster',
@@ -9,8 +9,8 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: 3000,
         HOST: '0.0.0.0',
-        BASE_URL: 'https://mamcontrol.com.br',
-        FRONTEND_URL: 'https://mamcontrol.com.br'
+        BASE_URL: 'https://example.com',
+        FRONTEND_URL: 'https://example.com'
       },
       error_file: './logs/pm2-error.log',
       out_file: './logs/pm2-out.log',

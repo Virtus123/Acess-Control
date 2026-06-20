@@ -14,7 +14,7 @@ import logger from './logger.js';
 const INTERVAL_MS = parseInt(process.env.PUSH_BRIDGE_MONITOR_MS || '60000', 10);
 const STUCK_SYNC_MINUTES = parseInt(process.env.PUSH_STUCK_SYNC_MIN || '5', 10);
 
-const SYSTEM_TENANTS = new Set(['mamcontrolmam']);
+const SYSTEM_TENANTS = new Set(['acesscontrolmaster']);
 
 let timer = null;
 

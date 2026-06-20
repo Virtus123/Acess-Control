@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Master - MAM Control</title>
+    <title>Admin Master - Acess Control</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -119,7 +119,7 @@
         <form id="master-login-form" method="POST">
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" placeholder="admin@mamcontrol.com.br" required>
+                <input type="email" id="email" placeholder="admin@example.com" required>
             </div>
             
             <div class="form-group">
@@ -169,8 +169,8 @@
                 
                 if (result.success) {
                     // Salvar dados da sessão master
-                    localStorage.setItem('mamcontrol_master_token', result.data.accessToken);
-                    localStorage.setItem('mamcontrol_master_user', JSON.stringify(result.data.user));
+                    localStorage.setItem('acesscontrol_master_token', result.data.accessToken);
+                    localStorage.setItem('acesscontrol_master_user', JSON.stringify(result.data.user));
                     
                     // Redirecionar para create-tenant
                     window.location.href = './create-tenant.html';

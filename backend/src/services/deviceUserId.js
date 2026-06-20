@@ -1,10 +1,10 @@
 // =============================================================================
-// deviceUserId — mapeamento entre MAMCONTROL e id na tabela `users` do equipamento
+// deviceUserId — mapeamento entre Acess Control e id na tabela `users` do equipamento
 // =============================================================================
 //
 // REGRA DE PRODUÇÃO (compatível com Comunicador legado):
 //   O `id` do usuário no equipamento Control iD é a MATRÍCULA (registration_number)
-//   do MAMCONTROL. Toda a lógica do autorizador busca por registration_number.
+//   do Acess Control. Toda a lógica do autorizador busca por registration_number.
 //
 // Fallback (sem matrícula):
 //   • Pessoa → usa persons.id (autoincrement). Convivem porque persons.id é
