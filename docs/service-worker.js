@@ -5,7 +5,9 @@ const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/logo.jpg'
+  '/logo.svg',
+  '/logo.png',
+  '/favicon.svg'
 ];
 
 // Evento de instalação

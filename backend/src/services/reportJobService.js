@@ -513,7 +513,7 @@ class ReportJobService {
     } catch(e) {}
 
     // Caminho da logo
-    const logoPath = join(__dirname, '..', '..', '..', 'frontend', 'logo.jpg');
+    const logoPath = join(__dirname, '..', '..', '..', 'frontend', 'logo.png');
 
     return new Promise((resolve, reject) => {
       const ML = 35;  // margem esquerda

@@ -50,7 +50,7 @@ function getSidebar() {
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
-                    <img src="${prefix}favicon.png" alt="Acess Control" draggable="false">
+                    <img src="${prefix}logo.svg" alt="Acess Control" draggable="false">
                     <div class="logo-text">
                         <h2>Acess Control</h2>
                         <small>Sistema de Controle</small>

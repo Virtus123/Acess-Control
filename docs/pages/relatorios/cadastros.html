@@ -987,7 +987,7 @@
         // ── Carregar logo como base64 ─────────────────────────────────────────
         async function carregarLogo() {
             try {
-                const resp = await fetch('../../logo.jpg');
+                const resp = await fetch('../../logo.png');
                 if (!resp.ok) return;
                 const blob = await resp.blob();
                 const reader = new FileReader();

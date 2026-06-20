@@ -4,29 +4,21 @@
   "id": "/",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#24A751",
+  "background_color": "#0f172a",
+  "theme_color": "#4361ee",
   "description": "Sistema de controle de acesso e visitantes",
   "icons": [
     {
-      "src": "/logo.jpg",
-      "sizes": "1024x1024",
-      "type": "image/jpeg",
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/logo.jpg",
-      "sizes": "1024x1024",
-      "type": "image/jpeg",
-      "form_factor": "wide"
     },
     {
-      "src": "/logo.jpg",
-      "sizes": "1024x1024",
-      "type": "image/jpeg",
-      "form_factor": "narrow"
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
   ]
 }

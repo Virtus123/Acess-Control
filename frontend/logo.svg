@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 120" role="img" aria-label="Acess Control">
+  <defs>
+    <linearGradient id="ac-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4361ee"/>
+      <stop offset="100%" stop-color="#4cc9f0"/>
+    </linearGradient>
+  </defs>
+  <rect width="360" height="120" rx="20" fill="#0f172a"/>
+  <g transform="translate(28, 20)">
+    <path d="M32 8 L32 58 Q32 78 52 88 Q72 78 72 58 L72 8 Z" fill="url(#ac-gradient)"/>
+    <path d="M42 38 L50 48 L62 32" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="52" cy="22" r="6" fill="#ffffff" opacity="0.95"/>
+  </g>
+  <text x="118" y="54" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700">Acess Control</text>
+  <text x="118" y="82" fill="#94a3b8" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="500">Controle de Acesso Inteligente</text>
+</svg>
